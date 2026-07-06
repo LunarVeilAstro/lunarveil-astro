@@ -1,0 +1,3311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔮 星盘解读 · 命运之轮</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #0a0a12;
+  --card: #12121f;
+  --gold: #c9a96e;
+  --gold-dim: #8a7040;
+  --purple: #2d1b4e;
+  --purple-light: #4a2d7a;
+  --text: #c8c8d0;
+  --text-dim: #7a7a8a;
+  --accent: #e8d5a3;
+  --border: #1e1e35;
+  --red: #a04040;
+  --green: #5a8a5a;
+  --blue: #4a6a9a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Georgia', 'Noto Serif SC', 'SimSun', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Starry Canvas ─────────────────────────────────────────────────────── */
+#stars {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events: none; z-index:0;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.container {
+  position: relative; z-index:1;
+  max-width: 900px; margin: 0 auto; padding: 20px;
+}
+header {
+  text-align: center; padding: 40px 20px 20px;
+}
+header h1 {
+  font-size: 2.4em; color: var(--accent);
+  text-shadow: 0 0 40px rgba(201,169,110,0.3);
+  letter-spacing: 0.15em; font-weight: normal;
+}
+header .subtitle {
+  color: var(--text-dim); font-size: 0.95em;
+  margin-top: 8px; letter-spacing: 0.1em;
+}
+
+/* ── Cards ──────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px; margin-bottom: 20px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+  position: relative;
+}
+.card::before {
+  content: ''; position: absolute; top:0; left:20px; right:20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+.card h2 {
+  color: var(--gold); font-size: 1.3em; font-weight: normal;
+  letter-spacing: 0.08em; margin-bottom: 20px;
+  text-align: center;
+}
+.card h3 {
+  color: var(--accent); font-size: 1.05em; font-weight: normal;
+  margin: 16px 0 8px; letter-spacing: 0.05em;
+}
+
+/* ── Form ───────────────────────────────────────────────────────────────── */
+.form-row {
+  display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.form-group {
+  flex: 1; min-width: 120px;
+}
+.form-group label {
+  display: block; color: var(--text-dim); font-size: 0.82em;
+  margin-bottom: 4px; letter-spacing: 0.05em;
+}
+.form-group input, .form-group select {
+  width: 100%; padding: 10px 12px;
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); font-size: 0.95em; font-family: inherit;
+  border-radius: 6px; outline: none;
+  transition: border-color 0.3s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--gold-dim);
+}
+.form-group input::placeholder { color: #3a3a50; }
+
+.geo-row { display: flex; gap: 8px; align-items: flex-end; }
+.geo-row .form-group:first-child { flex: 3; }
+.geo-row .form-group:last-child { flex: 0 0 auto; }
+.geo-status {
+  font-size: 0.78em; color: var(--text-dim); margin-top: 4px;
+  min-height: 1.2em; transition: color 0.3s;
+}
+.geo-status.success { color: #6a9a6a; }
+.geo-status.error { color: #c87070; }
+.geo-status.loading { color: var(--gold-dim); }
+.geo-btn {
+  padding: 10px 16px; font-size: 0.9em; font-family: inherit;
+  background: var(--purple); color: var(--accent);
+  border: 1px solid var(--gold-dim); border-radius: 6px;
+  cursor: pointer; white-space: nowrap; letter-spacing: 0.05em;
+  transition: all 0.3s;
+}
+.geo-btn:hover { background: var(--purple-light); }
+
+.btn-row { text-align: center; margin-top: 20px; }
+.btn {
+  padding: 12px 40px; font-size: 1.05em; font-family: inherit;
+  background: linear-gradient(135deg, var(--purple), var(--purple-light));
+  color: var(--accent); border: 1px solid var(--gold-dim);
+  border-radius: 8px; cursor: pointer; letter-spacing: 0.1em;
+  transition: all 0.3s;
+}
+.btn:hover {
+  background: linear-gradient(135deg, var(--purple-light), #5a3d9a);
+  box-shadow: 0 0 25px rgba(180,140,90,0.25);
+}
+.btn:disabled {
+  opacity: 0.4; cursor: not-allowed;
+}
+
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex; gap: 0; margin-bottom: 0; border-radius: 12px 12px 0 0;
+  overflow: hidden;
+}
+.tab {
+  flex:1; padding: 14px 8px; text-align: center; cursor: pointer;
+  background: #0e0e1a; border: 1px solid var(--border);
+  color: var(--text-dim); font-size: 0.9em; letter-spacing: 0.06em;
+  transition: all 0.3s;
+}
+.tab:first-child { border-radius: 12px 0 0 0; }
+.tab:last-child { border-radius: 0 12px 0 0; }
+.tab.active {
+  background: var(--card); color: var(--gold);
+  border-bottom-color: transparent;
+  box-shadow: 0 -2px 15px rgba(201,169,110,0.1);
+}
+.tab:hover:not(.active) { color: var(--text); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ── Chart Table ────────────────────────────────────────────────────────── */
+.chart-table {
+  width: 100%; border-collapse: collapse; margin: 12px 0;
+}
+.chart-table th {
+  color: var(--gold); font-weight: normal; font-size: 0.85em;
+  padding: 10px 8px; border-bottom: 1px solid var(--border);
+  letter-spacing: 0.05em; text-align: left;
+}
+.chart-table td {
+  padding: 8px; border-bottom: 1px solid rgba(30,30,53,0.5);
+  font-size: 0.9em;
+}
+.chart-table tr:hover td { background: rgba(255,255,255,0.02); }
+.tag {
+  display: inline-block; padding: 2px 10px; border-radius: 20px;
+  font-size: 0.8em; letter-spacing: 0.04em;
+}
+.tag-fire { background: rgba(180,100,60,0.2); color: #d4956a; }
+.tag-earth { background: rgba(100,140,80,0.2); color: #8ab87a; }
+.tag-air { background: rgba(120,140,200,0.2); color: #9ab0d8; }
+.tag-water { background: rgba(100,120,200,0.2); color: #8a9ed0; }
+
+/* ── Report Text ────────────────────────────────────────────────────────── */
+.report-section { margin-bottom: 18px; }
+.report-section p {
+  line-height: 1.9; margin-bottom: 8px; text-indent: 2em;
+  color: #b8b8c8;
+}
+.report-section .highlight {
+  color: var(--accent); font-weight: bold;
+}
+.aspect-good { color: #7ab87a; }
+.aspect-hard { color: #c87070; }
+.aspect-neutral { color: #c9a96e; }
+
+/* ── Synastry ───────────────────────────────────────────────────────────── */
+.person-section {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.person-card {
+  flex:1; min-width: 280px;
+  background: rgba(0,0,0,0.2); border-radius: 8px; padding: 16px;
+  border: 1px solid var(--border);
+}
+.person-card h3 { text-align: center; margin-top:0; }
+
+.score-display {
+  text-align: center; font-size: 2em; color: var(--accent);
+  margin: 12px 0; letter-spacing: 0.08em;
+}
+
+/* ── Tarot ──────────────────────────────────────────────────────────────── */
+.tarot-question-area {
+  display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end;
+}
+.tarot-question-area input {
+  flex: 1; padding: 12px 16px; background: var(--bg);
+  border: 1px solid var(--border); color: var(--text);
+  font-size: 1em; font-family: inherit; border-radius: 8px; outline: none;
+  transition: border-color 0.3s;
+}
+.tarot-question-area input:focus { border-color: var(--gold-dim); }
+.tarot-question-area input::placeholder { color: #3a3a50; }
+
+.spread-selector {
+  display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;
+}
+.spread-opt {
+  padding: 8px 20px; border: 1px solid var(--border); border-radius: 20px;
+  cursor: pointer; font-size: 0.85em; color: var(--text-dim);
+  transition: all 0.3s; background: transparent; font-family: inherit;
+}
+.spread-opt.active, .spread-opt:hover {
+  border-color: var(--gold-dim); color: var(--accent);
+  background: rgba(201,169,110,0.08);
+}
+
+.cards-area {
+  display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+  padding: 20px 0; min-height: 260px; align-items: center;
+  perspective: 1200px;
+}
+.tarot-card {
+  width: 140px; height: 230px; cursor: pointer;
+  position: relative; transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.tarot-card.flipped { transform: rotateY(180deg); }
+.tarot-card-inner {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+}
+.card-face {
+  position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+  border-radius: 10px; border: 2px solid var(--gold-dim);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.card-back {
+  background: linear-gradient(135deg, #1a0a2e, #2d1b4e, #1a0a2e);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 5px,
+    rgba(201,169,110,0.06) 5px, rgba(201,169,110,0.06) 10px);
+  z-index: 2;
+}
+.card-back::before {
+  content: '✦'; font-size: 2.4em; color: var(--gold-dim);
+}
+.card-back::after {
+  content: ''; position: absolute; inset: 12px; border: 1px solid rgba(201,169,110,0.3);
+  border-radius: 6px;
+}
+.card-front {
+  background: linear-gradient(180deg, #0d0d1f 0%, #141428 100%);
+  transform: rotateY(180deg); flex-direction: column; padding: 14px 10px;
+  overflow-y: auto; justify-content: flex-start;
+}
+.card-front .card-title {
+  color: var(--accent); font-size: 0.85em; letter-spacing: 0.05em;
+  margin-bottom: 4px; line-height: 1.3;
+}
+.card-front .card-suit { color: var(--text-dim); font-size: 0.7em; }
+.card-front .card-keywords {
+  color: var(--text); font-size: 0.7em; margin-top: 6px;
+  line-height: 1.5; opacity: 0.8;
+}
+.card-front .card-pos-label {
+  font-size: 0.65em; color: var(--gold); margin-bottom: 6px;
+  letter-spacing: 0.06em; border-bottom: 1px solid var(--border);
+  padding-bottom: 4px; width: 100%;
+}
+
+.card-position-label {
+  text-align: center; font-size: 0.75em; color: var(--text-dim);
+  margin-top: 2px; letter-spacing: 0.04em;
+}
+
+.draw-btn {
+  display: block; margin: 0 auto; padding: 14px 50px;
+  font-size: 1.1em; font-family: inherit;
+  background: linear-gradient(135deg, #1a0a2e, #3d1f6a);
+  color: var(--accent); border: 1px solid var(--gold-dim);
+  border-radius: 30px; cursor: pointer; letter-spacing: 0.1em;
+  transition: all 0.3s;
+}
+.draw-btn:hover {
+  background: linear-gradient(135deg, #2d1050, #5a2d9a);
+  box-shadow: 0 0 30px rgba(160,120,200,0.3);
+}
+.draw-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.tarot-interpretation {
+  margin-top: 24px; padding: 20px; background: rgba(0,0,0,0.2);
+  border-radius: 10px; border: 1px solid var(--border);
+}
+.tarot-interpretation h3 {
+  color: var(--accent); text-align: center; margin-bottom: 16px;
+  letter-spacing: 0.08em;
+}
+.tarot-interpretation .card-reading {
+  margin-bottom: 14px; padding-bottom: 14px;
+  border-bottom: 1px solid rgba(30,30,53,0.6);
+}
+.tarot-interpretation .card-reading:last-child { border-bottom: none; }
+.tarot-interpretation .card-reading h4 {
+  color: var(--gold); font-weight: normal; font-size: 0.95em;
+  margin-bottom: 6px; letter-spacing: 0.04em;
+}
+.tarot-interpretation .card-reading p {
+  color: #b8b8c8; line-height: 1.8; font-size: 0.9em; text-indent: 2em;
+}
+.tarot-interpretation .synthesis {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--gold-dim);
+}
+.tarot-interpretation .synthesis p {
+  color: var(--accent); line-height: 1.9; font-size: 0.95em;
+}
+.reversed-badge {
+  display: inline-block; padding: 1px 8px; border-radius: 10px;
+  font-size: 0.75em; background: rgba(200,100,100,0.2); color: #c87070;
+  margin-left: 6px;
+}
+
+@media (max-width: 600px) {
+  .tarot-card { width: 100px; height: 165px; }
+  .cards-area { gap: 10px; }
+}
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  header h1 { font-size: 1.6em; }
+  .form-row { flex-direction: column; gap: 8px; }
+  .tabs { flex-wrap: wrap; }
+  .tab { flex: 1 1 50%; font-size: 0.8em; padding: 10px 4px; }
+}
+
+/* ── Crystal Ball & Mystic Atmosphere ───────────────────────────────────── */
+.crystal-scene {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+.crystal-ball {
+  position: absolute; bottom: 8%; right: 6%;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%,
+    rgba(220,200,255,0.25) 0%, rgba(180,150,220,0.12) 15%,
+    rgba(100,60,160,0.08) 40%, rgba(40,20,80,0.25) 65%,
+    rgba(20,10,50,0.5) 80%, rgba(10,5,30,0.7) 100%);
+  box-shadow:
+    inset 0 0 80px rgba(160,130,220,0.2),
+    0 0 60px rgba(160,120,220,0.25),
+    0 0 140px rgba(140,100,200,0.15),
+    0 0 220px rgba(100,60,180,0.08);
+  animation: crystalPulse 4s ease-in-out infinite, crystalFloat 8s ease-in-out infinite;
+}
+.crystal-ball::before {
+  content: ''; position: absolute; top: 22%; left: 28%;
+  width: 80px; height: 50px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.3) 0%, transparent 70%);
+  transform: rotate(-20deg);
+  animation: crystalHighlight 3s ease-in-out infinite;
+}
+.crystal-ball::after {
+  content: ''; position: absolute; inset: 12%; border-radius: 50%;
+  border: 1px solid rgba(200,180,255,0.1);
+  background:
+    radial-gradient(circle at 45% 45%, rgba(200,180,255,0.05) 0%, transparent 50%),
+    radial-gradient(circle at 55% 60%, rgba(180,150,220,0.06) 0%, transparent 40%);
+  animation: mistSwirl 6s linear infinite;
+}
+.crystal-mist { position: absolute; border-radius: 50%; pointer-events: none; }
+.crystal-mist.m1 {
+  width: 120px; height: 50px; top: 55%; left: 30%;
+  background: radial-gradient(ellipse, rgba(200,180,240,0.1) 0%, transparent 70%);
+  animation: mistFloat1 7s ease-in-out infinite;
+}
+.crystal-mist.m2 {
+  width: 80px; height: 40px; top: 40%; left: 45%;
+  background: radial-gradient(ellipse, rgba(180,160,220,0.08) 0%, transparent 70%);
+  animation: mistFloat2 9s ease-in-out infinite;
+}
+.crystal-mist.m3 {
+  width: 100px; height: 35px; top: 65%; left: 35%;
+  background: radial-gradient(ellipse, rgba(200,190,240,0.07) 0%, transparent 70%);
+  animation: mistFloat3 5s ease-in-out infinite;
+}
+
+.witch-silhouette {
+  position: absolute; bottom: 2%; right: 0;
+  width: 280px; height: 440px; opacity: 0.35;
+  animation: witchBreathe 10s ease-in-out infinite;
+}
+.witch-body {
+  position: absolute; bottom: 0; right: 30px;
+  width: 140px; height: 380px; border-radius: 70px 70px 20px 20px;
+  background: linear-gradient(180deg,
+    rgba(30,15,50,0.95) 0%, rgba(20,10,40,0.9) 50%,
+    rgba(10,5,25,0.85) 100%);
+}
+.witch-hood {
+  position: absolute; bottom: 330px; right: 12px;
+  width: 135px; height: 140px;
+  background: rgba(25,12,45,0.95);
+  border-radius: 65px 65px 15px 25px;
+  clip-path: polygon(12% 5%, 88% 5%, 100% 82%, 75% 100%, 25% 100%, 0% 82%);
+}
+.witch-hood::after {
+  content: ''; position: absolute; bottom: -40px; left: 15px;
+  width: 120px; height: 90px;
+  background: radial-gradient(ellipse at center,
+    rgba(20,8,35,0.95) 0%, rgba(15,5,28,0.9) 60%, transparent 100%);
+  border-radius: 60px 60px 10px 10px;
+}
+
+.full-mist {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; opacity: 0.12;
+  background:
+    radial-gradient(ellipse at 20% 40%, rgba(150,120,220,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 60%, rgba(120,100,200,0.2) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 80%, rgba(100,80,180,0.15) 0%, transparent 40%);
+  animation: fullMistDrift 15s ease-in-out infinite;
+}
+
+@keyframes crystalPulse {
+  0%, 100% { box-shadow: inset 0 0 80px rgba(160,130,220,0.2), 0 0 60px rgba(160,120,220,0.25), 0 0 140px rgba(140,100,200,0.15), 0 0 220px rgba(100,60,180,0.08); }
+  50% { box-shadow: inset 0 0 100px rgba(170,140,230,0.3), 0 0 80px rgba(170,130,230,0.35), 0 0 180px rgba(150,110,210,0.2), 0 0 260px rgba(110,70,190,0.12); }
+}
+@keyframes crystalFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes crystalHighlight {
+  0%, 100% { opacity: 0.5; transform: rotate(-20deg) scale(1); }
+  50% { opacity: 0.8; transform: rotate(-25deg) scale(1.1); }
+}
+@keyframes mistSwirl {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes mistFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  50% { transform: translate(15px, -10px) scale(1.3); opacity: 0.9; }
+}
+@keyframes mistFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50% { transform: translate(-10px, -8px) scale(1.4); opacity: 0.8; }
+}
+@keyframes mistFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  50% { transform: translate(8px, 12px) scale(1.2); opacity: 0.7; }
+}
+@keyframes witchBreathe {
+  0%, 100% { opacity: 0.28; transform: translateY(0); }
+  50% { opacity: 0.42; transform: translateY(-6px); }
+}
+@keyframes fullMistDrift {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.16; }
+}
+
+@media (max-width: 768px) {
+  .crystal-ball { width: 180px; height: 180px; bottom: 5%; right: 3%; }
+  .crystal-ball::before { width: 50px; height: 30px; }
+  .crystal-mist.m1 { width: 70px; height: 30px; }
+  .crystal-mist.m2 { width: 50px; height: 25px; }
+  .crystal-mist.m3 { width: 60px; height: 22px; }
+  .witch-silhouette { width: 180px; height: 300px; }
+  .witch-body { width: 90px; height: 260px; right: 20px; }
+  .witch-hood { width: 85px; height: 95px; bottom: 225px; right: 8px; }
+}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="crystal-scene">
+  <div class="crystal-ball">
+    <div class="crystal-mist m1"></div>
+    <div class="crystal-mist m2"></div>
+    <div class="crystal-mist m3"></div>
+  </div>
+  <div class="witch-silhouette">
+    <div class="witch-hood"></div>
+    <div class="witch-body"></div>
+  </div>
+</div>
+<div class="full-mist"></div>
+<div class="container">
+  <header>
+    <h1>命 运 之 轮</h1>
+    <div class="subtitle">· 星盘解读 · 运势预测 · 合盘分析 ·</div>
+  </header>
+
+  <!-- ── Input Card ─────────────────────────────────────────────────────── -->
+  <div class="card" id="inputCard">
+    <h2>📡 输入出生信息</h2>
+    <div class="person-section">
+      <div class="person-card">
+        <h3>本人</h3>
+        <div class="form-row">
+          <div class="form-group"><label>出生日期</label><input type="date" id="p1_date" value="1995-07-12"></div>
+          <div class="form-group"><label>出生时间</label><input type="time" id="p1_time" value="02:45" step="60"></div>
+          <div class="form-group">
+            <label>时区 (UTC)</label>
+            <select id="p1_tz">
+              <option value="-12">UTC-12</option><option value="-11">UTC-11</option><option value="-10">UTC-10 (夏威夷)</option>
+              <option value="-9">UTC-9</option><option value="-8">UTC-8 (洛杉矶)</option><option value="-7">UTC-7 (丹佛)</option>
+              <option value="-6">UTC-6 (墨西哥城)</option><option value="-5">UTC-5 (纽约)</option><option value="-4">UTC-4</option>
+              <option value="-3">UTC-3 (巴西)</option><option value="-2">UTC-2</option><option value="-1">UTC-1</option>
+              <option value="0">UTC+0 (伦敦)</option><option value="1">UTC+1 (巴黎)</option><option value="2">UTC+2</option>
+              <option value="3">UTC+3 (莫斯科)</option><option value="4">UTC+4 (迪拜)</option>
+              <option value="5">UTC+5</option><option value="5.5">UTC+5:30 (印度)</option><option value="6">UTC+6</option>
+              <option value="7">UTC+7 (曼谷)</option><option value="8" selected>UTC+8 (北京)</option>
+              <option value="9">UTC+9 (东京)</option><option value="10">UTC+10 (悉尼)</option>
+              <option value="11">UTC+11</option><option value="12">UTC+12 (奥克兰)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:3">
+            <label>出生地点 (城市/地址)</label>
+            <div class="geo-row">
+              <div class="form-group" style="margin-bottom:0"><input type="text" id="p1_addr" value="宁夏银川" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p1')"></div>
+              <div class="form-group" style="margin-bottom:0"><button class="geo-btn" onclick="geocode('p1')">🔍 定位</button></div>
+            </div>
+            <div class="geo-status" id="p1_geo_status">✅ 宁夏银川 · 38.47°N, 106.27°E · UTC+8</div>
+          </div>
+        </div>
+        <input type="hidden" id="p1_lat" value="38.466">
+        <input type="hidden" id="p1_lng" value="106.267">
+        <div id="p1_manual" style="display:none; margin-top:8px;">
+          <div class="form-row">
+            <div class="form-group"><label>纬度</label><input type="number" id="p1_lat_m" step="0.001" placeholder="如 38.466"></div>
+            <div class="form-group"><label>经度</label><input type="number" id="p1_lng_m" step="0.001" placeholder="如 106.267"></div>
+          </div>
+        </div>
+      </div>
+      <div class="person-card" id="p2Card">
+        <h3>对方 (合盘用)</h3>
+        <div class="form-row">
+          <div class="form-group"><label>出生日期</label><input type="date" id="p2_date"></div>
+          <div class="form-group"><label>出生时间</label><input type="time" id="p2_time" step="60"></div>
+          <div class="form-group">
+            <label>时区 (UTC)</label>
+            <select id="p2_tz">
+              <option value="-12">UTC-12</option><option value="-11">UTC-11</option><option value="-10">UTC-10 (夏威夷)</option>
+              <option value="-9">UTC-9</option><option value="-8">UTC-8 (洛杉矶)</option><option value="-7">UTC-7 (丹佛)</option>
+              <option value="-6">UTC-6 (墨西哥城)</option><option value="-5">UTC-5 (纽约)</option><option value="-4">UTC-4</option>
+              <option value="-3">UTC-3 (巴西)</option><option value="-2">UTC-2</option><option value="-1">UTC-1</option>
+              <option value="0">UTC+0 (伦敦)</option><option value="1">UTC+1 (巴黎)</option><option value="2">UTC+2</option>
+              <option value="3">UTC+3 (莫斯科)</option><option value="4">UTC+4 (迪拜)</option>
+              <option value="5">UTC+5</option><option value="5.5">UTC+5:30 (印度)</option><option value="6">UTC+6</option>
+              <option value="7">UTC+7 (曼谷)</option><option value="8" selected>UTC+8 (北京)</option>
+              <option value="9">UTC+9 (东京)</option><option value="10">UTC+10 (悉尼)</option>
+              <option value="11">UTC+11</option><option value="12">UTC+12 (奥克兰)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:3">
+            <label>出生地点 (城市/地址)</label>
+            <div class="geo-row">
+              <div class="form-group" style="margin-bottom:0"><input type="text" id="p2_addr" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p2')"></div>
+              <div class="form-group" style="margin-bottom:0"><button class="geo-btn" onclick="geocode('p2')">🔍 定位</button></div>
+            </div>
+            <div class="geo-status" id="p2_geo_status"></div>
+          </div>
+        </div>
+        <input type="hidden" id="p2_lat" value="">
+        <input type="hidden" id="p2_lng" value="">
+        <div id="p2_manual" style="display:none; margin-top:8px;">
+          <div class="form-row">
+            <div class="form-group"><label>纬度</label><input type="number" id="p2_lat_m" step="0.001" placeholder="如 38.466"></div>
+            <div class="form-group"><label>经度</label><input type="number" id="p2_lng_m" step="0.001" placeholder="如 106.267"></div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="calculateAll()">✦  解 读 星 盘  ✦</button>
+    </div>
+  </div>
+
+  <!-- ── Results ────────────────────────────────────────────────────────── -->
+  <div class="card" id="resultsCard" style="display:none">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(0)">本命星盘</div>
+      <div class="tab" onclick="switchTab(1)">五年运势</div>
+      <div class="tab" onclick="switchTab(2)">合盘缘分</div>
+      <div class="tab" onclick="switchTab(3)">星盘指引</div>
+      <div class="tab" onclick="switchTab(4)">塔罗占卜</div>
+    </div>
+
+    <div class="tab-content active" id="tab0"></div>
+    <div class="tab-content" id="tab1"></div>
+    <div class="tab-content" id="tab2"></div>
+    <div class="tab-content" id="tab3"></div>
+    <div class="tab-content" id="tab4"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  STARFIELD BACKGROUND
+// ═══════════════════════════════════════════════════════════════════════════
+(function() {
+  const c = document.getElementById('stars');
+  const ctx = c.getContext('2d');
+  let stars = [];
+  function resize() {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 120; i++) {
+    stars.push({
+      x: Math.random() * c.width, y: Math.random() * c.height,
+      r: Math.random() * 1.5 + 0.3,
+      twinkle: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.02 + 0.005
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    for (const s of stars) {
+      s.twinkle += s.speed;
+      const alpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(s.twinkle));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,190,160,${alpha})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize', () => {
+    for (const s of stars) {
+      s.x = Math.random() * c.width;
+      s.y = Math.random() * c.height;
+    }
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CONSTANTS & HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+const SIGNS = [
+  "白羊座♈","金牛座♉","双子座♊","巨蟹座♋",
+  "狮子座♌","处女座♍","天秤座♎","天蝎座♏",
+  "射手座♐","摩羯座♑","水瓶座♒","双鱼座♓"
+];
+const SIGN_PURE = ["白羊座","金牛座","双子座","巨蟹座","狮子座","处女座","天秤座","天蝎座","射手座","摩羯座","水瓶座","双鱼座"];
+
+const PLANETS = [
+  {id:"Sun",name:"太阳☉",emoji:"☉"},
+  {id:"Moon",name:"月亮☽",emoji:"☽"},
+  {id:"Mercury",name:"水星☿",emoji:"☿"},
+  {id:"Venus",name:"金星♀",emoji:"♀"},
+  {id:"Mars",name:"火星♂",emoji:"♂"},
+  {id:"Jupiter",name:"木星♃",emoji:"♃"},
+  {id:"Saturn",name:"土星♄",emoji:"♄"},
+  {id:"Uranus",name:"天王星♅",emoji:"♅"},
+  {id:"Neptune",name:"海王星♆",emoji:"♆"},
+  {id:"Pluto",name:"冥王星♇",emoji:"♇"}
+];
+
+const ELEMENTS = ["火","土","风","水","火","土","风","水","火","土","风","水"];
+const MODES = ["开创","固定","变动","开创","固定","变动","开创","固定","变动","开创","固定","变动"];
+const ELEM_EMOJI = { "火":"🔥", "土":"🌍", "风":"💨", "水":"🌊" };
+
+function mod360(x) { return ((x % 360) + 360) % 360; }
+function rad(d) { return d * Math.PI / 180; }
+function deg(r) { return mod360(r * 180 / Math.PI); }
+function sind(d) { return Math.sin(rad(d)); }
+function cosd(d) { return Math.cos(rad(d)); }
+function tand(d) { return Math.tan(rad(d)); }
+function atan2d(y, x) { return deg(Math.atan2(y, x)); }
+
+// ── Julian Date ───────────────────────────────────────────────────────────
+function julianDay(y, m, d, h) {
+  if (m <= 2) { y--; m += 12; }
+  const A = Math.floor(y / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + h / 24.0 + B - 1524.5;
+}
+
+// T in centuries since J2000.0
+function centuriesSinceJ2000(jd) {
+  return (jd - 2451545.0) / 36525.0;
+}
+
+// ── Obliquity (IAU 1980) ─────────────────────────────────────────────────
+function obliquity(T) {
+  return 23.4392911111 - 0.0130041667 * T - 0.0000001639 * T * T + 0.0000005036 * T * T * T;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  PLANETARY POSITIONS (Simplified Meeus / Keplerian)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Sun: mean anomaly + equation of center, accuracy ~0.01°
+function calcSun(T) {
+  const L = mod360(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+  const M = mod360(357.52911 + 35999.05029 * T - 0.0001537 * T * T);
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * sind(M)
+          + (0.019993 - 0.000101 * T) * sind(2 * M)
+          + 0.000289 * sind(3 * M);
+  return mod360(L + C);
+}
+
+// Moon: truncated ELP, accuracy ~0.1°
+function calcMoon(T) {
+  const Lp = mod360(218.3164591 + 481267.88134236 * T);
+  const D = mod360(297.8502042 + 445267.1115168 * T);
+  const M = mod360(357.5291092 + 35999.0502909 * T);
+  const Mp = mod360(134.9634114 + 477198.8676313 * T);
+  const F = mod360(93.2720993 + 483202.0175273 * T);
+  let lon = Lp
+    + 6.289 * sind(Mp)
+    + 1.274 * sind(2 * D - Mp)
+    + 0.658 * sind(2 * D)
+    + 0.214 * sind(2 * Mp)
+    - 0.186 * sind(M)
+    - 0.114 * sind(2 * F)
+    + 0.059 * sind(2 * D - M - Mp)
+    + 0.057 * sind(2 * D - M)
+    + 0.053 * sind(2 * D + Mp)
+    + 0.046 * sind(2 * D - M - M)
+    + 0.041 * sind(Mp - M);
+  return mod360(lon);
+}
+
+// Keplerian elements for planets (Standish approx, J2000)
+// [a, e, i, L, peri, node, rate_L, rate_peri, rate_node]  -- angles in degrees
+const ELEMS = {
+  Mercury: [0.387099, 0.205636, 7.0050, 252.2509, 77.4561, 48.3317, 149472.6746, 0.1594, -0.1231],
+  Venus:   [0.723332, 0.006777, 3.3947, 181.9798, 131.5637, 76.6808, 58517.8154, 0.0049, -0.0363],
+  Mars:    [1.523710, 0.093405, 1.8497,  -4.5534, -23.9174, 49.5581, 19140.3027, 0.4440, -0.1000],
+  Jupiter: [5.202887, 0.048498, 1.3044,  34.3515,  14.3312,100.4548,  3034.9051, 0.1725, -0.1215],
+  Saturn:  [9.536651, 0.055508, 2.4860,  50.0774,  92.5989,113.6655,  1222.0005,-0.3830, -0.0568],
+  Uranus:  [19.18916,0.046857, 0.7726, 314.1377, 172.8848, 74.0160,   428.4546,-0.0187, -0.0178],
+  Neptune: [30.06992,0.008954, 1.7700, 304.3487,  46.1344,131.7842,   218.9985,-0.0254, -0.0122],
+  Pluto:   [39.445,  0.250249,17.142,  238.955,  224.097, 110.299,     145.207, -0.561,  -0.044]
+};
+
+function trueAnomaly(M, e) {
+  M = rad(M);
+  let E = M;
+  for (let i = 0; i < 20; i++) {
+    const dE = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+    E -= dE;
+    if (Math.abs(dE) < 1e-10) break;
+  }
+  return deg(2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2)));
+}
+
+// Earth heliocentric: longitude = Sun geo + 180°, radius in AU
+function earthHelio(T) {
+  const sunGeo = calcSun(T);
+  const lon = mod360(sunGeo + 180);
+  const L = mod360(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+  const perie = mod360(102.93735 + 0.32290 * T);
+  const M = mod360(L - perie);
+  const nu = trueAnomaly(M, 0.016709);
+  const r = 1.000001 * (1 - 0.016709 * 0.016709) / (1 + 0.016709 * cosd(nu));
+  return { lon, r };
+}
+
+function calcPlanet(id, T) {
+  const e = ELEMS[id];
+  if (!e) return 0;
+  const L = mod360(e[3] + e[6] * T);
+  const peri = mod360(e[4] + e[7] * T);
+  const M = mod360(L - peri);
+  const nu = trueAnomaly(M, e[1]);
+  const lonHelio = mod360(nu + peri);
+  const r = e[0] * (1 - e[1] * e[1]) / (1 + e[1] * cosd(nu));
+  // Convert heliocentric → geocentric ecliptic
+  const earth = earthHelio(T);
+  const x = r * cosd(lonHelio) - earth.r * cosd(earth.lon);
+  const y = r * sind(lonHelio) - earth.r * sind(earth.lon);
+  return mod360(atan2d(y, x));
+}
+
+function calcAllPlanets(T) {
+  return {
+    Sun: calcSun(T),
+    Moon: calcMoon(T),
+    Mercury: calcPlanet("Mercury", T),
+    Venus: calcPlanet("Venus", T),
+    Mars: calcPlanet("Mars", T),
+    Jupiter: calcPlanet("Jupiter", T),
+    Saturn: calcPlanet("Saturn", T),
+    Uranus: calcPlanet("Uranus", T),
+    Neptune: calcPlanet("Neptune", T),
+    Pluto: calcPlanet("Pluto", T)
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  HOUSES: ASC, MC, Placidus cusps
+// ═══════════════════════════════════════════════════════════════════════════
+
+function calcHouses(jd, lat, lng, eps) {
+  const T = centuriesSinceJ2000(jd);
+  // GMST at 0h UT
+  let gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0);
+  gmst = mod360(gmst);
+  // Add longitude to get LST
+  const lst = mod360(gmst + lng);
+  const lstRad = rad(lst);
+  const latRad = rad(lat);
+  const epsRad = rad(eps);
+
+  // MC
+  const mcRad = Math.atan2(Math.sin(lstRad), Math.cos(lstRad) * Math.cos(epsRad));
+  const mc = mod360(deg(mcRad));
+
+  // ASC
+  const y = Math.sin(epsRad) * Math.tan(latRad) + Math.cos(epsRad) * Math.sin(lstRad);
+  let ascRad = Math.atan2(-Math.cos(lstRad), y);
+  let asc = mod360(deg(ascRad));
+  // Quadrant check
+  const raAsc = eclToRA(asc, eps);
+  if (eastwardSpan(lst, raAsc) > 180) {
+    asc = mod360(asc + 180);
+  }
+
+  const ic = mod360(mc + 180);
+  const dsc = mod360(asc + 180);
+
+  // Placidus cusps
+  const cusps = new Array(13).fill(0);
+  cusps[1] = asc;
+  cusps[4] = ic;
+  cusps[7] = dsc;
+  cusps[10] = mc;
+
+  cusps[2]  = placidusOne(asc, ic, latRad, epsRad, 1/3, true, asc);
+  cusps[3]  = placidusOne(cusps[2], ic, latRad, epsRad, 2/3, true, asc);
+  cusps[5]  = placidusOne(ic, dsc, latRad, epsRad, 1/3, true, ic);
+  cusps[6]  = placidusOne(cusps[5], dsc, latRad, epsRad, 2/3, true, ic);
+  cusps[8]  = placidusOne(dsc, mc, latRad, epsRad, 1/3, false, dsc);
+  cusps[9]  = placidusOne(cusps[8], mc, latRad, epsRad, 2/3, false, dsc);
+  cusps[11] = placidusOne(mc, asc, latRad, epsRad, 1/3, false, mc);
+  cusps[12] = placidusOne(cusps[11], asc, latRad, epsRad, 2/3, false, mc);
+
+  return { cusps, asc, mc, ic, dsc };
+}
+
+function eclToRA(lon, eps) {
+  const r = rad(lon);
+  const epsR = rad(eps);
+  return mod360(deg(Math.atan2(Math.sin(r) * Math.cos(epsR), Math.cos(r))));
+}
+
+function eclToDec(lon, eps) {
+  return Math.asin(Math.max(-1, Math.min(1, Math.sin(rad(lon)) * Math.sin(rad(eps)))));
+}
+
+function semiArcDsa(dec, latRad) {
+  const arg = -Math.tan(latRad) * Math.tan(dec);
+  return deg(Math.acos(Math.max(-1, Math.min(1, arg))));
+}
+
+function semiArcNsa(dec, latRad) {
+  return 180 - semiArcDsa(dec, latRad);
+}
+
+function eastwardSpan(a, b) {
+  return b >= a ? b - a : 360 - a + b;
+}
+
+function lonAfterEastward(lon, offset) {
+  return mod360(lon + offset);
+}
+
+function placidusOne(lonA, lonB, latRad, epsRad, fraction, nocturnal, refLon) {
+  const raRef = eclToRA(refLon, deg(epsRad));
+
+  function error(lon) {
+    const dec = eclToDec(lon, deg(epsRad));
+    const ra = eclToRA(lon, deg(epsRad));
+    const ed = eastwardSpan(raRef, ra);
+    const sa = nocturnal ? semiArcNsa(dec, latRad) : semiArcDsa(dec, latRad);
+    return ed - fraction * sa;
+  }
+
+  const span = eastwardSpan(lonA, lonB);
+  const N = 720;
+  const step = span / N;
+
+  let loLon = lonA;
+  let loVal = error(lonA);
+
+  for (let i = 1; i <= N; i++) {
+    let hiLon = lonAfterEastward(lonA, i * step);
+    let hiVal = error(hiLon);
+
+    if (loVal * hiVal <= 0) {
+      for (let j = 0; j < 60; j++) {
+        const half = eastwardSpan(loLon, hiLon) / 2;
+        const midLon = lonAfterEastward(loLon, half);
+        const midVal = error(midLon);
+        if (Math.abs(midVal) < 0.0001) return mod360(midLon);
+        if (loVal * midVal <= 0) { hiLon = midLon; hiVal = midVal; }
+        else { loLon = midLon; loVal = midVal; }
+      }
+      return lonAfterEastward(loLon, eastwardSpan(loLon, hiLon) / 2);
+    }
+    loLon = hiLon;
+    loVal = hiVal;
+  }
+  return lonAfterEastward(lonA, span / 2);
+}
+
+function assignHouses(positions, cusps) {
+  const houses = {};
+  for (const [name, lon] of Object.entries(positions)) {
+    for (let h = 1; h <= 12; h++) {
+      const nh = h < 12 ? h + 1 : 1;
+      const a = cusps[h], b = cusps[nh];
+      if (b < a) {
+        if (lon >= a || lon < b) { houses[name] = h; break; }
+      } else {
+        if (lon >= a && lon < b) { houses[name] = h; break; }
+      }
+    }
+  }
+  return houses;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ASPECTS
+// ═══════════════════════════════════════════════════════════════════════════
+const ASPECT_DEFS = [
+  {name:"合", angle:0, orb:8, cls:"aspect-neutral"},
+  {name:"六合", angle:60, orb:6, cls:"aspect-good"},
+  {name:"刑", angle:90, orb:7, cls:"aspect-hard"},
+  {name:"拱", angle:120, orb:8, cls:"aspect-good"},
+  {name:"冲", angle:180, orb:8, cls:"aspect-hard"}
+];
+
+function calcAspects(positions) {
+  const aspects = [];
+  const keys = Object.keys(positions);
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = i + 1; j < keys.length; j++) {
+      const p1 = keys[i], p2 = keys[j];
+      let diff = mod360(Math.abs(positions[p1] - positions[p2]));
+      if (diff > 180) diff = 360 - diff;
+      for (const ad of ASPECT_DEFS) {
+        const delta = Math.abs(diff - ad.angle);
+        if (delta <= ad.orb) {
+          aspects.push({p1, p2, name:ad.name, actual:diff, orb:delta, cls:ad.cls});
+        }
+      }
+    }
+  }
+  return aspects;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  FORMATTING
+// ═══════════════════════════════════════════════════════════════════════════
+function degToSign(deg) {
+  deg = mod360(deg);
+  const si = Math.floor(deg / 30) % 12;
+  const pos = deg % 30;
+  const d = Math.floor(pos);
+  const m = Math.floor((pos - d) * 60);
+  return { si, d, m };
+}
+
+function formatPos(deg) {
+  const { si, d, m } = degToSign(deg);
+  return `${SIGNS[si]} ${d}°${String(m).padStart(2,'0')}′`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  INTERPRETATION DATA
+// ═══════════════════════════════════════════════════════════════════════════
+
+const PLANET_SIGN = {
+  "Sun": {
+    "0": "太阳白羊赋予你开拓者的灵魂——勇敢、直接、充满生命力。你不喜欢等待，更不愿被规则束缚，是天生的先行者。在事业上适合创业或需要快速决策的领域；感情中主动热情，但需要学会耐心倾听伴侣。此生课题是将冲劲转化为持久的成就。",
+    "1": "太阳金牛让你拥有大地般的沉稳和坚韧。你重视物质安全与感官享受，对美和财富有天然的判断力。赚钱是你建立安全感的核心方式之一，理财能力通常不弱。感情中忠诚且持久，但占有欲较强。需警惕因过度追求稳定而错过改变的机会。",
+    "2": "太阳双子赋予你永不疲倦的好奇心和敏捷的思维。你擅长收集信息和连接人脉，是天生的沟通者。职业上适合媒体、教育、销售等多元领域。感情中需要智识的碰撞和不断的交流，伴侣必须能跟上你的思维速度。最大的功课是学会专注和深入。",
+    "3": "太阳巨蟹让你将情感和安全感置于人生核心。家庭、根源和亲密关系是你力量的源泉。你天生具有滋养他人的能力，在照顾型职业中尤为出色。感情中温柔体贴但防御心重，需要对方先证明忠诚和可靠。财务决策常受情绪影响，需建立理性框架。",
+    "4": "太阳狮子赋予你天生的舞台魅力和创造力。你渴望被看见、被认可，内心深处相信自己注定不凡。适合领导岗位和创意产业。感情中热情浪漫，需要被伴侣崇拜和赞美。财运上敢投敢花，大方慷慨，但需学会储蓄和规划。此生课题是在自信与谦逊间找到平衡。",
+    "5": "太阳处女让你追求完美和秩序。你拥有精密的分析能力和服务精神，做事一丝不苟。职业上适合技术、医疗、研究等需要专业深度的领域。感情表达克制而务实，用行动而非言语证明爱。财运上精打细算，但可能因过度谨慎错过投资机会。学会接纳不完美是你的成长方向。",
+    "6": "太阳天秤赋予你优雅的社交能力和公正的判断力。你天生追求和谐与平衡，擅长合作和外交。职业上适合法律、公关、设计等需要审美和协调能力的领域。感情是你人生中最重要的主题之一——你需要在关系中照见自己。决策时容易犹豫不决，这是你需要克服的短板。",
+    "7": "太阳天蝎让你拥有X光般的洞察力和惊人的意志力。你不满足于表面的答案，总是在追问真相和深度。职业上适合研究、心理、金融等需要穿透力的领域。感情中全情投入，爱恨分明，背叛是你最难原谅的事。财运上有投资眼光，但需避免因执念而孤注一掷。",
+    "8": "太阳射手赋予你永远在路上的灵魂。你热爱自由、冒险和哲学探索，生命的意义在于不断扩展视野。职业上适合教育、出版、国际事务等领域。感情中不喜欢被束缚，需要一个能和你一起探索世界的伴侣。财运上乐观但容易过于乐观，需建立风险意识。",
+    "9": "太阳摩羯让你少年老成，早早承担起责任。你目标明确、意志坚定，耐心和耐力远超同龄人。职业上具有极强的事业心和执行力，适合管理和领导岗位。感情中克制而负责，用成就而非言语来表达爱。财运上擅长长线布局，但需学会享受奋斗的过程而不只是结果。",
+    "10": "太阳水瓶赋予你独立前卫的思想和人道主义情怀。你天生与众不同，不按常理出牌。职业上适合科技、社群、创新领域。感情中需要精神共鸣和充分的个人空间，传统的关系模式可能不适合你。财运上常有独特的收入来源，但不稳定。学会在独立与合作间找到平衡是此生课题。",
+    "11": "太阳双鱼让你拥有无边界的慈悲心和丰富的想象力。你的灵魂柔软而深邃，天然通晓艺术和灵性领域。职业上适合艺术、疗愈、慈善等需要共情能力的工作。感情中浪漫梦幻，容易在爱中失去自我边界。财运上直觉敏锐，但需建立实际的金钱管理习惯——你此生的修行是在现实世界中为梦想建造容器。"
+  },
+  "Moon": {
+    "0": "月亮白羊让你的情绪表达直接而热烈。内心永远住着一个战士，需要不断的新刺激来保持情感活力。在亲密关系中，你反应迅速但缺乏耐心，容易因小事爆发但转头就忘。你的情感安全感来自「行动」——感到不安时你会本能地想做点什么。",
+    "1": "月亮金牛给你最稳定的情绪底色。你需要物质安全和感官舒适来安抚内心，美食、美物、稳定的生活环境是你情感健康的基石。关系中忠诚度极高，但一旦受伤恢复缓慢。财运上的安全感直接影响你的情绪状态——存款数字是你内心平静的晴雨表。",
+    "2": "月亮双子让你的情感需求多变且以智识为核心。你需要不断的信息交流和新鲜体验来获得情绪满足。内心永远年轻，机智善辩，但可能因思维过度活跃而难以在情感中稳定下来。伴侣一定要能和你在智力上交锋，否则你会感到无聊。",
+    "3": "月亮巨蟹是月亮最自然的位置——情感丰富、直觉力强、极度重视家庭和亲密关系。你的情绪如潮汐般起伏，容易吸收周围人的情绪。在爱中你是天生的照顾者，但也需要被悉心呵护。情感安全感是你人生的基石，每当它被动摇，一切都会受影响。",
+    "4": "月亮狮子让你的内心渴望被赞美和崇拜。情感表达戏剧化而热烈，你需要伴侣的绝对忠诚和持续关注。自尊心是你情绪健康的核心——当你感到被忽视或低估时会变得非常敏感。创造性的自我表达和舞台上的光芒是你情感滋养的重要来源。",
+    "5": "月亮处女让你的情感表达谨慎克制。你通过服务和照顾他人来表达爱，内心追求完美但容易担忧和焦虑。在感情中你对自己和对方都有极高要求，这可能导致关系紧张。建立健康的生活秩序和日常规律是你的情绪稳定器。",
+    "6": "月亮天秤赋予你对和谐关系的深切渴望。你害怕冲突和孤独，需要伴侣的陪伴来获得情感满足。优雅温和的外表下，你其实对关系中的不平衡非常敏感。审美和美的事物是你情绪调节的重要方式。学会在取悦他人和照顾自己之间找到平衡是重要课题。",
+    "7": "月亮天蝎让你的情感世界如深海般强烈而神秘。爱恨分明，内心隐藏着巨大的情感能量和直觉力。你需要绝对的信任和灵魂层面的交融，肤浅的关系无法满足你。你具有极强的情绪再生能力——每一次的情感危机都是一次蜕变的契机。",
+    "8": "月亮射手让你的情感表达乐观开朗。内心充满对远方的向往和对生命意义的追寻，不喜欢被琐碎日常束缚。你需要一个能和你一起成长和探索的伴侣，限制你自由的人会让你本能地逃离。旅行、学习和哲学是你情绪充电的方式。",
+    "9": "月亮摩羯让你的情感表达克制而内敛。你重视责任和承诺，用行动而非言语表达爱。内心强大但不轻易表露，情绪管理能力是你在职场中的优势。但在亲密关系中，你需要学会允许自己脆弱——不是所有事都需要一个人扛。",
+    "10": "月亮水瓶赋予你独立理性的情感模式。你需要精神共鸣和充分的个人空间，传统的情感依赖模式可能让你感到窒息。你关心人类多于关心个人，理想主义和社群意识是你情绪世界的重要组成部分。与他人的情感距离是你保护自己的方式，但也可能成为孤独的来源。",
+    "11": "月亮双鱼让你拥有无边界的共情能力和丰富的内心世界。你的情绪敏锐度极高，能感知他人未说出口的感受。艺术和灵性是你情感滋养的重要来源。在感情中你容易迷失自我边界，将伴侣的课题当作自己的课题。你需要建立的不是更厚的墙，而是更清晰的界限。"
+  },
+  "Mercury": {
+    "0": "水星白羊让你的思维和表达直接而迅速。说话不拐弯抹角，想到什么说什么。学习能力强但缺乏耐心，适合开创性思考和快节奏的信息处理。在谈判或辩论中可以成为犀利的对手，但需要注意不要因为说话太冲而伤到关系。",
+    "1": "水星金牛让你的思维稳健而务实。学习速度不快，但一旦理解就根深蒂固。你的表达方式温和而有说服力，重视实际经验而非抽象理论。在财务决策和长期规划方面具有天赋。沟通风格偏保守，不喜欢无意义的闲聊。",
+    "2": "水星双子是水星最活跃的位置——思维敏捷、口才出众、信息处理速度极快。你天生适合写作、教学、媒体或销售等需要沟通技巧的工作。好奇心驱动你不断学习新事物，但也容易浅尝辄止。你的思维需要在广度和深度之间找到平衡。",
+    "3": "水星巨蟹让你的思维受情绪和记忆的深刻影响。你的记忆力极强，尤其是与情感体验相关的信息。直觉式的思维方式让你善于捕捉言语之外的信息。沟通风格温和而有同理心，适合从事需要情感智慧的领域。但需要注意不要让情绪完全主导判断。",
+    "4": "水星狮子赋予你创造性和戏剧化的表达方式。你善于宏观思考和故事讲述，有将复杂想法包装得引人入胜的天赋。适合领导力沟通、创意策划、公共演讲等领域。你可能对细节不太有耐心，需要培养团队中能帮你落实想法的人。",
+    "5": "水星处女是水星最强的位置之一——分析能力卓越，思维严谨细致。你善于分类、整理和优化信息，是天然的编辑、分析师或技术专家。工作中追求精确和效率。但过度追求完美可能让你陷入分析陷阱，迟迟无法做出最终判断。",
+    "6": "水星天秤让你善于从多角度看问题。你的表达优雅得体，是天生的外交官和谈判者。追求思维上的和谐与公正，在冲突中能站在中立位置调和各方。适合法律、公关、咨询等需要平衡不同利益的工作。决策时可能犹豫不决——你需要相信自己的判断。",
+    "7": "水星天蝎赋予你穿透表象的思维能力。你不满足于浅层信息，擅长挖掘真相和隐秘的动机。适合研究、调查、心理分析等需要深度的工作。你的表达简短但有力量，话不多但每句都在点上。保守秘密是你的天赋，但注意不要走向偏执和怀疑一切。",
+    "8": "水星射手让你的思维开阔而乐观。你喜欢探索哲学、宗教、文化等宏观话题，对知识的渴望驱动你不断远行——无论是实际的还是心智的。学习方式跳跃式，擅长把握整体图景但不耐烦细节。适合教育、出版、国际事务等领域。",
+    "9": "水星摩羯让你的思维严谨务实，逻辑性和结构性极强。学习方式循序渐进，适合需要长期积累和系统规划的领域。你的表达方式简洁高效，不说废话。在商业、管理、工程等需要精确思维和长期规划的领域有天然优势。",
+    "10": "水星水瓶让你的思维独特而前卫。你不按常理出牌，常有意想不到的洞见和创新想法。适合科技、发明、社会创新等需要前瞻性思维的领域。你关心人类进步和社会议题，善于发现未来的趋势。你的沟通风格可能有些抽离，在亲密沟通中需要注意情感温度。",
+    "11": "水星双鱼赋予你诗意和直觉式的思维方式。你的大脑不以线性逻辑运作，而是以图像、感受和联想。适合艺术创作、音乐、灵性疗愈等领域。你的表达能力可能不如其他配置清晰，但传达的情感和氛围是无与伦比的。日常逻辑表达需要刻意练习。"
+  },
+  "Venus": {
+    "0": "金星白羊让你在爱情中主动而热情。你喜欢追求和征服带来的刺激感，被动等待不是你的风格。审美直接大胆，喜欢鲜明的色彩和风格。感情中需要保持新鲜感和挑战性，但要注意冲动和三分热度的倾向。财运上果断但需要加强规划。",
+    "1": "金星金牛是金星最舒适的位置——你在爱情中忠诚稳定，重视感官享受和物质基础。喜欢自然舒适的美学风格，对品质有天然的判断力。感情慢热但持久，一旦交付真心就坚定不移。财运上具有积累财富的本能，对投资和保值有良好直觉。",
+    "2": "金星双子让你在爱情中追求智识的交流和多样性。你的魅力来自机智的谈吐和永不枯竭的好奇心。容易被聪明有趣的人吸引，审美多元化且时常变化。在感情中需要持续的新鲜刺激，但也可能因此难以做出长期承诺。适合以沟通和社交为核心的工作。",
+    "3": "金星巨蟹让你在爱中极度重视情感安全感。你温柔体贴，天然知道如何让伴侣感到被照顾和被珍视。喜欢营造温馨的家庭氛围，念旧且具有母性光辉。在感情中容易因害怕受伤而筑起保护壳，需要对方先证明忠诚。财运上倾向于储蓄和保守投资。",
+    "4": "金星狮子让你在爱情中热情浪漫、光芒四射。你喜欢被追求和赞美，付出的爱也是慷慨而戏剧化的。审美华丽，喜欢能让你在人群中脱颖而出的风格。需要伴侣的持续关注和认可。财运上有赚大钱的野心和魅力，但消费上也相当大方。",
+    "5": "金星处女让你在爱情中克制而理性。你通过实际行动而非华丽言辞来表达爱——为你爱的人做事、解决问题、提供实用的帮助。审美简约精致，注重细节和品质胜过数量。感情中对伴侣有较高标准，有时过于挑剔。财运上精打细算，擅长发现性价比高的东西。",
+    "6": "金星天秤是金星最强的位置——你天生懂得爱与美的艺术。追求和谐平等的关系，善于经营感情中的平衡。审美优雅经典，有出色的品味。害怕孤独，在关系中容易为了维持和谐而过度妥协。财运上可能因追求品质生活而花费较多，但你的社交资源往往能带来回报。",
+    "7": "金星天蝎让你在爱情中全情投入、渴望灵魂深处的连接。占有欲强但忠诚，一旦爱上便是刻骨铭心。审美神秘而性感，喜欢有深度和故事感的人和事。在感情中不容易原谅背叛。财运上有投资天赋，能洞察价值被低估的机会，但需避免因执念造成损失。",
+    "8": "金星射手让你在爱情中乐观开放、热爱自由。你喜欢跨国跨文化的浪漫，容易被不同背景的人吸引。审美自由奔放，热爱异域文化和冒险。在感情中不喜欢被束缚，需要伴侣能接纳你的独立性。财运上好运常来但缺乏规划，需要在乐观和实际之间找到平衡。",
+    "9": "金星摩羯让你在爱情中谨慎而认真。你不轻易陷入感情，但一旦确定关系就会认真对待并承担责任。审美经典低调，重视品质和长久价值而非潮流。在感情中可能显得有些冷淡和务实，但你用忠诚和实际行动来表达爱。财运上具有极强的长期积累和投资规划能力。",
+    "10": "金星水瓶让你在爱情中独立自由、不拘一格。你不需要传统的关系模式——精神共鸣和个人空间比浪漫仪式更重要。审美前卫独特，喜欢实验性和与众不同的风格。你吸引人的地方恰恰是你的与众不同。财运上可能有来自社群、互联网或创新领域的收入。",
+    "11": "金星双鱼是金星最高的表达——你在爱情中浪漫梦幻、具有无条件的慈悲心。爱对你来说是灵魂的融合而非物质的交换。审美富有艺术气息和灵性色彩。容易被需要帮助的人吸引，在感情中需要注意自我保护。财运上直觉力强，但需建立实际的金钱管理习惯。"
+  },
+  "Mars": {
+    "0": "火星白羊是火星最强的位置——行动力爆表，竞争意识极强。你在面对挑战时反应迅速，是天生的先锋和领袖。行动方式直接果敢，但忍耐力有限，容易对长期项目失去耐心。在事业、运动和需要快速决断的领域有天然优势。感情中热情主动，需要释放能量的出口。",
+    "1": "火星金牛让你的行动稳健而持久。启动速度慢，但一旦开始就坚定不移。你的耐力极强，适合需要长期坚持才能见到成果的领域。对物质和感官层面的追求驱动着你的行动力。在感情中你的欲望深沉而持续，但可能显得过于固执或占有欲强。",
+    "2": "火星双子让你的行动方式灵活多变。你擅长多任务处理，精力分散但效率高。沟通、写作、旅行和智力挑战是你释放能量的主要途径。在需要快速反应和适应力的场合你表现出色。感情中你需要智识的刺激和持续的交流来维持热情。",
+    "3": "火星巨蟹让你的行动受情绪和保护欲驱动。为家人和爱人而战时你最为勇猛。你的行动力是间歇性的——情绪高涨时无所不能，低落时需要安全港。具有极强的守护本能，但在职场中有时因情绪因素影响了行动的一致性。",
+    "4": "火星狮子赋予你戏剧化的行动风格和领导魅力。你需要被认可和赞赏来保持动力，在团队中自然地走向领导位置。你的行动具有表演性——当你站在聚光灯下时表现最好。感情中热情主动且慷慨，但需注意不要用支配替代爱护。",
+    "5": "火星处女让你的行动精准高效。你善于制定详细计划并严格执行，完美主义是你的驱动力。在需要精确性、手艺和分析能力的工作中表现出色。感情中通过服务的行动来表达爱——为你爱的人解决问题就是你的浪漫。需注意不要因过度自我批判而挫伤行动力。",
+    "6": "火星天秤让你在行动中注重公平和协作。你不喜欢独自冲锋陷阵，更擅长调动团队力量。你的决策过程需要权衡各方利益，这使你成为一个公正的领导者，但也可能因过度权衡而行动迟缓。在感情和合作中，你需要伙伴才能发挥最佳行动力。",
+    "7": "火星天蝎赋予你极强的意志力和持久的战斗力。不鸣则已一鸣惊人——你不需要时刻显示自己的力量，但在关键时刻爆发力惊人。具有战略思维，适合需要深度和坚韧的领域。感情中性魅力强烈，欲望深沉。你对背叛的反应是毁灭性的。",
+    "8": "火星射手让你行动充满热情和冒险精神。热爱运动、旅行和户外挑战，乐观积极的心态是你的最大驱动力。你行动的方向是不断扩展视野和获得新体验。在需要热情和信念的事业中你表现最佳。感情中追求自由和共同的冒险，不喜欢被日常琐事束缚。",
+    "9": "火星摩羯让你行动有计划、有纪律、有目标。你的执行力极强，一旦确定方向就会坚定不移地推进。成就导向驱动着你的每一步行动。在职场中你是一个可靠的力量，但可能显得过于严肃。感情中用实用行动表达爱，比起浪漫言辞更擅长为你爱的人提供实质支持。",
+    "10": "火星水瓶赋予你独特不羁的行动风格。你按自己的节奏和方式行事，不受传统和权威的束缚。你的行动力集中在改革、创新和群体事业上。在需要突破常规的领域你表现最佳。感情中需要充分的自由和空间，传统的关系规则对你来说不是必须遵守的。",
+    "11": "火星双鱼让你的行动受直觉和灵感驱动。看似柔弱实则柔韧——你的行动方式如水般适应力强。艺术创作、灵性实践和帮助他人是你释放能量的主要途径。在需要共情和想象力的领域中有独特优势。你可能不是最有执行力的配置，但你的行动具有深刻的感染力。"
+  },
+  "Jupiter": {
+    "0": "木星白羊让你通过勇气、冒险和竞争获得成长。你的好运来自敢于当机立断和走在最前面。事业上适合开创性角色，桃花容易发生在竞争或运动场合。财运机会常在你主动出击时降临——等待不是你的幸运策略。",
+    "1": "木星金牛让你通过积累、耐心和实际判断获得扩张。财富运是此配置中最突出的天赋——你不追求快钱，但长期稳健的财务增长是你的标志。感情中的幸运来自稳定和真诚的付出。你的福报常在缓慢而确定的过程中显现。",
+    "2": "木星双子让你通过信息、学习和人脉网络获得机遇。你的口才和对信息的敏感性是最大的财富催化剂。事业上适合多元化发展，桃花运来自社交场合和智识交流。财运机会常在你最不经意的时候通过朋友或新信息出现。",
+    "3": "木星巨蟹让你通过情感连接和家庭滋养获得成长。幸运来自直觉和对他人需求的敏感——你给予的温暖总会以某种方式回流。家庭和房产方面常有福报。感情中的好运来自你愿意照顾好自己和他人的情感需求。",
+    "4": "木星狮子让你通过创造性的自我表达和领导力获得扩张。你的自信和舞台魅力是最大的财富催化剂。事业上被看见和被认可的机会远超常人。桃花运旺盛——你走到哪里都自带光环。财运机会来自你的个人品牌和影响力。",
+    "5": "木星处女让你通过服务、精细化的工作和不断提升的专业能力获得成长。你的幸运在于把事做对、做细、做到极致。事业上的专业口碑是最可靠的财富来源。感情中的好运来自你真诚的付出和谦逊的态度——不求回报时反而得到最多。",
+    "6": "木星天秤让你通过合作、外交和人际关系的平衡获得机遇。好的伴侣和合作伙伴是你最大的幸运来源。事业上适合需要协商和审美的领域。桃花运在社交和艺术场合最旺。财运机会常通过合作关系和人际网络到来。",
+    "7": "木星天蝎让你通过深度转化、资源整合和策略性投资获得成长。你的投资眼光和资源运作能力是最大的财富天赋。事业上的成功来自深度的专业能力和战略思维。感情中的幸运在于你愿意面对自己的阴影并进行深刻的自我蜕变。",
+    "8": "木星射手是木星最强的位置——通过旅行、高等教育、哲学探索和跨文化体验获得无限扩展。你的开放心态和对生命的热情是最大的财富。事业上适合国际化和教育领域。桃花运在旅行和进修中最旺盛。财运机会常有异国或跨文化的色彩。",
+    "9": "木星摩羯让你通过努力、纪律和长期规划获得成长。虽然木星在此位置不够自如，但你的幸运在于持续不懈的付出——当别人已经放弃时你还在坚持。事业上的社会地位是最大的财富来源。财务安全感来自长线布局和稳定的职业晋升。",
+    "10": "木星水瓶让你通过创新、社群参与和前瞻性的愿景获得扩张。你的独特思维和人道主义情怀是最大的财富催化剂。事业上适合科技、社群和创新领域。桃花运常在社群和共同事业中悄然绽放。财运机会来自非传统渠道和志同道合的群体。",
+    "11": "木星双鱼让你通过灵性、艺术和慈悲心获得成长。你的直觉力和想象力是最大的财富来源。事业上适合艺术、疗愈和慈善领域。感情中的好运来自你无分别的爱和共情能力。财运上需在理想主义和实际管理之间找到平衡。"
+  },
+  "Saturn": {
+    "0": "土星白羊：你此生的核心课题是学会耐心和策略性的行动。你被要求将白羊的冲动转化为持续的努力和有序的推进。事业上只有通过纪律才能将领导的潜力转化为实际的成就。感情中需要学会在自我主张和妥协让步之间找到平衡。",
+    "1": "土星金牛：你此生的核心课题是建立健康的价值观和自我价值感。对物质安全感的过度执着需要被审视。事业上适合在稳定中逐步攀升，不适合高风险的操作。财运是你需要修行的重点领域——不是挣钱能力的问题，而是与金钱的心理关系。",
+    "2": "土星双子：你此生的核心课题是学会专注和深度的思考。信息碎片化和浅尝辄止是你容易陷入的模式。事业上需要选择一个领域深耕而非不断切换方向。沟通是你的天赋也是你的课题——学会在合适的时候保持沉默同样重要。",
+    "3": "土星巨蟹：你此生的核心课题是建立情绪边界和内在安全的根基。你容易承担超出自己承受范围的情感责任。事业上情感智慧是你的优势，但需要防止被他人的需求淹没。学会在照顾他人和保护自己之间取得平衡是你此生最重要的功课。",
+    "4": "土星狮子：你此生的核心课题是将自我表现转化为真正的创造和服务。你被要求从「被看到」走向「照亮他人」。事业上的领导力需要通过谦逊和持续付出来赢得。感情中需要学会爱不是索取关注，而是给予真诚的看见。",
+    "5": "土星处女：你此生的核心课题是接纳不完美和自我慈悲。过度批判和完美主义是你最沉重的负担。事业上你的专业能力极强，但焦虑可能阻碍你发挥。感情中需要学会关系的本质不是完美而是成长。当你停止苛责自己，世界也会对你温柔。",
+    "6": "土星天秤：你此生的核心课题是学会建立健康的边界和独立决策的能力。过度依赖他人的认可和回避冲突是你需要克服的模式。事业上你的协调能力是优势，但需要在关键时刻坚定立场。感情中真正的亲密不是融合，而是两个独立完整的人的选择。",
+    "7": "土星天蝎：你此生的核心课题是学会信任和放下控制。对背叛的恐惧可能导致你在关系中筑起高墙。事业上你的深度和战略思维是优势，但对权力的执念是陷阱。当你学会在适当的时候放手，转化才真正开始。",
+    "8": "土星射手：你此生的核心课题是将乐观转化为纪律，将信念转化为行动。过度乐观和逃避现实是你需要注意的倾向。事业上适合教育和国际领域，但需要建立持续的行动框架。真正的自由不是随心所欲，而是在约束中找到意义。",
+    "9": "土星摩羯：土星入庙——责任、成就和纪律是你此生最重要的课题和最大的力量来源。你天生懂得延迟满足和长远规划。事业上的成就驱动力极强，但也容易成为工作狂。学会在奋斗和享受之间找到平衡，是土星摩羯一生的功课。",
+    "10": "土星水瓶：你此生的核心课题是在独立与合作之间找到平衡。情感疏离和过度理性化是你需要突破的模式。事业上你的创新思维是优势，但需要学会与他人协作。真正的独立不意味着排斥连接，而是在连接中保持自我。",
+    "11": "土星双鱼：你此生的核心课题是建立界限和面对现实。逃避痛苦的倾向是你需要觉察的模式。事业上艺术和灵性天赋是优势，但需要建立实际的行动框架来承载你的梦想。当你学会在柔软中保持坚定，你的慈悲将成为真正的力量而非负担。"
+  },
+  "Uranus": {
+    "0": "天王星白羊（世代的先锋）：你具有打破传统、独立行动的强大冲动。你对个人自由的需求超越一切。在事业上你是天生的创业者和改革者。爱情中你需要一个不被规则束缚的关系模式，传统婚姻框架可能让你感到窒息。",
+    "1": "天王星金牛（世代的变革者）：你对物质世界和价值观有颠覆性的看法。可能经历财务上的大起大落或完全不同的赚钱方式。你这一代人将重塑金融体系和人与自然的关系。个人层面上，你对美的追求也不同寻常。",
+    "2": "天王星双子（新一代的沟通者）：信息处理和传播方式将被彻底颠覆。你具有高度原创的思维方式，对新技术和新媒体有天生的敏感。社交圈多元且变化快。学习方式打破常规——你可能同时是多个领域的深度爱好者。",
+    "3": "天王星巨蟹（情感的革命者）：你对家庭、安全感和情感表达的定义与上一代人截然不同。非传统的家庭结构、远程家庭关系、情感科技的应用都是你这一代带来的变革。个人层面上，你的情绪表达方式独特且不可预测。",
+    "4": "天王星狮子（创造力的解放者）：自我表达和创造力的形式被彻底颠覆。你不满足于传统的舞台和认可方式。你这一代人带来了全新的艺术形式和领导力概念。爱情中的自我展示方式也不同寻常——你的个人魅力与众不同。",
+    "5": "天王星处女（工作的革命者）：工作方式、健康观念和日常秩序正在被颠覆。你这一代人推动了远程工作和数字健康的发展。个人层面上，你的工作流程和健康习惯可能与主流完全不同。对完美的定义也在发生变化。",
+    "6": "天王星天秤（关系的革命者）：婚姻、合作和社会关系的定义正在被彻底改写。你这一代人正在创造全新的关系模式和社会契约。个人层面上，你在合作关系和伴侣关系中需要充分的自由度和灵活性。",
+    "7": "天王星天蝎（转化的加速器）：深度转化、权力结构和性的观念正在经历革命。你具有极强的直觉和突破禁忌的冲动。金融体系的变革和资源再分配是你这一代的核心议题。个人层面上，你的转化经历往往是突然而剧烈的。",
+    "8": "天王星射手（信仰的革命者）：教育、宗教和旅行的形式正在被颠覆。你这一代人带来了全新的哲学体系和跨文化理解方式。个人层面上，你的信念系统可能经历多次突然的转向——每次转向都是一次觉醒。",
+    "9": "天王星摩羯（权威的重塑者）：社会结构、政府和企业正在被根本性地改变。你这一代人将挑战和重建权威的形式。事业上的路径可能充满突然的转折——被裁员后创业、或在传统行业中引入颠覆性的模式。",
+    "10": "天王星水瓶（极致的天王星）：这是天王星最强大的位置之一。你具有极强的独立精神和前瞻性思维，对集体未来有深刻的直觉。科技创新和社会变革是你此生的核心主题。人际关系的模式高度个性化且不按常理。",
+    "11": "天王星双鱼（灵性的革命者）：灵性、艺术和集体潜意识的领域正在经历彻底的变革。你这一代人带来了全新的疗愈方式和灵性实践。个人层面上，你的直觉和灵性体验可能突然开启，以不寻常的方式与世界进行灵魂层面的连接。"
+  },
+  "Neptune": {
+    "0": "海王星白羊（梦想的先锋）：你这一代人将灵性和理想主义注入了行动和开创精神之中。个人层面上，你对梦想的追求具有不寻常的勇气，但也需要警惕冲动投入虚幻的目标。学会区分直觉和一时冲动的幻想是你的功课。",
+    "1": "海王星金牛（物质与灵性的融合）：你这一代人正在重新定义物质与精神的关系——金钱、自然、身体都可以是灵性的载体。个人层面上，你对财务和感官享受可能有理想化的倾向。财运上直觉敏锐，但需警惕不切实际的投资幻想。",
+    "2": "海王星双子（信息的灵性化）：你这一代人沟通和获取信息的方式被灵感和直觉渗透。思维不再仅仅是线性和逻辑的。个人层面上，你的表达具有诗意和感染力，但可能缺乏精确性。学会在灵感与逻辑之间找到平衡。",
+    "3": "海王星巨蟹（情感的海洋）：家庭、根源和情感安全被赋予了近乎神秘的色彩。你这一代人对「家」的定义更加流动和具有灵性维度。个人层面上，你对情感安全的需求与对超越家庭束缚的渴望之间存在张力。",
+    "4": "海王星狮子（创造力的神性）：自我表达与灵性融合。你这一代人将艺术创作视为灵性实践，将浪漫爱情视为超越自我边界的途径。个人层面上，你在感情中容易将对方理想化——爱人是你灵魂的镜子。创造力的迸发来自灵感的降临。",
+    "5": "海王星处女（日常的神圣）：工作、服务和健康被赋予了灵性维度。你这一代人将重新定义「服务」的意义——不仅是完成任务，更是灵魂的奉献。个人层面上，你可能对完美的追求带有不切实际的色彩，需警惕因过度付出而耗竭。",
+    "6": "海王星天秤（关系的幻象与理想）：你对伴侣关系和美的追求带有理想化的色彩。你这一代人正在重新定义爱与公平的含义。个人层面上，你容易在关系中将对方过度美化——当幻象褪去时可能感到失望。学会在理想与真实之间找到和谐。",
+    "7": "海王星天蝎（深度的迷幻）：潜意识、性和转化的领域被海王星的神秘力量渗透。你这一代人具有极强的灵性穿透力。个人层面上，你的直觉极强但可能被幻觉干扰。财运上需警惕与他人资源的模糊纠缠。灵魂层面的转化是你的道路。",
+    "8": "海王星射手（信仰的迷雾与光芒）：信仰、真理和远方的追求被灵性化。你这一代人将重塑宗教和哲学的面貌。个人层面上，你可能在寻找「终极真理」的过程中经历多次幻灭和重生。旅行不只是地理的，更是灵魂的朝圣。",
+    "9": "海王星摩羯（体制的溶解）：社会结构和权威形象正在被灵性力量悄悄溶解。你这一代人重新定义了成功和成就的含义。个人层面上，你可能在世俗成功和精神追求之间感到拉扯——真正的成就也许不是爬到塔顶，而是让塔本身变得不再重要。",
+    "10": "海王星水瓶（集体的梦想）：社群、科技和人道主义被赋予了灵性使命。你这一代人将科技视为连接集体意识的工具。个人层面上，你的理想主义与社会变革紧密相连。需警惕在宏大的愿景中忽视个人情感的现实需求。",
+    "11": "海王星双鱼（回归源头）：这是海王星最强的位置——灵性、艺术和集体慈悲达到顶峰。你这一代人拥有最强的共情能力和灵性天赋。个人层面上，边界感是你此生最大的课题。你的敏感是一份礼物，但首先你要学会保护自己的能量场。"
+  },
+  "Pluto": {
+    "0": "冥王星白羊（权力的新生）：你这一代将彻底重塑权力的定义——从控制转向赋权。个人层面上，你对自己的身份和意志力有近乎强迫的执着。你的人生中可能经历多次身份的彻底重组。行动力中蕴含着深沉的推动力。",
+    "1": "冥王星金牛（资源的掌控）：价值观、资源和物质世界正在经历根本性的转化。你这一代人将重塑经济体系和人与自然的关系。个人层面上，你对财务的掌控欲需要被觉察。真正的财富不是占有，而是智慧和资源的流动。",
+    "2": "冥王星双子（思想的重塑）：信息、沟通和思维模式正在被彻底改变。你具有极强的思维穿透力，能看穿表层的信息直达本质。你对知识的追求带有痴迷的色彩——一旦对某件事产生兴趣，你会深入到无人之境。",
+    "3": "冥王星巨蟹（情感的深渊）：家庭、根源和情感安全正在经历深度的重组。你这一代人对「家」和「归属感」的定义将被彻底改变。个人层面上，你与母亲或家庭之间可能存在着深刻的——有时是挑战性的——灵魂连接。",
+    "4": "冥王星狮子（创造力的涅槃）：自我表达、创造力和爱的本质正在经历彻底的转化。你这一代人将重新定义「被看见」的方式。个人层面上，你的创造力来自最深的情感深渊——每一次创作都是一次灵魂的再生。",
+    "5": "冥王星处女（日常的深度）：工作、健康和服务的意义正在被彻底重新定义。你具有穿透日常表层看见本质的能力。在工作中有强迫性的完美主义倾向——这是天赋也是陷阱。你的身体是你灵魂转化的重要场域。",
+    "6": "冥王星天秤（关系的炼金术）：婚姻、合作和社会契约正在经历根本性的重塑。你这一代人对关系中的权力平衡极为敏感。个人层面上，你的亲密关系是你最深转化的催化剂——每一次重要的关系都是一次灵魂的黑暗之旅与重生。",
+    "7": "冥王星天蝎（极致的冥王星）：这是冥王星最强大的位置。你具有穿透一切表象的洞察力和惊人的再生能力。转化是你生命的核心主题——你不会在舒适区停留太久。对真相和深度的追求近乎偏执。你的存在本身就是对周围人的转化催化剂。",
+    "8": "冥王星射手（信仰的涅槃）：信仰体系、教育和生命意义正在经历彻底的瓦解与重建。你可能经历多次精神上的「死亡与重生」——旧的信念被摧毁，新的理解从中升起。你这一代人将重塑教育和精神追求的方式。",
+    "9": "冥王星摩羯（体制的瓦解与重建）：社会结构、政府和企业正在经历最根本的权力重组。你这一代人的使命是摧毁已经腐朽的旧体系，并在废墟上建立新的秩序。个人事业上，你可能经历一次或多次彻底的职业转型——这不是失败，而是灵魂的必经之路。",
+    "10": "冥王星水瓶（未来的权力）：社群、科技和集体意识正在被彻底重塑。你这一代人是数字时代真正的权力玩家。个人层面上，你对集体变革有深刻的直觉。你的人道主义情怀带有一种不动摇的力量——你不是仅仅梦想更好的世界，你有意志力去实现它。",
+    "11": "冥王星双鱼（灵魂的暗夜与黎明）：灵性、慈悲和集体潜意识的领域正在经历最深层的清洗和重生。你这一代人承担着消化集体业力的使命。个人层面上，你的敏感度极高，可能会有激烈的灵性体验或深度的创作冲动。保护能量边界是你的必修课。"
+  }
+};
+
+const HOUSE_MEANINGS = {
+  1: "第1宫代表自我形象、人格面具和给他人留下的第一印象。此处的行星强烈影响你的外在气质和人生路径的起点。",
+  2: "第2宫代表财富、价值观和自我价值感。此处的行星影响你的赚钱方式和物质资源的积累。",
+  3: "第3宫代表沟通、学习、兄弟姐妹和短途旅行。此处的行星影响你的思维方式和信息处理能力。",
+  4: "第4宫代表家庭、根源、父亲和晚年的生活环境。此处的行星揭示你的家庭背景和内在安全感。",
+  5: "第5宫代表创造力、恋爱、子女和娱乐。此处的行星影响你的浪漫表达和创造性的自我展现。",
+  6: "第6宫代表工作、健康、服务和日常生活。此处的行星影响你的工作方式和身体状况。",
+  7: "第7宫代表婚姻、合作关系和公开的对手。此处的行星揭示你对伴侣的需求和关系模式。",
+  8: "第8宫代表性、死亡、转变和他人的资源。此处的行星影响你对深层生命议题的处理方式。",
+  9: "第9宫代表高等教育、哲学、长途旅行和信仰。此处的行星影响你的人生观和精神追求。",
+  10: "第10宫代表事业、社会地位、母亲和人生目标。此处的行星影响你的职业方向和社会成就。",
+  11: "第11宫代表朋友、社群、希望和理想。此处的行星影响你的社交圈和长远愿景。",
+  12: "第12宫代表潜意识、灵性、隐秘的事物和自我消融。此处的行星揭示你的内在灵性世界和业力课题。"
+};
+
+const SIGN_MEANING = {
+  0:"白羊座是火象开创星座，代表新的开始、原始冲动和竞争精神。能量直接而强烈。",
+  1:"金牛座是土象固定星座，代表稳定、感官享受和物质积累。能量踏实而持久。",
+  2:"双子座是风象变动星座，代表信息、交流和多样性。能量轻盈而灵活。",
+  3:"巨蟹座是水象开创星座，代表情感、家庭和滋养。能量温柔而深邃。",
+  4:"狮子座是火象固定星座，代表创造、自信和表现。能量热烈而辉煌。",
+  5:"处女座是土象变动星座，代表服务、精细和分析。能量精准而实用。",
+  6:"天秤座是风象开创星座，代表和谐、美感和关系。能量优雅而平衡。",
+  7:"天蝎座是水象固定星座，代表深度、转变和力量。能量强烈而神秘。",
+  8:"射手座是火象变动星座，代表探索、自由和真理。能量乐观而奔放。",
+  9:"摩羯座是土象开创星座，代表成就、责任和纪律。能量严肃而坚韧。",
+  10:"水瓶座是风象固定星座，代表创新、独立和博爱。能量前卫而理性。",
+  11:"双鱼座是水象变动星座，代表慈悲、灵性和融合。能量柔软而无边。"
+};
+
+// Planet-to-planet aspect interpretations for synastry
+const SYNASTRY_ASPECTS = {
+  "Sun_Moon": { good:"你们在情感和意志层面有天然的共鸣。太阳方的自我表达能滋养月亮方的情绪需求，是经典的婚姻相位。", hard:"你们的情感需求和自我表达方式存在冲突。需要学会尊重彼此的根本差异。" },
+  "Sun_Venus": { good:"强烈的吸引力，彼此欣赏和喜爱。太阳方被金星方的魅力和美感吸引，关系充满温暖和愉悦。", hard:"价值观和审美有时不一致，但吸引力仍然存在。" },
+  "Sun_Mars": { good:"充满激情和活力的组合。行动力强，能一起完成很多事情。性吸引力强烈。", hard:"容易产生竞争和权力斗争，自我意志的碰撞需要调和。" },
+  "Moon_Venus": { good:"情感关系非常和谐，彼此能给予对方所需的情感滋养。喜欢待在一起，共享美好时光。", hard:"情感表达方式不同，一方需要在情绪和爱意之间找到平衡。" },
+  "Moon_Mars": { good:"情感关系中充满激情和活力，能激发彼此的情绪表达。", hard:"容易产生情绪冲突和争吵，情绪反应激烈。" },
+  "Venus_Mars": { good:"极强的性吸引力和浪漫能量。金星方的柔美与火星方的阳刚形成完美的磁极吸引。", hard:"激情来得快去得也快，容易在亲密关系中产生摩擦。" },
+  "Sun_Saturn": { good:"关系稳定长久，彼此负责任。土星方给予太阳方实际的指导和保护。", hard:"土星方可能对太阳方过于苛刻或限制，导致压抑感。" },
+  "Jupiter_Venus": { good:"彼此带来快乐和扩张的能量。在一起时感觉幸运和富足，是很好的社交和旅行伙伴。", hard:"可能过度放纵或对关系期望过高。" },
+  "Saturn_Moon": { good:"土星方给予月亮方稳定的情感支持。关系严肃认真，有长期承诺的潜力。", hard:"月亮方可能感觉情感上被冷落或不被理解，需要更多温暖。" }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  REPORT GENERATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Deep Natal Chart Report ────────────────────────────────────────────────
+
+function detectStelliums(positions, houses) {
+  const signGroups = {};
+  const houseGroups = {};
+  for (const p of PLANETS) {
+    const lon = positions[p.id];
+    const {si} = degToSign(lon);
+    const h = houses[p.id];
+    if (!signGroups[si]) signGroups[si] = [];
+    signGroups[si].push(p);
+    if (!houseGroups[h]) houseGroups[h] = [];
+    houseGroups[h].push(p);
+  }
+  const stelliums = [];
+  for (const [si, planets] of Object.entries(signGroups)) {
+    if (planets.length >= 3) stelliums.push({type:'sign', index:parseInt(si), planets, label:SIGN_PURE[si]+'群星'});
+  }
+  for (const [h, planets] of Object.entries(houseGroups)) {
+    if (planets.length >= 3) stelliums.push({type:'house', index:parseInt(h), planets, label:'第'+h+'宫群星'});
+  }
+  return stelliums;
+}
+
+function detectKeyPatterns(positions, aspects) {
+  const patterns = [];
+  let diff = mod360(Math.abs(positions.Moon - positions.Venus));
+  if (diff > 180) diff = 360 - diff;
+  if (Math.abs(diff - 180) <= 8) patterns.push({name:'月金对冲', text:'你的情感需求（月亮）与爱的表达方式（金星）之间存在根本性的张力。你可能在亲密关系中反复经历"靠近-疏远"的循环。这是你星盘中最核心的情感课题——学会在爱中既不失去自我，也不筑起高墙。'});
+
+  diff = mod360(Math.abs(positions.Sun - positions.Saturn));
+  if (diff > 180) diff = 360 - diff;
+  if (Math.abs(diff - 90) <= 7 || Math.abs(diff - 180) <= 8 || Math.abs(diff) <= 8) {
+    patterns.push({name:'日土相位', text:'太阳与土星的相位赋予你强大的责任感和坚韧的意志力，但也可能带来对自我价值的严苛审判。你的人生成就往往在30岁之后才真正开始显现——这不是诅咒，而是让你有足够时间打好地基。'});
+  }
+
+  diff = mod360(Math.abs(positions.Mars - positions.Saturn));
+  if (diff > 180) diff = 360 - diff;
+  if (Math.abs(diff - 90) <= 7 || Math.abs(diff - 180) <= 8 || Math.abs(diff) <= 8) {
+    patterns.push({name:'火土相位', text:'火星与土星的相位赋予你惊人的毅力和持久力，但也让你容易在行动与克制之间反复拉扯。你的行动力需要经过"审查"才能释放——这让你不会轻易犯错，但也可能因过度克制而错失良机。'});
+  }
+
+  diff = mod360(Math.abs(positions.Uranus - positions.Neptune));
+  if (diff > 180) diff = 360 - diff;
+  if (Math.abs(diff) <= 8) {
+    patterns.push({name:'天海合相', text:'天王星与海王星的合相是1990年代出生者的共同印记。你这一代人在理想主义和科技创新之间拥有独特的桥梁——你们既是梦想家，也有能力将梦想落地。个人层面上，你需要在直觉和理性之间找到属于自己的平衡方式。'});
+  }
+
+  return patterns;
+}
+
+function generateDeepNatalReport(positions, houses, aspects, asc, mc) {
+  let html = '';
+
+  html += '<div class="report-section"><h3>✦ 整体格局 · 灵魂的蓝图</h3>';
+
+  const ec = {火:0,土:0,风:0,水:0};
+  const mc2 = {开创:0,固定:0,变动:0};
+  for (const p of PLANETS) {
+    const {si} = degToSign(positions[p.id]);
+    ec[ELEMENTS[si]]++;
+    mc2[MODES[si]]++;
+  }
+
+  const sortedElem = Object.entries(ec).sort((a,b)=>b[1]-a[1]);
+  const domElem = sortedElem[0];
+  const weakElem = sortedElem[3];
+  const sortedMode = Object.entries(mc2).sort((a,b)=>b[1]-a[1]);
+  const domMode = sortedMode[0];
+
+  html += '<p style="font-size:1.05em;color:var(--accent);text-indent:0;">';
+  html += `你的星盘呈现<strong>${domElem[0]}象主导</strong>（${domElem[1]}颗行星）· <strong>${domMode[0]}星座</strong>能量的格局。`;
+  if (weakElem[1] === 0) {
+    html += `值得注意的是<strong>${weakElem[0]}元素完全缺失</strong>——这不是缺陷，而是你此生的"空白画布"，你最深刻的学习和成长往往发生在${weakElem[0]}元素掌管的领域。`;
+  } else if (weakElem[1] <= 1) {
+    html += `${weakElem[0]}元素在你的星盘中较为薄弱（仅${weakElem[1]}颗），你在此领域可能需要更有意识地学习和补充。`;
+  }
+  html += '</p>';
+
+  if (domElem[0] === '水') {
+    html += '<p>水象主导意味着你的生命由情感、直觉和深层连接驱动。你像深海——表面上可能平静无波，但内部蕴含着巨大的能量和智慧。你做决定时依赖的是感受而非逻辑，这让你在人际和创意领域有天然优势。但也需要注意不要被情绪淹没，学会在必要时抽离。</p>';
+  } else if (domElem[0] === '土') {
+    html += '<p>土象主导让你拥有稳固的现实感和强大的执行力。在这个充满浮躁的时代，你的脚踏实地是稀缺的优势。你重视结果和实质，不喜欢空洞的理论和无法落地的承诺。但需要注意在追求安全感的过程中，不要关闭了探索未知的勇气。</p>';
+  } else if (domElem[0] === '火') {
+    html += '<p>火象主导赋予你充沛的生命力和行动力。你是人群中的点火者——你的热情和勇气能感染周围所有人。你不怕冒险，直觉式地知道什么时候该行动。但需要注意持续的耐力，以及在行动之前多听取他人的意见。</p>';
+  } else {
+    html += '<p>风象主导让你以理性、沟通和连接世界的方式运作。你的大脑是你最强大的工具，你天然懂得如何分析、表达和连接。人际网络和信息流是你最大的资源。但需要注意不要只活在头脑中，你的身体和情感也需要同等的关注。</p>';
+  }
+
+  html += '<p>行为模式上，' + domMode[0] + '星座的';
+  if (domMode[0] === '开创') html += '能量让你善于启动和开辟新局面，但可能在长期的坚持上需要额外的自律和支持系统。';
+  else if (domMode[0] === '固定') html += '特质让你一旦确定方向就坚定不移，耐力惊人，但也可能在需要改变时显得固执。';
+  else html += '灵活性让你能快速适应环境变化，但也可能在需要坚定时显得摇摆不定。';
+  html += '</p>';
+
+  const stelliums = detectStelliums(positions, houses);
+  if (stelliums.length > 0) {
+    html += '<p style="color:var(--accent);text-indent:0;">';
+    for (const s of stelliums) {
+      html += `⭐ <strong>${s.label}</strong>：${s.planets.map(p=>p.name).join('、')} 汇聚于此，`;
+      if (s.type === 'sign') html += `这个星座的能量在你生命中异常集中。该领域是你灵魂投入了最多"兵力"的地方——既是天赋所在，也是执着所在。`;
+      else html += `这个生活领域是你此生的核心舞台。该宫位的议题会反复出现在你人生的关键时刻。`;
+    }
+    html += '</p>';
+  }
+
+  html += '</div>';
+
+  html += '<div class="report-section"><h3>✦ 日月升 — 灵魂的三重奏</h3>';
+  const sunSign = degToSign(positions.Sun).si;
+  const moonSign = degToSign(positions.Moon).si;
+  const ascSign = degToSign(asc).si;
+  const sunHouse = houses.Sun || '?';
+  const moonHouse = houses.Moon || '?';
+
+  html += '<p style="color:var(--accent);text-indent:0;"><strong>太阳' + SIGN_PURE[sunSign] + ' · 第' + sunHouse + '宫</strong>：你的核心意志与生命目标。</p>';
+  html += '<p>' + (PLANET_SIGN.Sun[sunSign] || '') + '</p>';
+
+  html += '<p style="color:var(--accent);text-indent:0;margin-top:12px;"><strong>月亮' + SIGN_PURE[moonSign] + ' · 第' + moonHouse + '宫</strong>：你的情绪底色与内在安全感。</p>';
+  html += '<p>' + (PLANET_SIGN.Moon[moonSign] || '') + '</p>';
+
+  html += '<p style="color:var(--accent);text-indent:0;margin-top:12px;"><strong>上升' + SIGN_PURE[ascSign] + '</strong>：你与世界相遇时戴的面具，也是别人对你的第一印象。</p>';
+  html += '<p>上升' + SIGN_PURE[ascSign] + '赋予你' + SIGN_PURE[ascSign] + '的外在气质和行为方式。这是你的"默认模式"——当你不经思考地回应世界时，就是这个星座的能量在主导。' + (SIGN_MEANING[ascSign] || '') + '</p>';
+
+  html += '</div>';
+
+  const keyPatterns = detectKeyPatterns(positions, aspects);
+  if (keyPatterns.length > 0) {
+    html += '<div class="report-section"><h3>✦ 灵魂印记 — 关键格局</h3>';
+    for (const kp of keyPatterns) {
+      html += '<p><span class="highlight">' + kp.name + '</span>：' + kp.text + '</p>';
+    }
+    html += '</div>';
+  }
+
+  html += '<div class="report-section"><h3>✦ 行星深度解读</h3>';
+
+  const personalPlanets = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'];
+  for (const pid of personalPlanets) {
+    const lon = positions[pid];
+    const {si} = degToSign(lon);
+    const h = houses[pid] || '?';
+    const p = PLANETS.find(x=>x.id===pid);
+
+    const planetAspects = aspects.filter(a => a.p1===pid || a.p2===pid).slice(0, 4);
+    const aspectNames = planetAspects.map(a=>{
+      const other = a.p1===pid ? a.p2 : a.p1;
+      const otherName = PLANETS.find(x=>x.id===other)?.name||other;
+      return otherName + a.name;
+    });
+
+    html += '<p style="margin-top:12px;text-indent:0;"><span class="highlight">' + p.name + '在' + SIGN_PURE[si] + '／第' + h + '宫</span>';
+    if (aspectNames.length > 0) {
+      html += '（' + aspectNames.join('、') + '）';
+    }
+    html += '</p>';
+
+    const signText = PLANET_SIGN[pid] ? PLANET_SIGN[pid][si] : '';
+    html += '<p>' + (signText || '') + '</p>';
+
+    if (h !== '?') {
+      html += '<p style="font-size:0.88em;color:#9a9ab0;">落第' + h + '宫 — ' + (HOUSE_MEANINGS[h] || '') + '</p>';
+    }
+
+    for (const a of planetAspects.slice(0, 2)) {
+      const otherId = a.p1===pid ? a.p2 : a.p1;
+      const otherP = PLANETS.find(x=>x.id===otherId);
+      if (otherP) {
+        const nature = (a.name==='拱'||a.name==='六合') ? '和谐' : (a.name==='合'?'融合':(a.name==='冲'?'对立':'张力'));
+        html += '<p style="font-size:0.85em;color:#8a8aa0;">↳ 与' + otherP.name + '的' + a.name + '相（' + nature + '）：此相位为上述解读增添了' + nature + '的色彩。';
+        if (a.name==='冲') html += '两个行星所在的领域需要你在生活中不断寻找平衡点。';
+        else if (a.name==='刑') html += '内在的张力推动你在这两个领域之间不断成长和突破。';
+        else if (a.name==='拱') html += '两个领域的能量流动顺畅，是你可以善用的天赋管道。';
+        else if (a.name==='六合') html += '这是一个"机会窗口"——需要你主动作为才能激活的潜能。';
+        else html += '两股能量合而为一，此领域对你影响深远而持久。';
+        html += '</p>';
+      }
+    }
+  }
+  html += '</div>';
+
+  html += '<div class="report-section"><h3>✦ 此生的核心课题</h3>';
+
+  const satSign = degToSign(positions.Saturn).si;
+  const satHouse = houses.Saturn || '?';
+  html += '<p><span class="highlight">土星在' + SIGN_PURE[satSign] + '／第' + satHouse + '宫</span>揭示了你此生最重要的功课所在。</p>';
+  html += '<p>' + (PLANET_SIGN.Saturn ? PLANET_SIGN.Saturn[satSign] : '') + '</p>';
+
+  html += '<p style="border-left:3px solid var(--gold-dim);padding-left:16px;margin-top:16px;color:var(--accent);">';
+  html += '你的星盘是一幅' + (ec['水']>=4?'情感深邃':'') + (ec['土']>=3?'根基稳固':'') + '的图景。你的力量不在于"无所不能"，而在于' + (ec['水']>=3?'感受的深度和直觉的精准':'') + (ec['土']>=2?'持久的耐力和现实的判断力':'') + '。信任你的内在节奏——你不需要成为别人，你只需要成为最完整的自己。';
+  html += '</p>';
+
+  html += '</div>';
+
+  return html;
+}
+
+// ── Natal Chart Report ────────────────────────────────────────────────────
+function generateNatalReport(positions, houses, aspects, asc, mc) {
+  let html = '<div class="report-section">';
+  html += '<h3>✦ 整体格局</h3>';
+
+  // Element & Mode tally
+  const ec = {火:0,土:0,风:0,水:0};
+  const mc2 = {开创:0,固定:0,变动:0};
+  for (const p of PLANETS) {
+    const {si} = degToSign(positions[p.id]);
+    ec[ELEMENTS[si]]++;
+    mc2[MODES[si]]++;
+  }
+
+  const domElem = Object.entries(ec).sort((a,b)=>b[1]-a[1])[0];
+  const weakElem = Object.entries(ec).sort((a,b)=>a[1]-b[1])[0];
+  const domMode = Object.entries(mc2).sort((a,b)=>b[1]-a[1])[0];
+
+  html += `<p>你的星盘中<span class="highlight">${domElem[0]}元素</span>（${ELEM_EMOJI[domElem[0]]}）最为突出，共${domElem[1]}颗行星落入${domElem[0]}象星座，`;
+  if (domElem[0] === '火') html += '你是一个充满行动力和激情的人，敢于冒险，勇往直前。';
+  else if (domElem[0] === '土') html += '你是一个务实稳健的人，重视物质基础，做事脚踏实地。';
+  else if (domElem[0] === '风') html += '你是一个理性思考者，重视信息交流和人际关系，思维活跃。';
+  else html += '你是一个情感丰富的人，直觉力强，内心世界深邃。';
+
+  if (weakElem[1] <= 1) {
+    html += `${weakElem[0]}元素在你的星盘中相对薄弱，这恰恰是你此生需要重点发展和学习的领域。</p>`;
+  } else {
+    html += `</p>`;
+  }
+
+  html += `<p>你的行为模式以<span class="highlight">${domMode[0]}星座</span>为主，`;
+  if (domMode[0] === '开创') html += '善于开创局面，主导事情的走向；';
+  else if (domMode[0] === '固定') html += '坚韧不拔，一旦确定方向就坚定不移；';
+  else html += '灵活应变，善于适应环境和调整策略。';
+  html += '</p></div>';
+
+  // Sun, Moon, ASC
+  html += '<div class="report-section"><h3>✦ 日月升 — 灵魂的三重奏</h3>';
+  const sunSign = degToSign(positions.Sun).si;
+  const moonSign = degToSign(positions.Moon).si;
+  const ascSign = degToSign(asc).si;
+  html += `<p><span class="highlight">太阳${SIGN_PURE[sunSign]}</span>代表你的核心意志和人生目标。${(PLANET_SIGN.Sun||{})[sunSign]||''}</p>`;
+  html += `<p><span class="highlight">月亮${SIGN_PURE[moonSign]}</span>代表你的情绪底色和内在安全感。${(PLANET_SIGN.Moon||{})[moonSign]||''}</p>`;
+  html += `<p><span class="highlight">上升${SIGN_PURE[ascSign]}</span>是你戴的面具，也是别人见你的第一印象。上升${SIGN_PURE[ascSign]}赋予你${SIGN_PURE[ascSign]}的外在气质。</p>`;
+  html += '</div>';
+
+  // Key planets
+  html += '<div class="report-section"><h3>✦ 重点行星解读</h3>';
+  const keyPlanets = ['Sun','Moon','Mercury','Venus','Mars'];
+  for (const pid of keyPlanets) {
+    const lon = positions[pid];
+    const {si} = degToSign(lon);
+    const h = houses[pid] || '?';
+    const p = PLANETS.find(x=>x.id===pid);
+    html += `<p><span class="highlight">${p.name}在${SIGN_PURE[si]}／第${h}宫</span> — `;
+    if (PLANET_SIGN[pid] && PLANET_SIGN[pid][si]) {
+      html += PLANET_SIGN[pid][si].slice(0, -1) + `。`;
+    }
+    html += `落第${h}宫，${HOUSE_MEANINGS[h]||''}</p>`;
+  }
+  html += '</div>';
+
+  // Major aspects
+  html += '<div class="report-section"><h3>✦ 重要相位</h3>';
+  const majorAspects = aspects.filter(a =>
+    ['Sun','Moon','Mercury','Venus','Mars'].includes(a.p1) ||
+    ['Sun','Moon','Mercury','Venus','Mars'].includes(a.p2)
+  ).slice(0, 8);
+  for (const a of majorAspects) {
+    const n1 = PLANETS.find(x=>x.id===a.p1)?.name||a.p1;
+    const n2 = PLANETS.find(x=>x.id===a.p2)?.name||a.p2;
+    html += `<p><span class="${a.cls}">${n1} ${a.name} ${n2}</span>（偏差${a.orb.toFixed(1)}°）— `;
+    if (a.name==='合') html += '两股能量融为一体，此领域对你影响深远。';
+    else if (a.name==='拱'||a.name==='六合') html += '能量流动顺畅，是你的天赋所在。';
+    else html += '内在张力推动你不断成长和突破。';
+    html += '</p>';
+  }
+  html += '</div>';
+
+  return html;
+}
+
+// ── Deep 5-Year Forecast ───────────────────────────────────────────────────
+
+function generateDeepForecast(positions, houses, mc) {
+  const now = new Date();
+  const nowJD = julianDay(now.getFullYear(), now.getMonth()+1, now.getDate(),
+    now.getHours() + now.getMinutes()/60.0);
+  const nowT = centuriesSinceJ2000(nowJD);
+  const transitNow = calcAllPlanets(nowT);
+
+  const transitPlanets = [
+    {id:"Jupiter", label:"木星", period:"约1年/星座", theme:"机遇、扩张、幸运"},
+    {id:"Saturn", label:"土星", period:"约2.5年/星座", theme:"考验、责任、成长"},
+    {id:"Uranus", label:"天王星", period:"约7年/星座", theme:"突变、觉醒、突破"},
+    {id:"Neptune", label:"海王星", period:"约14年/星座", theme:"梦想、消融、灵性"},
+    {id:"Pluto", label:"冥王星", period:"约15-20年/星座", theme:"蜕变、权力、重生"}
+  ];
+
+  // Natal element counts for synthesis
+  const ec = {火:0,土:0,风:0,水:0};
+  for (const p of PLANETS) {
+    const {si} = degToSign(positions[p.id]);
+    ec[ELEMENTS[si]]++;
+  }
+
+  let html = '';
+
+  // ═══ Section 1: Current Major Transits ═══
+  html += '<div class="report-section">';
+  html += `<p style="text-indent:0;color:var(--text-dim);margin-bottom:16px;">当前行运深度分析（基于 ${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日天象）</p>`;
+
+  for (const tp of transitPlanets) {
+    const tl = transitNow[tp.id];
+    const {si} = degToSign(tl);
+    html += `<h3>✦ ${tp.label}行运 — ${tp.theme}</h3>`;
+    html += `<p><span class="highlight">${tp.label}当前位于${SIGNS[si]}</span>，${tp.period}。</p>`;
+
+    // Current sign interpretation for outer planets
+    if (tp.id === 'Jupiter') {
+      const jHouse = houses.Jupiter || '?';
+      html += `<p>木星是你星盘中的幸运之星，当前它正在你第${jHouse}宫领域释放扩张能量。这是你${jHouse <= 6 ? '个人成长':'外部世界'}层面最易获得突破的阶段。</p>`;
+    } else if (tp.id === 'Saturn') {
+      const sHouse = houses.Saturn || '?';
+      html += `<p>土星是你此生的主要功课导师，当前它正穿行于你第${sHouse}宫，要求你在这个领域建立结构、承担责任。虽然过程不轻松，但所有在此阶段打下的基础将支撑你未来数十年的发展。</p>`;
+    } else if (tp.id === 'Uranus') {
+      html += '<p>天王星带来不可预测的转变。它正在松动你生活中那些"理所当然"的领域——看似突然的改变其实是你内心早已渴望的解放。</p>';
+    } else if (tp.id === 'Neptune') {
+      html += '<p>海王星正在模糊某些边界，让你的直觉和灵感异常活跃。但同时也需要警惕自欺欺人和不切实际的幻想——尤其是在金钱和承诺方面。</p>';
+    } else if (tp.id === 'Pluto') {
+      html += '<p>冥王星正在进行深层的灵魂手术。它在剥除那些不再服务于你最高利益的东西——虽然过程伴随失去的痛感，但每一次"死亡"都孕育着更强大的重生。</p>';
+    }
+
+    // Check aspects to natal planets
+    const natalAspects = [];
+    for (const p of PLANETS) {
+      let diff = mod360(Math.abs(tl - positions[p.id]));
+      if (diff > 180) diff = 360 - diff;
+      for (const ad of ASPECT_DEFS) {
+        const delta = Math.abs(diff - ad.angle);
+        if (delta <= ad.orb) {
+          natalAspects.push({planet:p, aspect:ad.name, orb:delta, cls:ad.cls});
+        }
+      }
+    }
+
+    if (natalAspects.length > 0) {
+      html += '<p style="margin-top:8px;text-indent:0;"><strong>当前与本命行星的关键链接：</strong></p>';
+      for (const na of natalAspects.slice(0, 5)) {
+        let forecast = '';
+        const pid = na.planet.id;
+        if (tp.id === 'Jupiter') {
+          if (pid === 'Sun') forecast = '个人影响力显著扩大，事业发展迎来重要机遇。你的自信和魅力处于高峰期，适合争取更高职位或开启新项目。';
+          else if (pid === 'Moon') forecast = '家庭和情感领域充满温暖和好运。适合搬家、装修、或改善家庭关系。内心的安全感增强。';
+          else if (pid === 'Mercury') forecast = '学习和沟通运势极佳，适合考试、签约、开展新业务。你的想法更容易被他人接受和支持。';
+          else if (pid === 'Venus') forecast = '感情和财运的双重利好！桃花旺盛，容易遇到有缘人；投资和艺术相关领域也有不错的回报。';
+          else if (pid === 'Mars') forecast = '行动力和勇气爆棚，适合创业、竞赛或启动需要胆识的项目。但要避免过度乐观冒进。';
+          else if (pid === 'Jupiter') forecast = '本命木星被激活——这是"双重幸运"的时期，人生重要目标有望取得突破性进展。';
+          else if (pid === 'Saturn') forecast = '长期坚持的努力开始显现回报。财务上的长期投资或事业上的持久付出迎来收获期。';
+          else forecast = '该领域迎来扩展和幸运的能量，善用这段时间的顺风。';
+        } else if (tp.id === 'Saturn') {
+          if (pid === 'Sun') forecast = '这是你人生中的"大考"时期。事业和责任压力增大，但这也是你奠定长期成就的关键阶段。保持自律，成果将在1-2年后显现。';
+          else if (pid === 'Moon') forecast = '情感和家庭领域面临成熟化的压力。可能需要承担更多家庭责任，或重新审视你的情感需求与安全感的来源。';
+          else if (pid === 'Mercury') forecast = '思维变得更加严谨务实，适合深度学习、重要决策和长期规划。注意不要陷入过度悲观或自我怀疑。';
+          else if (pid === 'Venus') forecast = '感情关系经历现实考验。不稳固的关系可能走向终结，而真正有价值的关系将变得更加深厚和有承诺。财务上趋于保守。';
+          else if (pid === 'Mars') forecast = '行动受阻的感觉让你沮丧，但这其实是宇宙在教你"精准发力"。与其硬冲，不如重新审视策略和方向。';
+          else if (pid === 'Saturn') forecast = '土星回归！这是约29年一次的人生重要转折点。你在重新定义自己的身份、责任和人生方向。';
+          else forecast = '该领域需要你承担更多责任，付出努力将获得长期回报。';
+        } else if (tp.id === 'Uranus') {
+          if (pid === 'Sun' || pid === 'Mars') forecast = '生活中可能发生突如其来的变化，打破旧有模式。这可能表现为突然的职业转变、搬家、或重要的个人觉醒。';
+          else if (pid === 'Venus' || pid === 'Moon') forecast = '情感关系可能经历意想不到的转折。单身的你可能突然遇到一个完全不同类型的人；有伴的可能需要给彼此更多自由和空间。';
+          else if (pid === 'Mercury') forecast = '思维异常活跃，灵感迸发。适合创新和突破性思考，但注意不要因为想法太多而无法深入。';
+          else forecast = '该领域可能经历意想不到的变化和觉醒，顺应改变而非抗拒。';
+        } else if (tp.id === 'Neptune') {
+          if (pid === 'Sun' || pid === 'Moon') forecast = '直觉异常敏锐的时期，但方向感可能变得模糊。适合灵性探索和创意工作，但在重大决策上需要更多理性验证。';
+          else if (pid === 'Venus') forecast = '浪漫氛围浓厚，但需警惕"滤镜效应"——你可能在感情中看到的是自己投射的理想而非真实的人。财务上避免模糊不清的安排。';
+          else if (pid === 'Mars') forecast = '行动力可能被迷茫感稀释。与其强迫自己前进，不如利用这段时间进行内在探索和调整。';
+          else forecast = '该领域需要你信任直觉，但同时保持清醒的边界感。';
+        } else if (tp.id === 'Pluto') {
+          if (pid === 'Sun' || pid === 'Moon') forecast = '深刻的身份转化正在发生。你可能发现自己不再认同过去的某些身份标签——你正在蜕变成一个更真实的自己。';
+          else if (pid === 'Venus') forecast = '情感领域正在经历深度转化。控制与被控制、占有与放手的课题浮现。真正的爱不依赖操控，而在于信任与自由。';
+          else if (pid === 'Mars' || pid === 'Saturn') forecast = '你的事业方向和权力位置经历深刻重组。某些局面可能面临"不破不立"的选择——相信这个过程中的毁灭是为了更好的重建。';
+          else forecast = '该领域正在经历根本性的转化，旧的不去新的不来。';
+        }
+        html += `<p>${tp.label}${na.aspect}本命${na.planet.name} → ${forecast}</p>`;
+      }
+    } else {
+      html += `<p style="color:var(--text-dim);">${tp.label}目前与本命行星无紧密相位，该领域的直接影响较为温和，是整合和准备的好时机。</p>`;
+    }
+  }
+  html += '</div>';
+
+  // ═══ Section 2: 5-Year Timeline ═══
+  html += '<div class="report-section"><h3>✦ 未来五年 · 关键时间线</h3>';
+  html += '<p style="color:var(--text-dim);margin-bottom:12px;">以下时间线基于外行星行运与本命行星的相位推算。时间节点为近似值，实际感受可能提前或延后1-2个月。</p>';
+
+  // Compute 6-month intervals
+  const intervals = [];
+  for (let i = 0; i <= 10; i++) {
+    const intJD = nowJD + i * 182.625; // ~6 months in days
+    const intT = centuriesSinceJ2000(intJD);
+    const intPos = calcAllPlanets(intT);
+    const intDate = new Date(now.getTime() + i * 182.625 * 86400000);
+    const label = intDate.getFullYear() + '年' + (intDate.getMonth()+1) + '月';
+
+    // Find key aspects at this interval
+    const keyTransits = [];
+    const outerIds = ['Jupiter','Saturn','Uranus','Neptune','Pluto'];
+    const personalIds = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'];
+    for (const oid of outerIds) {
+      for (const pid of personalIds) {
+        if (oid === pid) continue;
+        let diff = mod360(Math.abs(intPos[oid] - positions[pid]));
+        if (diff > 180) diff = 360 - diff;
+        for (const ad of ASPECT_DEFS) {
+          const delta = Math.abs(diff - ad.angle);
+          if (delta <= ad.orb + 2) { // slightly wider orb for forecasting
+            const op = PLANETS.find(x=>x.id===oid);
+            const pp = PLANETS.find(x=>x.id===pid);
+            keyTransits.push({
+              transitPlanet: op ? op.name : oid,
+              natalPlanet: pp ? pp.name : pid,
+              aspect: ad.name,
+              orb: delta
+            });
+          }
+        }
+      }
+    }
+
+    intervals.push({label, keyTransits});
+  }
+
+  html += '<table class="chart-table" style="font-size:0.82em;">';
+  html += '<thead><tr><th>时间段</th><th>关键行运</th><th>主题</th></tr></thead><tbody>';
+
+  for (const iv of intervals) {
+    let theme = '', rowClass = '';
+    if (iv.keyTransits.length === 0) {
+      theme = '平稳整合期 — 适合巩固已有成果，为下一阶段做准备。';
+    } else {
+      const hasJupiter = iv.keyTransits.some(t=>t.transitPlanet.includes('木星'));
+      const hasSaturn = iv.keyTransits.some(t=>t.transitPlanet.includes('土星'));
+      const hasUranus = iv.keyTransits.some(t=>t.transitPlanet.includes('天王'));
+      const hasNeptune = iv.keyTransits.some(t=>t.transitPlanet.includes('海王'));
+      const hasPluto = iv.keyTransits.some(t=>t.transitPlanet.includes('冥王'));
+
+      if (hasJupiter && !hasSaturn) { theme = '机遇扩展期 ✦ '; rowClass = ' style="border-left:3px solid var(--gold-dim);"'; }
+      else if (hasSaturn && hasJupiter) { theme = '成长突破期 ⚡ '; }
+      else if (hasSaturn) { theme = '责任考验期 ⚙ '; }
+      else if (hasUranus || hasPluto) { theme = '重大转折期 🔥 '; }
+      else if (hasNeptune) { theme = '内省调整期 ~ '; }
+      else { theme = '稳定发展期 ● '; }
+
+      theme += iv.keyTransits.map(t=>t.transitPlanet+t.aspect+t.natalPlanet).slice(0,4).join('，');
+      if (iv.keyTransits.length > 4) theme += ' 等...';
+    }
+
+    html += `<tr${rowClass}><td>${iv.label}</td><td>${iv.keyTransits.length === 0 ? '—' : iv.keyTransits.length+'个重要相位'}</td><td>${theme}</td></tr>`;
+  }
+
+  html += '</tbody></table>';
+  html += '<p style="color:var(--text-dim);margin-top:8px;">※ 行运的影响是渐进的——在准确成相的前后几周内感受最为明显。外行星运行缓慢，一个相位的影响可能持续数月至一年以上。</p>';
+  html += '</div>';
+
+  // ═══ Section 3: Topic Deep Dive ═══
+  html += '<div class="report-section"><h3>✦ 三大主题深度分析</h3>';
+
+  // --- 财运 ---
+  html += '<h4 style="color:var(--gold);margin-top:16px;">💰 财运深度分析</h4>';
+  const venusSign = degToSign(positions.Venus).si;
+  const jupiterSign = degToSign(positions.Jupiter).si;
+  const saturnSign = degToSign(positions.Saturn).si;
+  const venusHouse = houses.Venus || '?';
+  const jupiterHouse = houses.Jupiter || '?';
+
+  html += '<p>你的财运格局由金星（价值观与吸引力）和木星（扩张与幸运）共同塑造。</p>';
+
+  if (ec['土'] >= 3) {
+    html += '<p>你的土象元素突出，天然具备稳健的理财基因。你倾向于通过长期积累和务实投资来增长财富，而非追求快速暴富。这种特质让你在长期财富竞赛中占有优势——你能守住别人守不住的钱。</p>';
+  } else if (ec['水'] >= 3) {
+    html += '<p>水象主导的你对金钱的态度往往是情感化的——赚钱的动力与安全感、情感连接紧密相关。你的财富机会往往与人际关系和直觉判断有关。投资方面的第六感常常很准，但需要搭配理性的风险管理。</p>';
+  } else if (ec['火'] >= 3) {
+    html += '<p>火象的你财富机会来自大胆的行动。创业、投资有成长潜力的领域、或将热情转化为产品和服务是你积累财富的主要路径。需要注意平衡冒险精神和财务安全底线。</p>';
+  } else {
+    html += '<p>风象的你财富与人脉和信息流密切相关。你的价值在于知识和连接能力——通过专业服务、咨询、或信息差创造财富是你最擅长的路径。</p>';
+  }
+
+  // Jupiter transit timing
+  const jupiterNatalHouse = houses.Jupiter || 1;
+  const jupiterCycleYear = (jupiterNatalHouse + 5) % 12 || 12;
+  html += `<p><strong>关键时间窗口：</strong>当行运木星进入你第${jupiterHouse}宫和第${((jupiterHouse%12)+2)}宫附近时（约每6年一次），是财务扩张的最佳时机。下一个重要窗口期在木星经过你太阳星座及其对宫时——届时新的收入渠道或投资机会将自然浮现。</p>`;
+
+  html += '<p style="color:var(--accent);">你的财务策略应聚焦于：发挥' + (ec['土']>=3?'稳健长期的复利思维':'') + (ec['火']>=3?'将热情转化为收入的创业能力':'') + (ec['水']>=3?'跟随直觉同时做好风险控制':'') + (ec['风']>=2?'构建多元化的收入来源':'') + '。</p>';
+
+  // --- 事业 ---
+  html += '<h4 style="color:var(--gold);margin-top:16px;">💼 事业深度分析</h4>';
+  const sunSignN = degToSign(positions.Sun).si;
+  const marsSign = degToSign(positions.Mars).si;
+  const sunHouse = houses.Sun || '?';
+  const marsHouse = houses.Mars || '?';
+  const mcSign = degToSign(mc).si;
+
+  html += '<p>你的事业格局由太阳（核心驱动力）+ 火星（行动模式）+ 中天MC（社会形象）共同定义。</p>';
+  html += `<p>太阳落第${sunHouse}宫暗示你的核心成就感来自${HOUSE_MEANINGS[sunHouse] || '个人成长'}领域。火星落第${marsHouse}宫则说明你的行动能量主要在${HOUSE_MEANINGS[marsHouse] || '行动'}领域释放。你的中天${SIGN_PURE[mcSign]}为你在这个世界上的"职业面孔"涂上了${SIGN_PURE[mcSign]}的色彩。</p>`;
+
+  // Career path based on dominant element
+  if (ec['火'] >= 3) {
+    html += '<p>火象主导赋予你开拓型职业生涯的潜能。适合创业、管理、销售、或任何需要领导力和驱动力的领域。你的职业满足感来自"做大事"和"影响他人"——被限制在格子间里做重复性工作会消耗你的生命力。</p>';
+  } else if (ec['土'] >= 3) {
+    html += '<p>土象主导让你在需要耐心和方法的职业中脱颖而出。金融、工程、建筑、医疗、或任何需要积累和精进的领域都适合你。你不在意一时的光环，而更看重长期的积累和实质性的产出。</p>';
+  } else if (ec['水'] >= 3) {
+    html += '<p>水象主导适合与人深度相关的职业——心理咨询、艺术创作、医疗护理、教育、或任何需要同理心和情感智慧的领域。你的职业满足感来自于"触及他人的灵魂"而非纯粹的商业成就。</p>';
+  } else {
+    html += '<p>风象主导适合与人沟通和信息处理相关的职业——媒体、科技、法律、咨询、写作、或任何需要分析能力和社交智慧的领域。多元化和持续学习是你职业生涯的关键词。</p>';
+  }
+
+  // Saturn transit for career
+  html += '<p><strong>事业关键时间线：</strong>土星行运经过你的太阳、火星、或MC附近时（约每7年循环中的关键节点），是你事业面临重要考验和飞跃的时期。未来5年中，当行运木星与你的MC或太阳形成和谐相位时，是晋升、跳槽或创业的黄金窗口。</p>';
+
+  // --- 桃花 ---
+  html += '<h4 style="color:var(--gold);margin-top:16px;">💕 桃花运深度分析</h4>';
+  const moonSignN = degToSign(positions.Moon).si;
+  const marsHouseN = houses.Mars || '?';
+
+  html += '<p>你的情感格局由月亮（情感需求）+ 金星（爱的表达）+ 火星（欲望模式）交织而成。</p>';
+  html += `<p>月亮${SIGN_PURE[moonSignN]}的你需要${moonSignN <= 3 ? '安全感和情绪共鸣' : moonSignN <= 7 ? '尊重和情感确认' : '自由与精神连接'}来感到被爱。金星${SIGN_PURE[venusSign]}则决定了你如何表达爱意——以及在什么样的人身上看到美。火星落第${marsHouseN}宫透露出你的激情最容易在${HOUSE_MEANINGS[marsHouseN] || '行动'}领域被点燃。</p>`;
+
+  if (ec['水'] >= 3) {
+    html += '<p>水象元素突出的你在感情中深度优先。你不需要很多段关系，但每一段都必须触及灵魂。你的挑战在于学会保护自己的情感边界——不是所有人都值得你的深度共情。</p>';
+  } else if (ec['火'] >= 3) {
+    html += '<p>火象的你在感情中热情主动、敢于表达。你容易被自信和有活力的人吸引。挑战在于学会持久的耐心——爱情的初始火花需要细水长流的养护才能成为温暖的火焰。</p>';
+  } else if (ec['土'] >= 3) {
+    html += '<p>土象的你在感情中务实而忠诚。你不会轻易开始一段关系，但一旦开始就会用心经营。挑战在于不要让"安全感"成为唯一的标准——有时候最好的爱来自最不按常理出牌的人。</p>';
+  } else {
+    html += '<p>风象的你在感情中重视精神契合和有趣的对话。你需要一个能与你持续对话的伴侣。挑战在于学会沉入情感的深水区——思考爱和感受爱是两件不同的事。</p>';
+  }
+
+  // Key romance windows
+  html += '<p><strong>桃花关键时间线：</strong>行运木星经过你的金星、月亮或第5/7宫时，是桃花最旺的时期。行运天王星触碰到本命金星时，则可能出现"电光火石"式的情感转折——可能是突如其来的邂逅，也可能是一次重要的关系重组。未来5年中，注意以下窗口：木星每约1年切换一次星座，当它进入与你金星同元素的星座时（约每3年一次），你的情感磁场会明显增强。</p>';
+  html += '</div>';
+
+  return html;
+}
+
+// ── 5-Year Forecast ───────────────────────────────────────────────────────
+function generateForecast(positions, houses) {
+  // Use "current" positions computed for July 2026 (approximate)
+  const now = new Date();
+  const nowJD = julianDay(now.getFullYear(), now.getMonth()+1, now.getDate(),
+    now.getHours() + now.getMinutes()/60.0);
+  const nowT = centuriesSinceJ2000(nowJD);
+  const transitPos = calcAllPlanets(nowT);
+
+  const transitPlanets = [
+    {id:"Jupiter", label:"木星", period:"约1年/星座", theme:"机遇、扩张、幸运"},
+    {id:"Saturn", label:"土星", period:"约2.5年/星座", theme:"考验、责任、成长"},
+    {id:"Uranus", label:"天王星", period:"约7年/星座", theme:"突变、觉醒、突破"}
+  ];
+
+  let html = '<div class="report-section">';
+  html += `<p style="text-indent:0;color:var(--text-dim);margin-bottom:16px;">当前行运分析（基于 ${now.getFullYear()}年${now.getMonth()+1}月天象）</p>`;
+
+  for (const tp of transitPlanets) {
+    const tl = transitPos[tp.id];
+    const {si} = degToSign(tl);
+    html += `<h3>✦ ${tp.label}行运（${tp.theme}）</h3>`;
+    html += `<p><span class="highlight">${tp.label}当前位于${SIGNS[si]}</span>，${tp.period}。</p>`;
+
+    // Check aspects to natal
+    const natalAspects = [];
+    for (const p of PLANETS) {
+      let diff = mod360(Math.abs(tl - positions[p.id]));
+      if (diff > 180) diff = 360 - diff;
+      for (const ad of ASPECT_DEFS) {
+        const delta = Math.abs(diff - ad.angle);
+        if (delta <= ad.orb) {
+          natalAspects.push({planet:p, aspect:ad.name, orb:delta, cls:ad.cls});
+        }
+      }
+    }
+
+    if (natalAspects.length > 0) {
+      for (const na of natalAspects.slice(0, 4)) {
+        const area = na.planet.id;
+        let forecast = '';
+        if (tp.id === 'Jupiter') {
+          if (area === 'Sun' || area === 'Jupiter') forecast = '事业发展迎来重要机遇，个人影响力扩大。';
+          else if (area === 'Venus') forecast = '人际关系和财运方面的好运，桃花旺盛。';
+          else if (area === 'Mars') forecast = '行动力和勇气增强，适合创业或新项目启动。';
+          else if (area === 'Saturn') forecast = '财务或事业上的长期投资开始回报。';
+          else forecast = '该领域迎来扩展和幸运的能量。';
+        } else if (tp.id === 'Saturn') {
+          if (area === 'Sun' || area === 'Mars') forecast = '事业上面临重要考验，需要更加努力和自律。这是奠定长期成就的时期。';
+          else if (area === 'Moon' || area === 'Venus') forecast = '情感和家庭领域面临成熟化的压力，需要更负责任地处理关系。';
+          else if (area === 'Mercury') forecast = '思维变得更加严谨务实，适合学习深造或重要决策。';
+          else forecast = '该领域需要承担更多责任，付出努力将获得长期回报。';
+        } else {
+          if (area === 'Sun' || area === 'Mars') forecast = '生活中可能发生突如其来的变化，打破旧有模式，带来新的可能。';
+          else if (area === 'Venus' || area === 'Moon') forecast = '情感关系可能经历意想不到的转折，引导你走向更真实的自我。';
+          else forecast = '该领域可能经历意想不到的变化和觉醒。';
+        }
+        html += `<p>${tp.label}${na.aspect}本命${na.planet.name} → ${forecast}</p>`;
+      }
+    } else {
+      html += `<p>${tp.label}目前与本命行星无紧密相位，该领域处于平稳过渡期。</p>`;
+    }
+  }
+
+  // Summary by topic
+  html += '<h3>✦ 专题运势摘要</h3>';
+  const ascHouse = houses.Sun || 1;
+  html += `<p><span class="highlight">💰 财运：</span>基于你的星盘配置，财富积累的关键在于发挥你的核心优势。`;
+  if (ec2(positions)['土'] >= 3) html += '你天生具有较强的理财能力，未来5年通过稳健投资和长期规划可获得稳定增长。';
+  else if (ec2(positions)['火'] >= 3) html += '你的财富机会来自大胆的行动和创业精神，但需注意风险管理。';
+  else html += '财运与你的人际网络和专业技能紧密相关，持续深耕专业领域将带来回报。';
+  html += '</p>';
+
+  html += `<p><span class="highlight">💼 事业运：</span>`;
+  const mcSign = degToSign(positions.Sun).si; // approximate
+  if (mcSign >= 9 && mcSign <= 11 || mcSign <= 1) html += '未来五年是你事业的关键上升期，社会地位和影响力有望显著提升。把握好当下的努力方向。';
+  else html += '事业发展的重点在于深耕专业能力和建立可靠的合作伙伴关系。稳步前进，不急于求成。';
+  html += '</p>';
+
+  html += `<p><span class="highlight">💕 桃花运：</span>`;
+  const venusSign = degToSign(positions.Venus).si;
+  if (venusSign >= 2 && venusSign <= 4) html += '你的魅力正在上升期，未来两年桃花运势较强。真诚表达自我，美好的缘分自然会来。';
+  else if (venusSign >= 6 && venusSign <= 8) html += '深度情感连接是你未来五年的主题。质量重于数量，一段深刻的关系比众多浅薄的缘分更有价值。';
+  else html += '桃花运平缓上升，在事业和社交场合中容易遇到志同道合的人。保持开放的心态。';
+  html += '</p></div>';
+
+  return html;
+}
+
+function ec2(positions) {
+  const ec = {火:0,土:0,风:0,水:0};
+  for (const p of PLANETS) {
+    const {si} = degToSign(positions[p.id]);
+    ec[ELEMENTS[si]]++;
+  }
+  return ec;
+}
+
+// ── Synastry Report ───────────────────────────────────────────────────────
+function generateSynastryReport(pos1, pos2, asc1, asc2) {
+  let html = '<div class="report-section">';
+
+  // Cross aspects
+  const crossAspects = [];
+  for (const p1 of PLANETS) {
+    for (const p2 of PLANETS) {
+      let diff = mod360(Math.abs(pos1[p1.id] - pos2[p2.id]));
+      if (diff > 180) diff = 360 - diff;
+      for (const ad of ASPECT_DEFS) {
+        const delta = Math.abs(diff - ad.angle);
+        if (delta <= ad.orb) {
+          crossAspects.push({p1:p1.id, p2:p2.id, name:ad.name, orb:delta, angle:ad.angle});
+        }
+      }
+    }
+  }
+
+  // Score
+  let goodScore = 0, hardScore = 0;
+  for (const a of crossAspects) {
+    if (a.name === '拱' || a.name === '六合') goodScore += a.name==='拱' ? 3 : 2;
+    else if (a.name === '合') goodScore += 2;
+    else if (a.name === '刑') hardScore += 2;
+    else if (a.name === '冲') hardScore += 3;
+  }
+
+  const total = goodScore + hardScore;
+  const compatPct = total > 0 ? Math.round(goodScore / total * 100) : 50;
+
+  html += '<div class="score-display">';
+  if (compatPct >= 75) html += `💫 契合度：较高（${compatPct}%）`;
+  else if (compatPct >= 55) html += `✨ 契合度：中等偏上（${compatPct}%）`;
+  else if (compatPct >= 40) html += `🌗 契合度：中等（${compatPct}%）`;
+  else html += `🌑 契合度：充满挑战（${compatPct}%）`;
+  html += '</div>';
+
+  html += `<p style="text-align:center;color:var(--text-dim);">和谐相位 ${goodScore} 分 / 紧张相位 ${hardScore} 分</p>`;
+
+  // Key synastry aspects
+  html += '<h3>✦ 关键合盘相位</h3>';
+  const keyPairs = [
+    ['Sun','Moon'],['Sun','Venus'],['Sun','Mars'],
+    ['Moon','Venus'],['Moon','Mars'],['Venus','Mars'],
+    ['Sun','Saturn'],['Moon','Saturn'],['Jupiter','Venus']
+  ];
+
+  let found = false;
+  for (const [p1,p2] of keyPairs) {
+    for (const a of crossAspects) {
+      if ((a.p1===p1&&a.p2===p2) || (a.p1===p2&&a.p2===p1)) {
+        found = true;
+        const key = `${p1}_${p2}`;
+        const reversalKey = `${p2}_${p1}`;
+        const data = SYNASTRY_ASPECTS[key] || SYNASTRY_ASPECTS[reversalKey];
+        if (data) {
+          const n1 = PLANETS.find(x=>x.id===p1)?.name||p1;
+          const n2 = PLANETS.find(x=>x.id===p2)?.name||p2;
+          const cls = (a.name==='拱'||a.name==='六合'||a.name==='合') ? 'aspect-good' : 'aspect-hard';
+          const text = (a.name==='拱'||a.name==='六合'||a.name==='合') ? data.good : data.hard;
+          html += `<p><span class="${cls}">${n1} ${a.name} ${n2}</span> — ${text}</p>`;
+        }
+        break;
+      }
+    }
+  }
+  if (!found) {
+    html += '<p>你们的行星之间没有形成传统意义上的紧密相位，关系可能更多受到外在因素或其他星盘配置的影响。</p>';
+  }
+
+  // Element compatibility
+  html += '<h3>✦ 元素契合度分析</h3>';
+  const asc1Sign = degToSign(asc1).si;
+  const asc2Sign = degToSign(asc2).si;
+  const e1 = ELEMENTS[asc1Sign], e2 = ELEMENTS[asc2Sign];
+
+  if (e1 === e2) {
+    html += `<p>你们的上升星座同为${e1}象，初次见面就有一种熟悉感和默契。你们本能地用相似的方式理解和回应世界。</p>`;
+  } else if ((e1==='火'&&e2==='风')||(e1==='风'&&e2==='火')||(e1==='土'&&e2==='水')||(e1==='水'&&e2==='土')) {
+    html += `<p>你们的上升元素（${e1}🔥💨🌍🌊 与 ${e2}）天然互补，彼此能为对方提供所欠缺的视角。这是良好的化学反应的来源。</p>`;
+  } else {
+    html += `<p>你们的上升元素（${e1} 与 ${e2}）差异较大，初期可能需要更多的理解和适应，但也因此能带来深刻的互相学习和成长。</p>`;
+  }
+
+  html += '<p style="color:var(--text-dim);margin-top:12px;">※ 合盘是复杂的艺术，以上仅为初步分析。真正的缘分需要双方用心经营。</p>';
+  html += '</div>';
+
+  return html;
+}
+
+// ── Guidance Report ───────────────────────────────────────────────────────
+function generateGuidance(positions, houses, asc) {
+  let html = '<div class="report-section">';
+
+  html += '<h3>✦ 当前宇宙给你的讯息</h3>';
+
+  // Current Saturn transit guidance
+  const now = new Date();
+  const nowJD = julianDay(now.getFullYear(), now.getMonth()+1, now.getDate(),
+    now.getHours() + now.getMinutes()/60.0);
+  const nowT = centuriesSinceJ2000(nowJD);
+  const transitPos = calcAllPlanets(nowT);
+
+  const saturnTransitSign = degToSign(transitPos.Saturn).si;
+  const jupiterTransitSign = degToSign(transitPos.Jupiter).si;
+
+  html += `<p><span class="highlight">🪐 土星当前在${SIGNS[saturnTransitSign]}</span>，它问你：`;
+  const saturnMessages = [
+    "你愿意为真正重要的目标付出多少努力和耐心？",
+    "哪些旧有的结构和模式已经不再服务于你的成长，需要被放下？",
+    "你是否在逃避你内心真正知道需要面对的责任？",
+    "你的根基够不够稳固？你需要在哪里建立更强的纪律和边界？"
+  ];
+  html += `「${saturnMessages[saturnTransitSign % 4]}」</p>`;
+
+  html += `<p><span class="highlight">⭐ 木星当前在${SIGNS[jupiterTransitSign]}</span>，它告诉你：`;
+  const jupiterMessages = [
+    "扩展的方向在于勇敢地开启新的冒险，相信自己的直觉和勇气。",
+    "幸运来自于持续积累和感恩你已经拥有的资源。",
+    "通过学习和交流打开新的视野，走出去认识新的人。",
+    "情感的深度连接和家庭的温暖是你当前最大的幸运来源。",
+    "创造性地表达自己，让你的才华被看见。",
+    "精益求精，在你的专业领域里做到最好。",
+    "合作与分享将带你走向更大的舞台。",
+    "向内探索，深度的自我认知会带来意想不到的转化。",
+    "旅行、学习和精神追求是你当前的最佳投资。",
+    "一步步建立你的事业基础，辛勤的付出终将得到认可。",
+    "拥抱你的独特之处，社群和志同道合的人会为你带来机遇。",
+    "相信直觉和灵感，艺术和灵性实践会带来意想不到的收获。"
+  ];
+  html += `「${jupiterMessages[jupiterTransitSign]}」</p>`;
+
+  // Life path based on Sun house
+  const sunHouse = houses.Sun || 1;
+  html += `<h3>✦ 你当前的人生课题</h3>`;
+  const guidanceByHouse = {
+    1: "当下的核心课题是关于「自我确立」。你需要更清晰地知道自己是谁、想要什么。不要活在别人的期待中，勇敢做自己。星盘的指引：现在是重新定义个人形象和人生方向的最佳时机。",
+    2: "当下的核心课题是关于「自我价值」。你是否真正认可自己的价值？是否在物质和精神上都给予了应有的重视？星盘的指引：重新审视你与金钱、资源的关系，建立更健康的自我价值感。",
+    3: "当下的核心课题是关于「表达与连接」。有些话你需要说出来，有些关系需要你去主动维系。星盘的指引：打破沉默，用文字或言语分享你的想法和感受。",
+    4: "当下的核心课题是关于「内在安全感」。你可能正在经历与家庭、根源和情感安全相关的议题。星盘的指引：回到内心，疗愈过去的创伤，建立内在的稳定基石。",
+    5: "当下的核心课题是关于「真实的自我表达」。你多久没有纯粹地享受和创造了？星盘的指引：允许自己光芒四射，去做那些让你感到快乐和活力的事情。",
+    6: "当下的核心课题是关于「身心灵的整体健康」。你的身体在告诉你什么？是否需要调整日常习惯？星盘的指引：关注健康，建立秩序，服务他人的同时也照顾好自己。",
+    7: "当下的核心课题是关于「关系」。你与他人之间的互动正在映射你内在需要整合的部分。星盘的指引：学会平衡自我与他人，在关系中既不过度妥协也不过度独立。",
+    8: "当下的核心课题是关于「深度转化」。你正处在一个重要的蜕变期，旧的不去新的不来。星盘的指引：面对你内心最深的恐惧和欲望，允许自己经历一场灵魂的重生。",
+    9: "当下的核心课题是关于「信仰与意义」。你需要一次精神上的远行——无论是实际的旅行还是心智的探索。星盘的指引：打开心扉，接受不同的人生观和世界观。",
+    10: "当下的核心课题是关于「使命与成就」。你正在被召唤去承担更多的社会责任和职业角色。星盘的指引：明确你的职业目标，用纪律和努力一步步实现。",
+    11: "当下的核心课题是关于「找到你的族群」。孤独感可能来源于周围没有志同道合的人。星盘的指引：主动参与社群活动，你的梦想需要集体的力量来实现。",
+    12: "当下的核心课题是关于「放下与臣服」。有些事情你无法用意志力控制，需要学会交给更大的力量。星盘的指引：独处、冥想和灵性实践会帮助你找到答案。"
+  };
+  html += `<p>${guidanceByHouse[sunHouse]}</p>`;
+
+  // Additional insight based on prominent planet
+  html += '<h3>✦ 星盘的智慧话语</h3>';
+  const moonHouse = houses.Moon || 1;
+  const saturnHouse = houses.Saturn || 1;
+  const jupiterHouse = houses.Jupiter || 1;
+
+  html += '<p style="border-left:3px solid var(--gold-dim);padding-left:16px;margin:12px 0;color:var(--accent);">';
+  const wisdomPool = [
+    `你的月亮在第${moonHouse}宫——真正的安全感不是来自外界，而是你与自己的和解。照顾好你的情绪需求，这不是软弱，是智慧。`,
+    `你的土星在第${saturnHouse}宫——最困难的道路往往通向最美的风景。你在这个领域的挣扎，正在锻造你灵魂的肌肉。`,
+    `你的木星在第${jupiterHouse}宫——幸运不是等待机会，而是准备好了的自己。在这个领域保持学习和开放，大门会自然打开。`,
+    `你的上升星座守护着你的外在路径，但你的太阳才是你真正的目的地。不要为了取悦世界而忘记你为何而来。`,
+    `星盘中没有绝对的吉凶——刑冲相位虽然带来张力，却是你此生最有可能实现突破的领域。拥抱你的不完美。`
+  ];
+  html += wisdomPool[Math.floor(Math.random() * wisdomPool.length)];
+  html += '</p>';
+
+  html += '<p style="color:var(--text-dim);margin-top:16px;">※ 星盘是指南针，不是判决书。你所拥有的自由意志，才是最强大的行星。</p>';
+  html += '</div>';
+
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  MAIN — Calculate & Render
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Geocoding (Nominatim, free, no API key) ──────────────────────────────
+async function geocode(prefix) {
+  const addrInput = document.getElementById(prefix + '_addr');
+  const statusEl = document.getElementById(prefix + '_geo_status');
+  const query = addrInput.value.trim();
+  if (!query) { statusEl.textContent = '⚠️ 请输入城市名或地址'; statusEl.className = 'geo-status error'; return; }
+
+  statusEl.textContent = '⏳ 正在查询坐标...';
+  statusEl.className = 'geo-status loading';
+
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&accept-language=zh`;
+    const resp = await fetch(url, { headers: { 'User-Agent': 'AstroChart/1.0' } });
+    const data = await resp.json();
+    if (data.length === 0) throw new Error('未找到该地点');
+
+    const lat = parseFloat(data[0].lat);
+    const lng = parseFloat(data[0].lon);
+    const displayName = data[0].display_name || query;
+
+    document.getElementById(prefix + '_lat').value = lat.toFixed(4);
+    document.getElementById(prefix + '_lng').value = lng.toFixed(4);
+
+    // Auto-detect timezone: China always UTC+8, otherwise lon/15 approx
+    const isChina = data[0].display_name && data[0].display_name.includes('中国');
+    const estTz = isChina ? 8 : Math.round(lng / 15);
+    const tzSelect = document.getElementById(prefix + '_tz');
+    let found = false;
+    for (let i = 0; i < tzSelect.options.length; i++) {
+      if (parseFloat(tzSelect.options[i].value) === estTz) {
+        tzSelect.selectedIndex = i; found = true; break;
+      }
+    }
+    if (!found && estTz === 8) tzSelect.value = '8';
+
+    const ns = lat >= 0 ? 'N' : 'S';
+    const ew = lng >= 0 ? 'E' : 'W';
+    const tzSign = estTz >= 0 ? '+' : '';
+    statusEl.textContent = `✅ ${displayName.split(',')[0]} · ${Math.abs(lat).toFixed(2)}°${ns}, ${Math.abs(lng).toFixed(2)}°${ew} · UTC${tzSign}${estTz}`;
+    statusEl.className = 'geo-status success';
+  } catch (e) {
+    statusEl.textContent = '⚠️ 查询失败，请在下方手动输入经纬度';
+    statusEl.className = 'geo-status error';
+    document.getElementById(prefix + '_manual').style.display = 'block';
+  }
+}
+
+function getInputValues(prefix) {
+  const dateVal = document.getElementById(prefix + '_date').value;
+  const timeVal = document.getElementById(prefix + '_time').value;
+  const tzVal = parseFloat(document.getElementById(prefix + '_tz').value);
+  let lat = parseFloat(document.getElementById(prefix + '_lat').value);
+  let lng = parseFloat(document.getElementById(prefix + '_lng').value);
+
+  // Fallback to manual entry if geocoding failed
+  if (isNaN(lat) || isNaN(lng)) {
+    lat = parseFloat(document.getElementById(prefix + '_lat_m').value);
+    lng = parseFloat(document.getElementById(prefix + '_lng_m').value);
+  }
+
+  if (!dateVal || !timeVal || isNaN(lat) || isNaN(lng)) return null;
+
+  const [y, m, d] = dateVal.split('-').map(Number);
+  const [hh, mm] = timeVal.split(':').map(Number);
+  const localH = hh + mm / 60;
+  const utcH = localH - tzVal;
+
+  return { y, m, d, utcH, lat, lng };
+}
+
+function computeChart(data) {
+  const jd = julianDay(data.y, data.m, data.d, data.utcH);
+  const T = centuriesSinceJ2000(jd);
+  const eps = obliquity(T);
+  const positions = calcAllPlanets(T);
+  const { cusps, asc, mc } = calcHouses(jd, data.lat, data.lng, eps);
+  const houses = assignHouses(positions, cusps);
+  const aspects = calcAspects(positions);
+  return { jd, T, eps, positions, cusps, asc, mc, houses, aspects };
+}
+
+let chartData1 = null;
+let chartData2 = null;
+
+function calculateAll() {
+  try {
+    const d1 = getInputValues('p1');
+    if (!d1) { alert('请完整填写本人的出生信息'); return; }
+
+    chartData1 = computeChart(d1);
+
+    // Try to compute person 2 if filled
+    const d2 = getInputValues('p2');
+    chartData2 = d2 ? computeChart(d2) : null;
+
+    // Show results
+    document.getElementById('resultsCard').style.display = 'block';
+    document.getElementById('resultsCard').scrollIntoView({behavior:'smooth'});
+
+    // Render all tabs
+    renderTab0();
+    renderTab1();
+    renderTab2();
+    renderTab3();
+    renderTab4();
+
+    // Default to tab 0
+    switchTab(0);
+  } catch(e) {
+    document.getElementById('resultsCard').style.display = 'block';
+    document.getElementById('tab0').innerHTML = '<p style=\"color:#c87070;padding:20px;\">计算出错：' + e.message + '</p>';
+    console.error(e);
+  }
+}
+
+// ── Tab 0: Natal Chart ────────────────────────────────────────────────────
+function renderTab0() {
+  try {
+  const d = chartData1;
+  let html = '<div style="overflow-x:auto;">';
+  html += '<table class="chart-table">';
+  html += '<thead><tr><th>行星</th><th>位置</th><th>宫位</th><th>元素</th><th>模式</th></tr></thead><tbody>';
+  for (const p of PLANETS) {
+    const lon = d.positions[p.id];
+    const {si, d:dd, m} = degToSign(lon);
+    const h = d.houses[p.id] || '?';
+    const elem = ELEMENTS[si], mode = MODES[si];
+    const tagCls = elem==='火'?'tag-fire':elem==='土'?'tag-earth':elem==='风'?'tag-air':'tag-water';
+    html += `<tr>
+      <td>${p.name}</td>
+      <td>${SIGNS[si]} ${dd}°${String(m).padStart(2,'0')}′</td>
+      <td>第${h}宫</td>
+      <td><span class="tag ${tagCls}">${elem}</span></td>
+      <td>${mode}</td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+
+  // Angles
+  html += '<table class="chart-table" style="margin-top:12px;">';
+  html += '<thead><tr><th>轴点</th><th>位置</th><th></th><th></th><th></th></tr></thead><tbody>';
+  html += `<tr><td>ASC 上升</td><td>${formatPos(d.asc)}</td><td></td><td></td><td></td></tr>`;
+  html += `<tr><td>MC 天顶</td><td>${formatPos(d.mc)}</td><td></td><td></td><td></td></tr>`;
+  html += `<tr><td>DSC 下降</td><td>${formatPos(mod360(d.asc+180))}</td><td></td><td></td><td></td></tr>`;
+  html += `<tr><td>IC 天底</td><td>${formatPos(mod360(d.mc+180))}</td><td></td><td></td><td></td></tr>`;
+  html += '</tbody></table>';
+
+  // Placidus cusps
+  html += '<table class="chart-table" style="margin-top:12px;">';
+  html += '<thead><tr><th>宫位</th><th>宫头 (Placidus)</th><th>元素/模式</th></tr></thead><tbody>';
+  for (let h = 1; h <= 12; h++) {
+    const {si} = degToSign(d.cusps[h]);
+    html += `<tr><td>第${h}宫</td><td>${formatPos(d.cusps[h])}</td><td>${ELEMENTS[si]}/${MODES[si]}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  html += '</div>';
+
+  // Report
+  html += generateDeepNatalReport(d.positions, d.houses, d.aspects, d.asc, d.mc);
+
+  document.getElementById('tab0').innerHTML = html;
+  } catch(e) { document.getElementById('tab0').innerHTML = '<p style=\"color:#c87070;padding:20px;\">渲染错误：' + e.message + '</p>'; console.error(e); }
+}
+
+// ── Tab 1: Forecast ───────────────────────────────────────────────────────
+function renderTab1() {
+  try {
+  const d = chartData1;
+  let html = generateDeepForecast(d.positions, d.houses, d.mc);
+  document.getElementById('tab1').innerHTML = html;
+  } catch(e) { document.getElementById('tab1').innerHTML = '<p style=\"color:#c87070;padding:20px;\">渲染错误：' + e.message + '</p>'; console.error(e); }
+}
+
+// ── Tab 2: Synastry ───────────────────────────────────────────────────────
+function renderTab2() {
+  try {
+  let html = '';
+  if (!chartData2) {
+    html += '<div class="report-section">';
+    html += '<p style="text-align:center;color:var(--text-dim);padding:40px;">请在"对方"区域填写第二个人的出生信息，然后点击"解读星盘"查看合盘分析。</p>';
+    html += '</div>';
+  } else {
+    html += generateSynastryReport(chartData1.positions, chartData2.positions, chartData1.asc, chartData2.asc);
+  }
+  document.getElementById('tab2').innerHTML = html;
+  } catch(e) { document.getElementById('tab2').innerHTML = '<p style=\"color:#c87070;padding:20px;\">渲染错误：' + e.message + '</p>'; console.error(e); }
+}
+
+// ── Tab 3: Guidance ───────────────────────────────────────────────────────
+function renderTab3() {
+  try {
+  const d = chartData1;
+  let html = generateGuidance(d.positions, d.houses, d.asc);
+  document.getElementById('tab3').innerHTML = html;
+  } catch(e) { document.getElementById('tab3').innerHTML = '<p style=\"color:#c87070;padding:20px;\">渲染错误：' + e.message + '</p>'; console.error(e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TAROT SYSTEM — 78 cards, 3-card & single-card spreads
+// ═══════════════════════════════════════════════════════════════════════════
+
+const MAJOR_ARCANA = [
+  { id:0, name:"愚者", en:"The Fool", num:"0",
+    up:"新的开始、冒险精神、天真无畏、信任宇宙的安排、无限可能",
+    rev:"鲁莽冲动、缺乏计划、被欺骗、过于天真、逃避责任",
+    love:"一段全新的恋情或感情阶段即将开始。放下过去的包袱，像愚者一样勇敢地跳入未知。保持开放和信任的心态。",
+    career:"新的职业方向或创业机会正在召唤你。虽然前路未知，但宇宙在鼓励你大胆迈出第一步。相信直觉。",
+    advice:"不要过度分析，不要等待完美时机。宇宙在邀请你迈出信任的一步，旅程本身就会教会你一切。" },
+  { id:1, name:"魔术师", en:"The Magician", num:"I",
+    up:"创造力、技能、自信、资源整合、心想事成的能力、意志力",
+    rev:"欺骗、操纵、技能不足、资源浪费、计划受阻、自信缺失",
+    love:"你拥有吸引理想伴侣的所有条件。主动展现真实的自己，用你的魅力和智慧去创造你想要的感情生活。",
+    career:"现在是将想法转化为行动的最佳时机。你拥有所需的全部技能和资源。专注目标，展现专业能力。",
+    advice:"你手中握有所有元素（风火水土），只需将它们整合并付诸行动。相信自己，你可以创造奇迹。" },
+  { id:2, name:"女祭司", en:"The High Priestess", num:"II",
+    up:"直觉、潜意识、内在智慧、神秘、等待、灵性觉醒",
+    rev:"忽视直觉、隐藏的秘密被揭露、情感封闭、肤浅、内在混乱",
+    love:"静下心来倾听内心的声音。有些答案不在外面，而在你内心深处。保持神秘感，不要过早暴露全部底牌。",
+    career:"表面之下的信息比可见的部分更重要。相信你的直觉判断，特别是在涉及隐藏信息或未明朗的局面时。",
+    advice:"向内探索，而非向外寻求答案。静坐、冥想、关注梦境。答案会在你准备好时自然浮现。" },
+  { id:3, name:"皇后", en:"The Empress", num:"III",
+    up:"丰饶、母爱、创造力、自然、感官享受、滋养、繁荣",
+    rev:"依赖过度、创造力枯竭、忽视自我照顾、物质匮乏、情感冷漠",
+    love:"爱与温暖围绕着你。现在是享受关系中的甜蜜和滋养的时刻。单身者可能遇到一位温暖而富有魅力的人。",
+    career:"创意项目将获得丰硕成果。适合从事与美、艺术、自然或照顾他人相关的工作。财务上也有增长的好兆头。",
+    advice:"像皇后一样，允许自己去感受、去创造、去享受生活中的美好。照顾好你的身体和心灵，丰盛自然而来。" },
+  { id:4, name:"皇帝", en:"The Emperor", num:"IV",
+    up:"权威、结构、领导力、稳定、规则、保护、野心",
+    rev:"专制、滥用权力、不稳定、缺乏纪律、失控、软弱",
+    love:"关系中需要建立清晰的边界和规则。寻找一位成熟稳重的伴侣，或在现有关系中承担更多的责任和承诺。",
+    career:"职场中展现出领导才能。现在是为长远目标建立稳固基础的时候。遵守规则，建立秩序，逐步攀升。",
+    advice:"用理性和纪律来组织你的生活。建立稳固的结构和规则，这看似枯燥，却是实现长远目标的基础。" },
+  { id:5, name:"教皇", en:"The Hierophant", num:"V",
+    up:"传统、信仰、教育、导师、精神指引、仪式、社会规范",
+    rev:"挑战传统、反叛、不受教、过时观念、教条主义、盲目追随",
+    love:"传统形式的感情或婚姻可能被提上日程。寻求长辈或专业人士的情感建议。遵循内心的道德准则。",
+    career:"寻找导师或参加专业培训将大有裨益。遵循行业规范，在现有的体系内稳步前进比另辟蹊径更有效。",
+    advice:"你不需要独自解决所有问题。寻找一位导师或加入一个有共同信念的团体。遵循经过验证的道路。" },
+  { id:6, name:"恋人", en:"The Lovers", num:"VI",
+    up:"真爱、和谐、选择、价值观念、结合、吸引力、重要决定",
+    rev:"分离、背叛、价值观冲突、错误选择、犹豫不决、不平衡",
+    love:"爱情是当前的核心主题。无论是新恋情的开始还是现有关系的深化，都需要发自内心的真诚选择。",
+    career:"面临重要的职业选择。选择你真正热爱和相信的方向，而不仅仅是看起来有利可图的。合作伙伴关系至关重要。",
+    advice:"你正站在十字路口。这个选择反映了你的核心价值观。选择出于爱而非恐惧的道路。" },
+  { id:7, name:"战车", en:"The Chariot", num:"VII",
+    up:"胜利、决心、意志力、掌控、前进、克服困难、野心实现",
+    rev:"失控、失败、攻击性、方向错误、被击败、缺乏信心",
+    love:"感情方面你需要主动掌控方向盘。用决心和毅力克服感情中的障碍。异地恋或需要努力维持的关系将取得进展。",
+    career:"竞争激烈的环境中你能脱颖而出。保持专注，用钢铁般的意志克服一切阻碍。胜利属于坚持到最后的人。",
+    advice:"你已经拥有战胜一切困难的力量。关键在于驾驭内心各种冲突的力量，让它们朝同一个方向前进。" },
+  { id:8, name:"力量", en:"Strength", num:"VIII",
+    up:"内在力量、勇气、耐心、温柔的力量、驯服本能、自信",
+    rev:"软弱、自我怀疑、失控、攻击性、缺乏耐心、被本能支配",
+    love:"用温柔而非控制来赢得对方的心。你内心的力量足以化解感情中的矛盾。耐心和包容是最强大的武器。",
+    career:"以柔克刚是当前的制胜策略。不需要大声证明自己，你的专业能力和内在沉稳自行会说话。",
+    advice:"真正的力量不是征服外在，而是驯服内在的野兽。用爱和耐心对待自己的恐惧和不安。" },
+  { id:9, name:"隐士", en:"The Hermit", num:"IX",
+    up:"内省、独处、智慧、寻求真理、指引、沉淀、深思熟虑",
+    rev:"孤独、孤立、逃避、拒绝建议、迷失方向、偏执",
+    love:"需要一段独处来反思自己在感情中真正的需求。不要为了填补空虚而匆忙进入关系。内在的圆满才能吸引健康的爱情。",
+    career:"暂时从外界的喧嚣中抽离，重新审视你的职业方向。深造、进修或独立研究将带来突破性的洞见。",
+    advice:"回归内心，在寂静中找到答案。你不需要更多的信息，你需要的是更深的洞察。独处不是逃避，是蓄力。" },
+  { id:10, name:"命运之轮", en:"Wheel of Fortune", num:"X",
+    up:"命运转变、机遇、周期、运气、转折点、命运的安排",
+    rev:"厄运、阻力、失控、负循环、错失机会、命运受阻",
+    love:"命运的齿轮正在转动。命中注定的相遇或重逢可能到来。接受感情中的周期性变化，把握当下出现的缘分。",
+    career:"职场或事业即将迎来重要转折。好运正在靠近，但你需要主动抓住机会。命运的青睐往往伴随着准备。",
+    advice:"你是命运之轮的一部分。好运和坏运都是暂时的，顺应变化而不是抵抗它。站在轮子的中心保持平衡。" },
+  { id:11, name:"正义", en:"Justice", num:"XI",
+    up:"公正、真相、因果、平衡、法律、决定、理性",
+    rev:"不公、偏见、逃避后果、失衡、法律纠纷、错误判断",
+    love:"感情中需要公平和诚实。现在做出的决定将产生影响深远的后果。真诚面对自己和伴侣，做出公正的选择。",
+    career:"涉及合同、谈判或法律事务时需格外谨慎。你过去在职场中的行为将在此时得到公正的回报（好或坏）。",
+    advice:"因果法则正在运作。诚实地评估自己的处境，为你的选择承担后果。公正不仅是对别人，也是对自己。" },
+  { id:12, name:"倒吊人", en:"The Hanged Man", num:"XII",
+    up:"牺牲、换个角度看世界、放手、等待、灵性启迪、暂停",
+    rev:"停滞、无谓的牺牲、固执己见、不愿放手、拖延、内耗",
+    love:"在感情中可能需要做出某种牺牲或妥协。暂时放下一味追求的执念，转换视角看问题，会有新的领悟。",
+    career:"当前可能需要暂停或延迟。这不是失败，而是让你换个角度审视自己的职业路径。耐心的等待自有其价值。",
+    advice:"当你觉得被困住时，试着倒过来看世界。有时候最大的行动是停止行动，最大的控制是放手。" },
+  { id:13, name:"死神", en:"Death", num:"XIII",
+    up:"转变、结束、新生、蜕变、放下过去、必然的改变",
+    rev:"抗拒改变、停滞不前、恐惧结束、无法放手、腐朽",
+    love:"一段旧有的感情模式必须结束，才能迎来新的可能。不要抗拒感情的转变和蜕变。结束是为了更好的开始。",
+    career:"可能面临职业的重大转变——离职、转行或项目终结。这是蜕变的阵痛，新生的曙光紧随其后。",
+    advice:"死神牌不是肉体的死亡，而是旧我的消融。放下那些已经不再服务你的人和事，让蜕变自然发生。" },
+  { id:14, name:"节制", en:"Temperance", num:"XIV",
+    up:"平衡、调和、耐心、中庸之道、融合、治愈、适应",
+    rev:"失衡、过度、缺乏节制、冲突、不和谐、急躁",
+    love:"感情需要双方的调和与融合。避免极端情绪，寻找两人之间的平衡点。细水长流的爱比轰轰烈烈更持久。",
+    career:"工作中需要平衡多个方面——效率与质量、合作与独立。找到适合自己的节奏，不急不躁地稳步前进。",
+    advice:"像炼金术师一样，将生活中不同的元素融合成黄金。避免极端，中庸之道是你当前的智慧之选。" },
+  { id:15, name:"恶魔", en:"The Devil", num:"XV",
+    up:"束缚、物质主义、欲望、执念、阴影面、上瘾、权力",
+    rev:"挣脱束缚、觉醒、面对阴影、重获自由、戒除成瘾",
+    love:"审视感情中是否存在不健康的依赖、控制或执念。也许是性吸引掩盖了真正的问题。诚实面对黑暗面才能解脱。",
+    career:"你可能被困在一份只有金钱回报但没有热情的工作中。检查权力关系和职场中的操控。改变始于认清现实。",
+    advice:"锁链其实是你自己戴上的。正视你的欲望和恐惧——它们控制你的程度远比你意识到的深。你可以选择自由。" },
+  { id:16, name:"高塔", en:"The Tower", num:"XVI",
+    up:"突变、崩塌、启示、真相大白、打破幻象、觉醒",
+    rev:"避免灾难、抗拒改变、延迟不可避免的崩塌、恐惧突破",
+    love:"关系中一些虚假的稳定可能会突然崩塌。虽然痛苦，但真相的揭露会让你看清关系的本质。重建需要勇气。",
+    career:"职场中可能出现突如其来的变动——被裁员、项目失败或组织重组。这是宇宙在推你走向更真实的道路。",
+    advice:"高塔的崩塌是剧烈的，但它摧毁的只是那些本就不稳固的东西。在废墟之上，你可以建造真正坚固的新生。" },
+  { id:17, name:"星星", en:"The Star", num:"XVII",
+    up:"希望、疗愈、灵感、宁静、信念、重生、指引",
+    rev:"绝望、失去信心、消极、灵感枯竭、自我否定、迷失",
+    love:"感情中的疗愈和新生正在发生。过去的伤痛正在愈合，你将重新相信爱情的美好。保持希望，星光正指引着你。",
+    career:"职业生涯迎来充满希望的新阶段。创意灵感源源不断，你的才华将被看见和欣赏。梦想正在变为现实。",
+    advice:"暴风雨后的宁静星空。你在正确的道路上，宇宙正在用星光为你照亮前路。保持信念，疗愈自己。" },
+  { id:18, name:"月亮", en:"The Moon", num:"XVIII",
+    up:"幻觉、恐惧、潜意识、梦境、直觉、迷惑、未知",
+    rev:"恐惧消散、真相浮现、克服焦虑、混乱结束、看清现实",
+    love:"感情中可能存在误解、隐藏的信息或不明确的局面。不要被表面的幻象迷惑。信任直觉，但也要保持理性。",
+    career:"职场中的某些事情可能并非表面看起来那样。谨慎行事，在信息不明确时避免重大决策。迷雾终将散去。",
+    advice:"在月光下，一切都显得朦胧而不确定。你内心最深处的恐惧可能被放大——直面它们，你会发现它们只是影子。" },
+  { id:19, name:"太阳", en:"The Sun", num:"XIX",
+    up:"快乐、成功、活力、真理、童真、光明、成就",
+    rev:"暂时的黯淡、缺乏自信、抑郁、延迟的快乐、悲观",
+    love:"爱情中最灿烂的一张牌。热烈、真诚、充满快乐的感情。单身者将遇到阳光般温暖的人。关系中的一切都被温暖照亮。",
+    career:"你正处于事业的阳光时刻。成就被认可，才华被赏识。享受这段黄金时期，同时用它来照亮更多人。",
+    advice:"世界为你点亮了聚光灯。这是属于你的高光时刻——享受它，分享它，让内心的阳光照亮你走的每一步。" },
+  { id:20, name:"审判", en:"Judgement", num:"XX",
+    up:"觉醒、重生、召唤、清算、宽恕、灵魂的召唤、重大决定",
+    rev:"逃避召唤、无法面对过去、悔恨、拒绝改变、自我审判",
+    love:"旧情复燃或感情中的重大觉醒可能到来。听从内心最真实的召唤。原谅自己和对方过去的错误，迎接感情的再生。",
+    career:"你正在被召唤到更高的职业舞台。也许是转行、创业或接受一个重要项目。这是你回应灵魂使命的时刻。",
+    advice:"觉醒的号角已经吹响。你不必等到「完美的时机」，现在的你已经准备好了。回应召唤，获得灵魂的升华。" },
+  { id:21, name:"世界", en:"The World", num:"XXI",
+    up:"完成、圆满、成就、旅行、整合、宇宙意识、达成",
+    rev:"未完成、拖延、不圆满、封闭、延迟成功、缺乏整合",
+    love:"一段感情可能迎来圆满的结局——无论是走向更深承诺还是和平完成一个周期。你正处于感情整合的完满时刻。",
+    career:"一个重要的职业周期即将圆满结束。你已完成了一个阶段的所有功课，准备好进入下一个更大的舞台。",
+    advice:"你完成了一个重要的生命循环。在进入下一个周期之前，停下来庆祝你的成就。你与宇宙和谐共舞。" }
+];
+
+const MINOR_SUITS = [
+  {
+    "suit": "权杖",
+    "en": "Wands",
+    "element": "火",
+    "theme": "行动、创造力、热情、事业",
+    "cards": [
+      {
+        "rank": "王牌",
+        "en": "Ace",
+        "up": "一股强大的创造力与行动力正在你体内觉醒。这是一个全新的开始，灵感如同火焰般燃烧，推动你迈出勇敢的第一步。不要犹豫，宇宙在邀请你去开创属于自己的道路。",
+        "rev": "创意的火花暂时被压抑，你可能感到动力不足或方向迷茫。新的计划遭遇延迟，不是时机未到就是你还没准备好。先整理内在的火焰，等风来再点燃。",
+        "love": "一段充满激情的新恋情或现有关系的重大突破正在酝酿。主动表达你的热情和渴望，不要害怕展露真实的自己。",
+        "career": "创业、新项目、跳槽的绝佳时机。你拥有开创性的能量，适合主动争取机会、提出创新方案。勇敢地做第一个点火的人。",
+        "advice": "宇宙正在给你一张空白的画布。不要等待完美的时机——行动起来，让灵感在实践中成形。"
+      },
+      {
+        "rank": "二",
+        "en": "2",
+        "up": "你站在两个方向之间，手握选择的权力。对未来你已经有了初步的规划和设想，现在需要的是做出决定并坚定地朝前走。相信自己的远见。",
+        "rev": "犹豫不决正在消耗你的能量。你可能在多个选项中徘徊，或者害怕做出错误的选择。这种优柔寡断本身就是一种决定——停滞不前。",
+        "love": "在感情中面临抉择，也许是两段关系的取舍，也许是关系中某个重要决定的权衡。倾听你内心的声音，而非外界的意见。",
+        "career": "职业规划的关键节点。你可能在考虑转行、跳槽或选择不同的发展方向。做好调研，然后大胆下注。",
+        "advice": "选择没有绝对的对错。重要的是选择之后全力以赴。不要因为害怕选错而不选。"
+      },
+      {
+        "rank": "三",
+        "en": "3",
+        "up": "你的远见和规划正在结出初步的果实。事业上的拓展、合作的达成、项目的推进都呈现出良好的势头。这是向外探索、扩展版图的时刻。",
+        "rev": "计划遇到了阻力，可能是外部环境的变动，也可能是你自身缺乏足够的远见。初期的小挫折不应让你退缩，调整策略而非放弃目标。",
+        "love": "感情关系进入了新的发展阶段，可能是同居、订婚或者一起规划未来。关系的基础正在夯实，前景可期。",
+        "career": "事业拓展期，适合开拓新市场、建立新合作、推进新项目。你的领导力和远见正在得到认可。",
+        "advice": "初期的成功是信心的基石，不是骄傲的资本。保持远见的同时，脚踏实地地推进每一步。"
+      },
+      {
+        "rank": "四",
+        "en": "4",
+        "up": "经过努力，你迎来了稳定和收获的时刻。事业或生活的基础已经夯实，你可以安心地庆祝这来之不易的成就。这是一个享受成果、感受安全感的阶段。",
+        "rev": "根基不稳，你可能感到焦虑不安。计划中的稳定被外部因素扰动，工作上出现变数。需要重新审视基础是否牢固。",
+        "love": "感情关系进入稳定期，适合考虑同居、结婚或一起建立一个安稳的家。安全感和归属感是此时的核心主题。",
+        "career": "职业发展进入平台期，基础已经奠定，可以享受一段安稳的时光。适合巩固已有的成果，而非激进扩张。",
+        "advice": "稳固的根基是未来腾飞的跳板。珍惜现有的果实，同时为下一步的成长留出空间。"
+      },
+      {
+        "rank": "五",
+        "en": "5",
+        "up": "竞争和挑战正在激发你的斗志。这是一个需要你站出来争取自己立场的时刻。冲突本身不是坏事，它能让你更加清楚自己的边界和力量。",
+        "rev": "你被冲突耗尽能量，可能想要逃避或妥协。内部的纷争或外部的压力让你感到孤立。有时退一步不是失败，而是战略调整。",
+        "love": "感情中可能出现竞争或冲突，也许是第三者的介入，也许是双方观念的碰撞。面对挑战是关系中不可避免的成长过程。",
+        "career": "职场竞争加剧，你可能面临来自同事或同行的压力。将竞争转化为动力，证明自己的实力和价值。",
+        "advice": "挑战是成长的催化剂。不要逃避冲突——它会告诉你你的边界在哪里，你的力量有多大。"
+      },
+      {
+        "rank": "六",
+        "en": "6",
+        "up": "胜利的凯歌已经奏响。你的努力和坚持得到了认可和赞誉，可能是升职加薪、项目成功或公开表彰。这是属于你的荣耀时刻，请骄傲地接受掌声。",
+        "rev": "失败或丢脸的经历让你备受打击。可能是傲慢导致了跌落，也可能是外界的不公正评价。无论哪种，都是一个谦逊的功课。",
+        "love": "在感情中占据主动和优势，你的魅力和付出得到了伴侣的欣赏和回应。一段充满认可和赞誉的关系正在展开。",
+        "career": "升职加薪、项目大获成功、行业认可——职业上的高光时刻。你的努力即将被看到并得到实质性的回报。",
+        "advice": "胜利不仅是结果，更是你一路走来的印证。接受赞誉，但不要忘记那些曾经帮助过你的人。"
+      },
+      {
+        "rank": "七",
+        "en": "7",
+        "up": "你正在坚守自己的阵地，面对压力和反对毫不退缩。这是一场勇气的考验，你需要坚持自己的信念和立场。虽然孤立，但你的勇敢值得尊敬。",
+        "rev": "力量的对比让你无法继续坚守，撤退或投降也许是最明智的选择。继续硬撑只会消耗更多。有时放下是一种更大的勇气。",
+        "love": "在感情中捍卫自己的底线和原则。也许面临外界的反对或伴侣的挑战，但你清楚地知道什么是不可以妥协的。",
+        "career": "职场中需要坚守自己的立场，可能面临不公平的对待或恶意的竞争。勇敢地为自己发声，捍卫你的权益。",
+        "advice": "独自坚守的感觉是孤独的，但这也正是你证明自己信念的时刻。知道何时该坚守，也知何时该放手。"
+      },
+      {
+        "rank": "八",
+        "en": "8",
+        "up": "事情正在快速推进！消息、旅行、变化接踵而至。停滞的局面即将被打破，你需要保持敏捷和开放的心态来迎接即将到来的变化。",
+        "rev": "计划被推迟或取消，你期待的进展迟迟不来。这种停滞可能是外部的阻力，也可能是内在的恐惧在拖慢你的脚步。",
+        "love": "感情中的变化来得很快——可能是突然的表白、关系的推进或者一起旅行。保持开放的心态迎接这段加速的旅程。",
+        "career": "工作中节奏加快，可能有出差、调动或突发任务。保持灵活应变的能力，快速行动中蕴藏着新的机会。",
+        "advice": "当风的翅膀展开时，不要犹豫。机会来得快也去得快，敏捷是此时最大的优势。"
+      },
+      {
+        "rank": "九",
+        "en": "9",
+        "up": "你在最后的坚守中展现出惊人的韧性。虽然疲惫，但你还没有放弃。这最后的坚持是最珍贵的品质，再坚持一步，黎明就在前方。",
+        "rev": "筋疲力尽，你的能量已经透支。也许是时候承认自己需要休息和支援。过度防御会耗尽你最后的力量。",
+        "love": "感情中的坚持到了关键时刻。你可能已经疲惫，但心中还有最后一丝信念。问问自己：这段关系值得你坚持到什么程度？",
+        "career": "工作压力和责任已经让你接近极限。最后的冲刺需要顽强的意志力。但也请注意：过度消耗不是可持续的策略。",
+        "advice": "韧性是你最宝贵的品质，但智慧在于知道何时该休息。保护好自己的能量，这场战役还很长。"
+      },
+      {
+        "rank": "十",
+        "en": "10",
+        "up": "负担沉重，责任如山。你可能正在承担超出常人的工作量或义务。虽然压力大，但你能够坚持完成。问题是：这些负担真的都是你的吗？",
+        "rev": "你正在学会放下不属于你的重担，或者不再愿意一个人扛下所有。过度压力正在损害你的健康，放手是一种解脱。",
+        "love": "感情中你承担了太多责任，也许是单方面付出太多。问问自己：这段关系是否在消耗你而非滋养你？",
+        "career": "工作量大到难以承受，也许在同时处理多个项目或角色。你需要优先排序和合理分配，而不是一个人硬扛。",
+        "advice": "负重前行不是能力的证明，而是边界的缺失。学会说'不'，将不属于你的担子放下。"
+      },
+      {
+        "rank": "侍从",
+        "en": "Page",
+        "up": "一个充满热情和好奇心的新开始。新的消息、新的学习机会或新的探索方向正在出现。保持开放和天真的心态，像孩子一样去探索未知。",
+        "rev": "不成熟的表现可能会带来麻烦。你或许在接受坏消息，或者因为缺乏方向而四处乱撞。需要更多的耐心和规划。",
+        "love": "一段轻松愉快的新恋情可能在萌芽，或者在现有关系中加入新鲜的元素。保持好奇心和探索欲，让感情充满活力。",
+        "career": "收到新的工作消息或学习机会。也许是培训、新项目或者职业发展的新鲜方向。保持开放的接收状态。",
+        "advice": "以赤子之心面对新的开始。你还不需要知道所有答案——好奇心是你最强的导航。"
+      },
+      {
+        "rank": "骑士",
+        "en": "Knight",
+        "up": "冒险精神正在驱动你向前冲。行动迅速、激情满满，你对未来充满了无畏的勇气。这是一个冲锋的时刻，不要被恐惧拖慢脚步。",
+        "rev": "鲁莽和缺乏耐心可能导致半途而废。你太急于看到结果而忽视了必要的准备和细节。慢下来，才不会翻车。",
+        "love": "主动追求心仪的对象，或者在关系中注入冒险和激情。你是一个充满了浪漫勇气的骑士，但要小心不要太冲动。",
+        "career": "事业上的冲锋期，适合大胆行动、主动争取。你有着充沛的行动力，但需要确保方向正确再出发。",
+        "advice": "勇敢的骑士也需要地图。激情是翅膀，但计划是方向——两者兼顾才能飞得更远。"
+      },
+      {
+        "rank": "皇后",
+        "en": "Queen",
+        "up": "自信和温暖是你最大的魅力。你能够独立领导他人，同时保持亲和力。这是一个展现个人魅力和领导力的阶段，用你的创造力照亮周围。",
+        "rev": "专横或缺乏安全感正在损害你的影响力。你可能在过度控制或者因为不自信而退缩。找到内在的平衡是当前的功课。",
+        "love": "在感情中展现出迷人的自信和温暖。你是一个充满魅力的伴侣，能够独立地爱而不依赖。吸引力自然散发。",
+        "career": "职场中的领导力得到充分发挥。你自信而不咄咄逼人，能够激励团队又保持亲和力。职业女性力量的典范。",
+        "advice": "真正的女王不需要证明自己的威严——她用存在本身影响一切。你身上的温暖与自信，是最好的武器。"
+      },
+      {
+        "rank": "国王",
+        "en": "King",
+        "up": "你正在展现成熟的领导力和远见卓识。这是一个负责任的领导者形象，能够做出果断的决定并带领他人向前。创造力与执行力兼备。",
+        "rev": "权力被滥用或者因为急躁而做出错误的决定。你可能在过度专制或者因为缺乏耐心而失去追随者。",
+        "love": "在感情中展现出成熟的担当和保护欲。你是一个负责任的伴侣，但也有着激情和创造力的一面。",
+        "career": "事业上的顶峰状态。你具备企业家的远见和领导者的魄力，适合创业、管理或独立决策。",
+        "advice": "真正的权力不是控制他人，而是引领方向。用你的远见照亮前路，让追随者自愿与你同行。"
+      }
+    ]
+  },
+  {
+    "suit": "圣杯",
+    "en": "Cups",
+    "element": "水",
+    "theme": "情感、爱情、直觉、关系",
+    "cards": [
+      {
+        "rank": "王牌",
+        "en": "Ace",
+        "up": "一股丰沛的情感能量正在涌出。新的恋情、深层的直觉、丰富的创造力都在此时被激活。敞开心扉，让爱的能量自由流动。",
+        "rev": "情感被堵塞，你可能感到空虚或无法连接自己的内心。创意枯竭或感情受挫让你暂时封闭了自己。",
+        "love": "一段全新的感情正在敲门。也许是命中注定的相遇，也许是现有关系的情感升华。打开心扉，爱正在流入你的生命。",
+        "career": "创意工作者的灵感高峰期。适合开始新的创意项目、品牌策划或需要情感智慧的领域。让你的想象力自由流淌。",
+        "advice": "爱是最强大的创造力。当你敞开心扉时，整个宇宙都会通过你表达自己。不要害怕情感的深度。"
+      },
+      {
+        "rank": "二",
+        "en": "2",
+        "up": "两个灵魂之间的深度连接正在形成。这是两情相悦的和谐时刻，彼此看到对方最真实的样子。灵魂伴侣的相遇或现有关系的升华。",
+        "rev": "关系中的裂痕正在扩大，信任在流失。分离或疏远可能是当前正在面对的课题。需要诚实地审视双方之间到底发生了什么。",
+        "love": "爱情中最美好的牌之一——双向奔赴的深情。你和伴侣之间有着深刻的连接和理解，这是灵魂层面的相遇。",
+        "career": "商业合作或团队协作的和谐期。找到志同道合的伙伴，合作关系将为你的事业带来深远的影响。",
+        "advice": "真正的连接来自平等和相互尊重。爱不是占有，而是两个完整的灵魂选择并肩同行。"
+      },
+      {
+        "rank": "三",
+        "en": "3",
+        "up": "友情和欢聚的快乐正在包围你。和朋友们的聚会、庆祝和分享带来心灵的滋养。这是社交和情感连接的丰收时刻。",
+        "rev": "过度社交带来的疲惫，或者流言蜚语正在影响你的情绪。过多的聚会让你忽略了内在的需要。适当收敛，回归内心。",
+        "love": "感情生活中的轻松和愉快正在增加。朋友聚会、约会或者轻松惬意的社交活动，让你在关系中感到快乐和满足。",
+        "career": "同事关系的融洽期，团队合作和团建活动让工作氛围更加愉悦。创意和灵感在轻松的氛围中自由流动。",
+        "advice": "快乐是用来分享的。在朋友中找到滋养和力量，但也不要忘记独处的重要性。"
+      },
+      {
+        "rank": "四",
+        "en": "4",
+        "up": "你正在经历情感上的沉淀和内在的冥想。表面的快乐不再满足你，你在寻找更深的意义和连接。这是一个内省和重新评估的阶段。",
+        "rev": "倦怠和麻木让你对外界的邀请无动于衷。你可能正在错过重要的机会，因为你陷入了内心的死水。需要唤醒沉睡的感知力。",
+        "love": "感情进入反思期。你也许在重新评估这段关系对你的意义，或者需要一些独处的时间来理清自己的感受。",
+        "career": "对当前的工作产生了倦怠感，需要重新评估职业方向。适当的休息和反思比盲目努力更重要。",
+        "advice": "安静不是空虚。在静默中，你才能听到内心最真实的声音。不要害怕停下来——这是重启的前奏。"
+      },
+      {
+        "rank": "五",
+        "en": "5",
+        "up": "失落和悲伤是此刻真实的感受，但请注意——在这失去的背后，希望的曙光已经出现。杯子没有完全倒下，你拥有的比你以为的多。",
+        "rev": "你正在走出阴霾，开始接受现实并重建自己。虽然伤痛还在，但你已经能够看到前方的光亮。",
+        "love": "感情中经历了失去或失望。但重要的是——你没有失去一切，留下的部分值得你珍惜。新的希望正在孕育。",
+        "career": "职业上可能经历了挫折或损失，但这也是重新评估真正重要之事的时机。有些失去是在为更好的让路。",
+        "advice": "当你只看到失去的两杯时，请回头看看——你还有三杯完好。悲伤是真实的，但希望也是。"
+      },
+      {
+        "rank": "六",
+        "en": "6",
+        "up": "怀旧的情绪将你带回过去。纯真的回忆、童年的影子、旧时的连接正在影响你做当下的选择。这不是逃避，而是从过去汲取智慧。",
+        "rev": "你沉溺在过去无法前行。美好的回忆变成了逃避现实的借口。需要拔出被过去吸住的脚，回到当下的生活中来。",
+        "love": "旧情复燃或回忆过往恋情的阶段。你也许在和旧人重新建立连接，或者在回忆中寻找对当下感情的启示。",
+        "career": "过去的经验正在为你提供指引。也许在回归曾经热衷的领域，或者从以往的教训中找到了新的方向。",
+        "advice": "回忆是甜美的，但它只是指向过去的箭头。不要让怀旧变成拒绝当下的理由。"
+      },
+      {
+        "rank": "七",
+        "en": "7",
+        "up": "你面对多种可能性，沉浸在白日梦和幻想中。美好的憧憬让你兴奋，但也需要分辨哪些是真正的机会，哪些只是幻影。",
+        "rev": "幻梦破灭后的清醒时刻。你可能意识到自己一直在不切实际地幻想。虽然清醒有时残酷，但它给了你脚踏实地重新出发的机会。",
+        "love": "感情中面临多种选择或诱惑，或者你对某段感情有太多不切实际的幻想。需要分辨真心和一时冲动。",
+        "career": "职业发展中出现了多条可能的路径。白日梦的作用是激发愿景，但你需要将愿景与实际规划结合起来。",
+        "advice": "幻想是创造力的翅膀，但地面上的行动才能让你真正飞起来。选择一条路，然后坚定地走下去。"
+      },
+      {
+        "rank": "八",
+        "en": "8",
+        "up": "你决定离开熟悉的环境，去寻找更高的意义和更真实的自己。放下过去的安全感和舒适区，走向未知的旅程。这是勇敢者的选择。",
+        "rev": "恐惧改变让你滞留在不满意的状态中。你知道该离开，但害怕未知让你动弹不得。停留的代价正在变得越来越大。",
+        "love": "离开一段不再滋养你的感情。虽然不舍，但你知道继续下去只会消耗彼此。离开是为了更高的追求。",
+        "career": "辞职、转行或离开熟悉的领域去探索新的方向。这是一个勇敢的决定，但也是被内心深处的高我召唤。",
+        "advice": "当你不再属于脚下的这片土地时，离开就是最深的自我忠诚。未知并不可怕，停滞才可怕。"
+      },
+      {
+        "rank": "九",
+        "en": "9",
+        "up": "深刻的满足感——你的情感需求正在得到满足。愿望正在实现，你感到内心充盈而喜悦。这是知足常乐的美好状态。",
+        "rev": "虽然外在条件不错，但内心总感觉少了点什么。不满足感正在侵蚀你的幸福感。贪得无厌会让你看不到已经拥有的美好。",
+        "love": "感情中的满足和幸福感。你正处于一段令人愉悦的关系中，内心的情感需求得到了回应和滋养。",
+        "career": "职业上达到了一种满意的状态——也许是收入、成就感或工作氛围让你感到满足。享受当下的丰收。",
+        "advice": "真正的富足不在于拥有更多，而在于感到自己已经足够。你此刻手中握着的，已经是很多人梦寐以求的。"
+      },
+      {
+        "rank": "十",
+        "en": "10",
+        "up": "情感的圆满和家庭的幸福达到了顶峰。这是一个充满爱与和谐的阶段，你感到自己真正属于某个地方。家庭关系、亲密关系和内心的平和都达到了理想状态。",
+        "rev": "家庭中的不和谐或关系的破裂让你感到失去了归属感。需要重新修复和家庭成员之间的连接。",
+        "love": "感情关系达到了婚姻或家庭层面的圆满。这是建立一个温暖家庭的理想时期，情感承诺得到深化。",
+        "career": "工作和家庭的平衡趋于完美。你也许在家族企业、居家办公或者团队中找到了一种归属感。",
+        "advice": "情感的圆满是你一路走来所有选择的回报。好好享受这份幸福，同时也把爱传递出去。"
+      },
+      {
+        "rank": "侍从",
+        "en": "Page",
+        "up": "温柔的灵感和直觉信息正在流向你。一个情感上的新开始——可能是一段新的感情萌芽，或者创意灵感在你心中涌动。保持敏感和接收状态。",
+        "rev": "情绪化的波动让你难以保持稳定。创意受阻或感情上的不成熟正在制造麻烦。需要有更多的自我觉察。",
+        "love": "一段温柔的新恋情可能在萌芽。或者你收到了来自心仪对象的情感信号。保持接收的心态，但不要过度解读。",
+        "career": "创意灵感的初期阶段，适合构思新方案或计划。你的直觉在工作中会发挥重要作用。",
+        "advice": "敏感是一种超能力，但需要智慧来驾驭。保持心的敏锐，同时保持心智的清醒。"
+      },
+      {
+        "rank": "骑士",
+        "en": "Knight",
+        "up": "浪漫的追求者——你或你生活中的某人正在展示迷人的魅力和理想的爱情。举止优雅、充满激情，但需要确认这种热情是否持久。",
+        "rev": "花心或不切实际的浪漫幻想正在浪费你的时间和感情。表面迷人的东西可能缺乏实质。需要警惕那些只说不做的人。",
+        "love": "浪漫的追求期——你可能是追求者也可能是被追求者。爱情的氛围浓厚，但需要确认这不仅仅是瞬间的化学反应。",
+        "career": "带着理想主义投入工作，适合需要创意和审美能力的领域。但需要注意不要因为理想化而忽视实际问题。",
+        "advice": "浪漫是最美的糖衣，但持久的爱情需要更多——承诺、理解和共同的成长。"
+      },
+      {
+        "rank": "皇后",
+        "en": "Queen",
+        "up": "你正在展现出最高级的同理心和直觉力。像温柔的月亮一样，你能够滋养周围的人，同时保持着深刻的直觉洞察。情感智慧是你的超能力。",
+        "rev": "情绪过度依赖他人，或者因为缺乏边界而感到疲惫。过度敏感让你失去了内在的中心。需要建立情感上的独立性。",
+        "love": "在感情中展现出极高的情商和滋养力。你懂得如何爱人和被爱，是伴侣的精神港湾。",
+        "career": "职场中的情感智慧得到发挥——也许是HR、心理咨询、创意或任何需要与人深度连接的领域。",
+        "advice": "你不需要吸收所有人的情绪——共情不是同情。保持你的温柔，同时守护你的边界。"
+      },
+      {
+        "rank": "国王",
+        "en": "King",
+        "up": "情感上达到成熟的顶峰。你能够包容和理解他人，同时保持内在的稳定。艺术鉴赏力和情感智慧都处于最高水平。",
+        "rev": "情感上的冷漠或者通过操纵他人的情绪来达到目的。压抑自己的情感表达，用理智的高墙隔绝内心。",
+        "love": "感情中的成熟伴侣——你能够给予安全感和理解，是值得信赖的情感依托。",
+        "career": "适合担任需要情感智慧和稳定性的领导角色。你的判断力兼具理智和情感的深度。",
+        "advice": "真正的王者不是没有情感，而是能够驾驭情感的海洋而不被淹没。"
+      }
+    ]
+  },
+  {
+    "suit": "宝剑",
+    "en": "Swords",
+    "element": "风",
+    "theme": "思想、沟通、挑战、真理",
+    "cards": [
+      {
+        "rank": "王牌",
+        "en": "Ace",
+        "up": "真理的利剑劈开了迷雾——一个清晰的洞见或突破性的想法正在降临。思维高度锐利，适合做重大决策。追求真相，不管它多不舒服。",
+        "rev": "思维混乱，真相被遮蔽。你可能收到错误信息或者被自己的偏见蒙蔽。在做出重大决定前，先确认事实。",
+        "love": "感情中需要坦诚沟通。也许是一个重要的对话即将发生，真相可能会刺破舒适的幻象，但长期来看是有益的。",
+        "career": "突破性的想法或解决方案即将出现。清晰的思维和果断的沟通能力是你的利器。适合做重要决策。",
+        "advice": "真相比舒适更珍贵。你此刻拥有看清事物本质的能力——不要放弃这个天赋。"
+      },
+      {
+        "rank": "二",
+        "en": "2",
+        "up": "你正处在两难抉择的十字路口。两种选择各有优劣，让你陷入僵局。信息似乎都不够充分，需要更多的内心指引才能做出明智决定。",
+        "rev": "错误的选择或逃避让你陷入了更深的困境。信息过载加重了焦虑，你可能已经做出了一个不明智的决定。",
+        "love": "感情中的两难——两段关系的取舍，或者关系中某个无法回避的艰难选择。拖延只会让情况恶化。",
+        "career": "职业选择的关键时刻。两份工作、两个方向，你需要权衡利弊做出决定。信息已经足够，不要再等。",
+        "advice": "当理性无法抉择时，跟随你的直觉。平衡的假象不如一个坚定的选择重要。"
+      },
+      {
+        "rank": "三",
+        "en": "3",
+        "up": "心碎、背叛、悲伤——这是宝剑牌组中最痛苦的一张。你的心正在经历一场暴雨。但请记住：这场风暴会过去，而你会比之前更强大。",
+        "rev": "你正在从痛苦中恢复。虽然伤口还在隐隐作痛，但你已经能够释怀并向前看。治愈正在发生。",
+        "love": "感情中的心碎——背叛、分离或深刻的失望。允许自己哀伤，但不要陷入自怜。时间是治愈的良药。",
+        "career": "工作中可能经历了背叛或重大挫折。但这次痛苦会带给你重要的教训。有些人的离开是为了给你更好的让路。",
+        "advice": "允许自己崩溃一会儿。悲伤不是软弱——它是你灵魂的暴雨，冲刷过后才会有彩虹。"
+      },
+      {
+        "rank": "四",
+        "en": "4",
+        "up": "你需要彻底的休息和恢复。精神和身体的双重疲惫告诉你该暂停了。暂时从外界的纷扰中隐退，给自己充电的空间。",
+        "rev": "焦躁不安让你无法好好休息。虽然身体躺在床上，但脑子还在高速运转。真正的休息不仅需要身体的静止，更需要心智的宁静。",
+        "love": "感情中的冷静期。也许需要暂时的空间来整理自己的情绪和想法。距离不是疏远，而是为了更好地靠近。",
+        "career": "工作上的倦怠需要被正视。强制性的休息比持续消耗更有效率。给自己放一个假，回来时你会更有力量。",
+        "advice": "休息不是浪费时间，而是投资自己。在寂静中，你才能听到下一个阶段的召唤。"
+      },
+      {
+        "rank": "五",
+        "en": "5",
+        "up": "你在冲突中可能落败了，但这只是一种消极的胜利——对方可能赢得并不光彩。评估这场冲突：你失去了什么？你又从中学到了什么？",
+        "rev": "从冲突中学习和和解。你能够放下怨恨，看到冲突背后的教训。和解比胜利更有价值。",
+        "love": "感情中的争执和冲突可能以你的不情愿让步而告终。问自己：赢不了的人是你，还是硬要赢的对方？",
+        "career": "职场竞争中的挫折。同事或竞争者可能用不公平的方式胜出。不要降低自己的标准——实力终会被看到。",
+        "advice": "有些胜利是带着苦味的。在冲突中保持自己的尊严比赢得争吵重要得多。"
+      },
+      {
+        "rank": "六",
+        "en": "6",
+        "up": "你正在离开困境，走向光明的彼岸。这是一个过渡时期，虽然身后还有未了之事，但你的船已经掉转了方向。新的开始正在地平线上显现。",
+        "rev": "你被困在原地，拒绝改变。远离问题的机会就在眼前，但你的恐惧让你无法启航。需要看到更大的图景。",
+        "love": "一段感情的过渡期——你正在从过去的伤痛中走出来，驶向新的情感风景。路途可能孤单，但方向是正确的。",
+        "career": "职业转变的过渡期。你可能正在离开旧岗位、旧公司或旧行业，走向新的方向。这段路上的不确定性是暂时的。",
+        "advice": "你不需要看到整条路才能启程，只需看到前面一步的亮光。过渡不是终点，而是抵达前的必经之路。"
+      },
+      {
+        "rank": "七",
+        "en": "7",
+        "up": "巧妙和灵活的策略正在发挥作用。你不需要从正面进攻——暗中的布局、借力打力、灵活的应对才是制胜之道。保持低调，让结果说话。",
+        "rev": "诡计暴露或弄巧成拙。你的算计被他人识破了。需要重新审视策略，更诚实一些才能达成目标。",
+        "love": "感情中需要一些微妙的策略——不是操纵，而是懂得何时该说、何时该等。暗恋或有秘密的感情关系。",
+        "career": "职场需要灵活应对——不是所有事情都要硬碰硬。暗中准备、寻找盟友、等待最佳时机——这些比硬扛更有智慧。",
+        "advice": "柔能克刚。不战而屈人之兵是最高级的战略。保持你的秘密武器，在关键时刻才亮出来。"
+      },
+      {
+        "rank": "八",
+        "en": "8",
+        "up": "你感到被困住了，但监狱的门其实是开着的。自我设限的想法让你看不到出路。重新评估你的假设，你的限制比你想象的要少得多。",
+        "rev": "你正在释放自己，突破思维的牢笼。曾经的恐惧和限制正在被看清，你终于获得了自由思考的能力。",
+        "love": "感情中的被困感——你或许觉得离不开一个人、一段关系，但实际上你比想象中更有选择。",
+        "career": "职业上的无力感。你觉得自己别无选择，但其实是你选择了不选择。重新审视你的能力和市场价值。",
+        "advice": "你唯一的监狱是你认为没有选择的那个想法。自由始于认知：你一直都有选择。"
+      },
+      {
+        "rank": "九",
+        "en": "9",
+        "up": "焦虑和恐惧在深夜啃噬你的心。你可能被过度担忧、失眠和负面思维困扰。但请认清：绝大多数的恐惧只是头脑的虚构，现实远没有你想的那么糟。",
+        "rev": "你终于能够释然——那些纠缠你许久的恐惧正在消散。学会放手和信任，噩梦终将过去。",
+        "love": "感情中的焦虑不安——可能是对关系的不确定性、对伴侣忠诚的怀疑，或者是对自己被抛弃的恐惧。需要区分直觉和焦虑。",
+        "career": "工作压力导致的身心疲惫。你可能在担心失业、犯错或被替代。但你的恐惧往往比现实更大。",
+        "advice": "你恐惧的不是事实，而是你编造的故事。深呼吸，看看窗外——世界并没有崩塌。"
+      },
+      {
+        "rank": "十",
+        "en": "10",
+        "up": "彻底的结束。痛苦的结局是不可避免的，但这也是触底反弹的时刻。你已经没什么可以失去了，从今往后只会好起来。",
+        "rev": "拒绝结束带来持续的痛苦。你还在旧故事里挣扎，不接受已经结束的事实。放手是唯一的路。",
+        "love": "一段感情的彻底终结。虽然痛苦，但结束意味着你可以重新开始。有些事到该结束的时候就是该结束了。",
+        "career": "职业上的重大结束——离职、被裁或项目彻底终止。但结束不是失败，它是为新的机会腾出空间。",
+        "advice": "有些结束不是惩罚，而是礼物。当一扇门关上时，别在走廊里站太久——转身看看窗户。"
+      },
+      {
+        "rank": "侍从",
+        "en": "Page",
+        "up": "旺盛的求知欲和敏锐的观察力是你当前的特点。新信息正在汇集，保持警觉和开放的心态去接收。像侦探一样去探索你感兴趣的领域。",
+        "rev": "八卦和不经思考的言论正在制造麻烦。信息泄露或轻信谣言可能伤害你关心的人。管好自己的嘴巴。",
+        "love": "感情中的观察和试探期。你在收集关于心仪对象的信息，或者通过对话了解更多。保持敏锐但不要多疑。",
+        "career": "学习新技能的时期。可能在参加培训、学习技术或者研究新的职业方向。保持好奇心。",
+        "advice": "知识是宝剑，但智慧在于如何使用它。你的求知欲是天赋，但需要加上审慎才能带来真正的力量。"
+      },
+      {
+        "rank": "骑士",
+        "en": "Knight",
+        "up": "你正在果敢地冲向真理的战场。言辞犀利、思维敏锐、行动迅速——你是一个不容小觑的对手。但记住：速度需要有方向才有意义。",
+        "rev": "冲动的言论和好斗的姿态正在破坏关系。你可能说话太伤人、做事太急切。学会在说话前数到三。",
+        "love": "感情中的冲突可能一触即发。你的言辞可能过于犀利，伤害到在乎的人。在表达不满时记得留有余地。",
+        "career": "工作中需要果断决策和迅速行动。你的能力和态度都很强，但需注意不要用对抗代替沟通。",
+        "advice": "最快的剑不一定是最好用的。真正的力量在于控制——知道何时出剑，更知道何时收剑。"
+      },
+      {
+        "rank": "皇后",
+        "en": "Queen",
+        "up": "独立的思考和清晰的判断是你最珍贵的品质。你能在复杂的局面中保持理性，同时不失人情味。这是智慧与沉着的结合。",
+        "rev": "过于冷漠和批判——你在用自己的标准衡量一切。过度的理性让你失去了温度。偶尔示弱也是一种力量。",
+        "love": "感情中的独立和理性——你不会为了感情失去自我，但也需要学习在关系中柔化你的边界。",
+        "career": "职场中的明智决策者。你能在压力下保持冷静和判断力，是团队中最值得信赖的理性声音。",
+        "advice": "智慧不只是知道什么是对的，更是在对的时候用对的方式说出来。"
+      },
+      {
+        "rank": "国王",
+        "en": "King",
+        "up": "权威的智慧和公正的决断力正在你身上展现。你具备最高的逻辑思维能力和领导判断力。一个真正的智者和领袖。",
+        "rev": "专制和冷酷——你正在用智慧作为武器去控制他人。过度强调逻辑而忽视情感，让你在人际关系中显得高高在上。",
+        "love": "感情中展现出理性和智慧的掌控力。你能够帮助伴侣理清思绪，但不要让自己变成法官而非恋人。",
+        "career": "职业生涯的智慧巅峰。你具备成为行业权威和资深专家的一切条件。你的判断被广泛尊重。",
+        "advice": "真正的智慧是知道自己有局限。最伟大的君王不是从不犯错，而是能够听取逆耳之言。"
+      }
+    ]
+  },
+  {
+    "suit": "星币",
+    "en": "Pentacles",
+    "element": "土",
+    "theme": "财富、工作、健康、物质",
+    "cards": [
+      {
+        "rank": "王牌",
+        "en": "Ace",
+        "up": "一扇财富和机遇的大门正在你面前打开。新的投资机会、收入来源或物质上的好运正在降临。脚踏实地去把握——这是你靠实力赢得的机会。",
+        "rev": "错失良机或投资失利。财富的种子没有发芽，可能是因为土壤还没准备好。拖延或贪婪会让你错过窗口。",
+        "love": "一段稳定且有物质基础的感情机会。金钱不是爱情的全部，但共同的财务目标能让关系更稳固。",
+        "career": "职业上的黄金机会——跳槽、升职、创业或重大项目的启动。这是实质性的进步，不是画大饼。",
+        "advice": "财富之门的钥匙一直在你手中。不要等待一个'完美'的时机——种下种子，然后耐心浇灌。"
+      },
+      {
+        "rank": "二",
+        "en": "2",
+        "up": "你正在多个财务或工作任务之间巧妙地保持平衡。这是灵活调配资源的能力。像一个杂技演员一样，你能同时处理多项事务而不乱。",
+        "rev": "财务失衡或分身乏术。你承担了太多，却没有足够的精力去做好每一件事。需要优先排序并学会拒绝。",
+        "love": "感情和工作之间的平衡是当前的课题。你需要在爱情和生活中找到一个可持续的节奏。",
+        "career": "同时在处理多个项目或收入来源。灵活性和适应力是你的优势，但也要防止过度分散精力。",
+        "advice": "平衡不是静止的——它是在不断的微调中保持不倒下。欣赏自己已经做到的成就。"
+      },
+      {
+        "rank": "三",
+        "en": "3",
+        "up": "团队合作正在结出硕果。你的专业技能得到认可，合作项目顺利推进。这是协作和共享成功的阶段。",
+        "rev": "合作失败或技能不足导致项目受挫。也许你和团队的目标不一致，或者你需要进一步打磨自己的专业技能。",
+        "love": "通过共同的兴趣或项目建立联系。一段建立在共同价值观和务实基础之上的关系。",
+        "career": "职业认证、技能提升和团队合作的关键期。你的专业能力正在得到正式的认可。",
+        "advice": "单打独斗成就有限。找到那些和你有共同愿景的人——合作能将你的能力放大数倍。"
+      },
+      {
+        "rank": "四",
+        "en": "4",
+        "up": "财务基础稳固，储蓄在增加，你对物质资源的掌控力很强。这是经济安全感的建设期。但要注意：过度节省会变成吝啬。",
+        "rev": "对金钱的控制欲过强——可能是吝啬或恐惧财务损失。抓住手中的钱不放，也拒绝了金钱的流通。",
+        "love": "感情中可能过于注重物质安全而忽略了情感的流动。金钱上的控制欲也可能影响关系。",
+        "career": "职业稳定，收入有保障。现在不适合冒险——先巩固已有的基础。但不要让安逸变成保守。",
+        "advice": "财务安全是必要的，但金钱只是工具不是目的。你抓住的钱越多，能流动进来的就越少。"
+      },
+      {
+        "rank": "五",
+        "en": "5",
+        "up": "财务困难或物质上的匮乏正在考验你。你可能感到被孤立或雪上加霜。但请看清：你周围的资源比你意识到的多——向外寻求帮助。",
+        "rev": "你正在恢复，找到帮助和走出贫困的路径。境况正在好转，你不再是一个人。",
+        "love": "感情中因为物质问题发生摩擦。财务方面的压力正在影响关系。记住你们是队友，不是对手。",
+        "career": "职业或收入上的低谷期。但这只是暂时的——你的价值不因暂时的困难而降低。主动寻求支援。",
+        "advice": "在最低落的时候，最难的是开口说'我需要帮助'。但你不需要一个人扛——伸出手。"
+      },
+      {
+        "rank": "六",
+        "en": "6",
+        "up": "慷慨的给予和资源的分享——你正处在能够帮助他人的位置上。也许是慈善捐助，也许是知识经验的分享。给出的都会以某种方式回来。",
+        "rev": "在接受施舍的被动位置——权力的不对等让你不舒服。或者你有能力帮别人却在吝啬。",
+        "love": "感情中的付出与接受达到了健康的平衡。你愿意为伴侣付出，也懂得接受对方的爱。",
+        "career": "在工作中分享资源和机会，也许是在指导新人或回馈行业社区。善意的付出会扩大你的影响力。",
+        "advice": "你给出的每一颗星币，都会在宇宙的账簿中刻下印记。真正的富有不是你拥有什么，而是你给出什么。"
+      },
+      {
+        "rank": "七",
+        "en": "7",
+        "up": "耐心等待你的投资和努力结出果实。这是一个评估进展的阶段——看看哪些已经成熟，哪些还需要更多时间。不急不躁的态度是最有价值的心态。",
+        "rev": "对进展的焦虑让你失去了耐心。你急于看到结果，但这种急躁可能导致错误的判断。成长需要时间。",
+        "love": "感情需要时间的浇灌——你不能催促一段关系的发展。耐心观察，看看这段关系是否值得继续投入。",
+        "career": "长期职业投资的评估期。你之前种下的种子哪些快要收成了？哪些需要重新调整？",
+        "advice": "种下一棵树最好的时间是十年前，其次是现在。有些成果需要时间——等待也是投资的一部分。"
+      },
+      {
+        "rank": "八",
+        "en": "8",
+        "up": "勤奋和专注正在打磨你的技能。日复一日的努力虽然枯燥，但它是通向精通的唯一道路。你正在成为自己领域的高手。",
+        "rev": "敷衍了事或缺乏动力的状态。你不投入，不思考，只是在走流程。这种状态持续下去会吞噬你的前途。",
+        "love": "感情需要日复一日的用功——不是大张旗鼓的表白，而是每天的点滴关心和投入。",
+        "career": "职业技能的精进期。适合学习新技能、考证、或者深度打磨专业能力。一万小时定律——投入就是你最大的竞争力。",
+        "advice": "成功没有捷径。每天的微小进步，累积起来就是别人望尘莫及的高度。"
+      },
+      {
+        "rank": "九",
+        "en": "9",
+        "up": "独立和富足——你正在享受自己努力换来的成果。财务自由、专业技能被认可、生活品质优良。这是自给自足的丰盛状态。",
+        "rev": "过度依赖他人的经济支持，或者因为挥霍无度而失去了之前积累的成果。需要重新建立财务独立。",
+        "love": "感情中的独立和自信。你不需要依附于任何人来获得安全感——这本身就是一种魅力。",
+        "career": "职业上的自给自足。你也许在自由职业、创业或达到了较高的专业级别。享受独立的状态。",
+        "advice": "真正的富足是你能够独立地生活，优雅地给予，而不需要依赖任何人。你做到了。"
+      },
+      {
+        "rank": "十",
+        "en": "10",
+        "up": "家族财富、遗产继承和长期的繁荣。你正在享受代代相传的成果，或者为自己家族的未来打下了坚实的基础。这是最长久的富足。",
+        "rev": "家族纠纷或财富传承出现问题。继承权、遗产分配或家庭企业的矛盾让你既疲惫又无奈。",
+        "love": "感情中考虑长远规划——婚姻、家庭、共同的财产和未来。你和伴侣正在为共同的家族打下基石。",
+        "career": "事业进入长期稳定繁荣的阶段。你正在为退休、遗产或下一个世代积累资源。考虑更长远的布局。",
+        "advice": "真正的遗产不是你留下的金钱，而是你这一生的作为对后世的影响。"
+      },
+      {
+        "rank": "侍从",
+        "en": "Page",
+        "up": "务实的学习态度和对新技能的渴望。一个与金钱或职业相关的新机会正在萌芽——也许是实习、学徒或进修课程。",
+        "rev": "懒散和缺乏上进心正在拖慢你。你不愿意为未来投资时间和精力，只想待在舒适区。",
+        "love": "感情中的务实和默默付出。你可能在用实际行动而不是甜言蜜语来表达爱。",
+        "career": "职业学习的起点——新的培训、技能课程或实习机会。这是打下基础的重要阶段。",
+        "advice": "每一棵大树都是从一颗种子开始的。你现在学到的每一点知识，都是未来的财富。"
+      },
+      {
+        "rank": "骑士",
+        "en": "Knight",
+        "up": "踏实可靠和勤奋努力是你当前的特质。你在稳步前进，如一头勤恳的牛。虽然不快，但每一步都扎实。",
+        "rev": "拖延和停滞正在消磨你的机会。你可能过于谨慎或缺乏野心，让自己在原地踏步。",
+        "love": "感情中的务实和专一——你是一个值得信赖的伴侣。虽然不浪漫，但你用行动证明了你的承诺。",
+        "career": "事业上稳步推进。虽然没有大起大落，但这种稳定和踏实是你长期发展的保障。",
+        "advice": "慢不是缺点——只要方向正确，每一步都在靠近目的地。坚持你目前的步伐。"
+      },
+      {
+        "rank": "皇后",
+        "en": "Queen",
+        "up": "务实而温暖的财富管理者和滋养者。你不仅能够照顾好自己，还能滋养周围的人。实用的智慧加上丰盛的心态是你最大的财富。",
+        "rev": "过度物质的倾向让你忽视了情感和精神的需要。可能因为过度消费或财务管理不善。",
+        "love": "感情中的务实担当——你既能够给予伴侣物质上的安全感，又能用实际的行动表达爱。",
+        "career": "职场中的实干家——你是团队中最可靠的那个人。财务管理和资源调配是你的强项。",
+        "advice": "真正的丰盛是物质与精神的平衡。你拥有的不只是星币，更是滋养他人的能力。"
+      },
+      {
+        "rank": "国王",
+        "en": "King",
+        "up": "财富和商业智慧的高度。你具备卓越的理财能力和商业头脑，是财富的大师。稳健和远见兼具，你正在进行大手笔的布局。",
+        "rev": "贪婪和物质主义——你在用金钱的价值衡量一切。权力的腐败让你忘记了财富的真正意义。",
+        "love": "感情中提供坚实的物质基础和安全感。但不要以为用钱可以买到一切——情感需要用心，不需要用钱。",
+        "career": "商业和财富领域的巅峰。你具备企业家的远见和实力，适合大项目投资和资产管理。",
+        "advice": "你是财富的主人，不是奴隶。真正的国王用财富编织未来，而不是被它编织。"
+      }
+    ]
+  }
+];
+
+// Build full 78-card deck
+function buildDeck() {
+  const deck = [];
+  for (const card of MAJOR_ARCANA) {
+    deck.push({ ...card, type:'major', id:`major_${card.id}` });
+  }
+  for (const suit of MINOR_SUITS) {
+    for (const c of suit.cards) {
+      deck.push({
+        ...c, type:'minor', suit:suit.suit, element:suit.element,
+        suitTheme:suit.theme, id:`${suit.en}_${c.en}`
+      });
+    }
+  }
+  return deck;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Keyword-based question analysis
+function analyzeQuestion(question) {
+  const q = question.toLowerCase();
+  const themes = [];
+  if (/爱|情|恋|对象|男朋友|女朋友|老公|老婆|伴侣|分手|复合|婚姻|结婚|单相思|暗恋|喜欢/.test(q)) themes.push('爱情');
+  if (/工作|事业|职业|老板|同事|跳槽|面试|升职|加薪|辞职|创业/.test(q)) themes.push('事业');
+  if (/钱|财|收入|投资|理财|经济|债务|贷款|工资/.test(q)) themes.push('财运');
+  if (/家人|父母|孩子|亲戚|家庭|妈|爸|兄弟|姐妹/.test(q)) themes.push('家庭');
+  if (/健康|身体|病|不舒服|累|疲惫|失眠/.test(q)) themes.push('健康');
+  if (/学习|考试|学校|大学|读书|成绩|毕业/.test(q)) themes.push('学业');
+  if (/朋友|社交|人际|圈子|闺蜜|兄弟|关系/.test(q)) themes.push('人际');
+  if (/自己|迷茫|人生|方向|意义|目标|选择|决定|怎么办/.test(q)) themes.push('人生方向');
+  return themes.length > 0 ? themes : ['综合'];
+}
+
+function interpretCard(card, isReversed, position, questionThemes) {
+  const rev = isReversed;
+  let reading = '';
+  const name = card.name || `${card.suit}${card.rank}`;
+
+  if (card.type === 'major') {
+    const meaning = rev ? card.rev : card.up;
+    reading += `<strong>${name}</strong> ${rev?'<span class="reversed-badge">逆位</span>':''} — ${meaning}。`;
+
+    // Add context-specific interpretation
+    const primaryTheme = questionThemes[0];
+    if (primaryTheme === '爱情' && card.love) {
+      reading += `<br><br>💕 <em>感情方面：</em>${rev ? '逆位提示需要反思：' : ''}${card.love}`;
+    } else if (primaryTheme === '事业' && card.career) {
+      reading += `<br><br>💼 <em>事业方面：</em>${rev ? '逆位提示需要警惕：' : ''}${card.career}`;
+    }
+    if (card.advice) {
+      reading += `<br><br>🔮 <em>宇宙建议：</em>${card.advice}`;
+    }
+  } else {
+    // Minor Arcana — now with deep interpretations
+    const meaning = rev ? (card.rev || card.up + '（逆位）') : card.up;
+    reading += `<strong>${card.suit}${card.rank}</strong> ${rev?'<span class="reversed-badge">逆位</span>':''} <span style="color:var(--text-dim)">${card.element}元素·${card.suitTheme}</span>`;
+    reading += `<br><br>${meaning}`;
+
+    // Context-specific interpretation (same pattern as major)
+    const primaryTheme = questionThemes[0];
+    if (primaryTheme === '爱情' && card.love) {
+      reading += `<br><br>💕 <em>感情方面：</em>${card.love}`;
+    } else if (primaryTheme === '事业' && card.career) {
+      reading += `<br><br>💼 <em>事业方面：</em>${card.career}`;
+    }
+    if (card.advice) {
+      reading += `<br><br>🔮 <em>宇宙建议：</em>${card.advice}`;
+    }
+  }
+
+  return reading;
+}
+
+function synthesizeReading(cards, positions, question, questionThemes) {
+  let syn = '';
+  const count = cards.length;
+  const majorCards = cards.filter(c => c.type === 'major');
+  const minorCards = cards.filter(c => c.type === 'minor');
+  const reversedCards = cards.filter(c => c.isReversed);
+  const hasMajor = majorCards.length;
+  const hasReversed = reversedCards.length;
+
+  syn += `<div class="tarot-synthesis">`;
+
+  // ── 1. Opening ──
+  syn += `<p>关于你的问题「<span class="highlight">${question}</span>」，牌阵为你揭示了以下深层信息：</p>`;
+
+  // ── 2. Major Arcana significance ──
+  if (hasMajor === count) {
+    syn += `<p>🔥 <strong>全部为大阿卡纳</strong> — 这不是日常小事，而是命运层面的重要转折。宇宙在直接对你说话，每一张牌都是灵魂旅程中的一个里程碑。请格外重视这次解读。</p>`;
+  } else if (hasMajor >= 2) {
+    const majorNames = majorCards.map(c => c.name).join('、');
+    syn += `<p>🌟 <strong>${hasMajor}张大阿卡纳</strong>（${majorNames}）同时出现 — 这个问题远超日常琐事，它触及你生命中的核心课题。大阿卡纳是灵魂的导师，它们的出现意味着你正站在一个重要的成长节点上。</p>`;
+  } else if (hasMajor === 1) {
+    syn += `<p>✨ 大阿卡纳「${majorCards[0].name}」的出现，为这次解读定下了灵魂层面的基调。它是整个牌阵的核心信号，其余牌围绕它展开细节。</p>`;
+  }
+
+  // ── 3. Element analysis ──
+  if (minorCards.length > 0) {
+    const elemCount = { '火': 0, '水': 0, '风': 0, '土': 0 };
+    minorCards.forEach(c => { if (elemCount[c.element] !== undefined) elemCount[c.element]++; });
+    const elemEntries = Object.entries(elemCount).filter(([k, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+    const dominantElem = elemEntries[0];
+    const domName = dominantElem[0];
+    const domCount = dominantElem[1];
+
+    let elemMsg = '';
+    if (domCount >= 2 && domCount === minorCards.length) {
+      elemMsg = `牌阵中所有小阿卡纳全部集中在一个元素——<strong>${domName}元素</strong>。`;
+    } else if (domCount >= 2) {
+      elemMsg = `小阿卡纳以<strong>${domName}元素</strong>为主导（${domCount}张），`;
+      if (elemEntries.length > 1) {
+        elemMsg += `辅以${elemEntries.slice(1).map(([k, v]) => `${k}元素（${v}张）`).join('、')}。`;
+      }
+    }
+
+    if (elemMsg) {
+      syn += `<p>⚖️ ${elemMsg}`;
+      const elemReadings = {
+        '火': '火元素主导意味着行动力、热情和创造力是当前的核心驱动力。你被推动着去主动出击、大胆表达。注意不要过于冲动。',
+        '水': '水元素主导意味着情感、直觉和关系是当前的焦点。你的心在说话，感受比逻辑更重要。注意不要被情绪淹没。',
+        '风': '风元素主导意味着思想、沟通和真理是当前的战场。清晰的思考和坦诚的交流是关键。注意不要过度分析和焦虑。',
+        '土': '土元素主导意味着务实、稳定和物质是当前的主题。脚踏实地、耐心积累是最佳策略。注意不要陷入保守和僵化。'
+      };
+      syn += `${elemReadings[domName] || ''}</p>`;
+    }
+
+    // Missing element warning
+    const presentElems = new Set(Object.keys(elemCount).filter(k => elemCount[k] > 0));
+    const allElems = ['火', '水', '风', '土'];
+    const missing = allElems.filter(e => !presentElems.has(e));
+    if (missing.length >= 2) {
+      const missReadings = {
+        '火': '行动力的缺失',
+        '水': '情感连接的缺失',
+        '风': '理性思考的缺失',
+        '土': '务实落地能力的缺失'
+      };
+      const missDesc = missing.map(e => missReadings[e]).join('、');
+      syn += `<p>⚠️ 牌阵中<strong>缺少${missing.join('、')}元素</strong>（${missDesc}）。这不是缺陷，而是牌阵在提醒你——当前课题中哪些能量是你需要从外部借力或有意识培养的。</p>`;
+    }
+  }
+
+  // ── 4. Suit dominance ──
+  if (minorCards.length >= 2) {
+    const suitCount = {};
+    minorCards.forEach(c => {
+      const s = c.suit || '';
+      suitCount[s] = (suitCount[s] || 0) + 1;
+    });
+    const dominantSuit = Object.entries(suitCount).sort((a, b) => b[1] - a[1])[0];
+    if (dominantSuit && dominantSuit[1] >= 2) {
+      const suitReadings = {
+        '权杖': '权杖牌组主导说明你当前的核心动力在于行动和创造。事业、项目和自我实现是你最关切的战场。',
+        '圣杯': '圣杯牌组主导说明情感世界是你当前的主旋律。爱情、关系和内在感受正在塑造你的选择。',
+        '宝剑': '宝剑牌组主导说明思想层面的挑战是核心。决策、沟通和真理的追寻是你目前最重要的课题。',
+        '星币': '星币牌组主导说明物质世界是你关注的焦点。财务、工作和实际成果是你当前最在意的领域。'
+      };
+      if (suitReadings[dominantSuit[0]]) {
+        syn += `<p>🎯 ${suitReadings[dominantSuit[0]]}</p>`;
+      }
+    }
+  }
+
+  // ── 5. Number symbolism (for minor cards) ──
+  const numberPatterns = minorCards.filter(c => c.rank && !isNaN(parseInt(c.rank))).map(c => parseInt(c.rank));
+  if (numberPatterns.length >= 2) {
+    const numCount = {};
+    numberPatterns.forEach(n => { numCount[n] = (numCount[n] || 0) + 1; });
+    const repeating = Object.entries(numCount).filter(([k, v]) => v >= 2);
+    if (repeating.length > 0) {
+      const numNames = { 1: '王牌/Ace', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十' };
+      const numReadings = {
+        1: '数字1（王牌）的重复出现强调了"新的开始"。一个全新的周期正在启动，你手握创造的火种。',
+        2: '数字2的重复出现强调了"选择与平衡"。你在多个力量之间寻求平衡，决策是当前的关键词。',
+        3: '数字3的重复出现强调了"创造与扩展"。初步的成果正在显现，合作和共享是你当前的力量来源。',
+        4: '数字4的重复出现强调了"稳固与基础"。你需要夯实根基，稳定是当前最重要的主题。',
+        5: '数字5的重复出现强调了"冲突与变化"。不稳定的能量在推动你突破舒适区，挑战中蕴含着成长。',
+        6: '数字6的重复出现强调了"和谐与恢复"。平衡正在回归，关系中的给予与接受趋于健康。',
+        7: '数字7的重复出现强调了"反思与评估"。你需要退一步审视全局，内在的智慧正在觉醒。',
+        8: '数字8的重复出现强调了"行动与进展"。事情正在加速，快速的变化要求你保持灵活和专注。',
+        9: '数字9的重复出现强调了"完成与满足"。一个周期接近尾声，成果正在显现，你接近了目标。',
+        10: '数字10的重复出现强调了"圆满与终结"。一个完整的循环即将结束，新的循环在终点等候。'
+      };
+      repeating.forEach(([num, cnt]) => {
+        if (numReadings[num]) syn += `<p>🔢 ${numReadings[num]}</p>`;
+      });
+    }
+  }
+
+  // ── 6. Reversed card energy ──
+  if (hasReversed === count) {
+    syn += `<p>🔄 <strong>全部逆位</strong> — 这是一个强烈的信号：你当前的内在阻力或外在障碍比较显著。但逆位并非坏牌——它们是内在功课的邀请函。每一张逆位的牌都在问你：你在抗拒什么？你需要转化什么？</p>`;
+  } else if (hasReversed >= 2) {
+    const revNames = reversedCards.map(c => c.name || `${c.suit||''}${c.rank||''}`).join('、');
+    syn += `<p>🔄 <strong>${hasReversed}张逆位牌</strong>（${revNames}）— 这些领域存在需要你面对的内在阻力或外在延迟。逆位不是"不好"，而是在告诉你：这个课题需要更多的内在工作和觉察才能转正。</p>`;
+  } else if (hasReversed === 1) {
+    const rn = reversedCards[0].name || `${reversedCards[0].suit||''}${reversedCards[0].rank||''}`;
+    syn += `<p>🔄 唯一逆位的「${rn}」是牌阵指出的关键卡点。它的能量被阻塞或内化——这也是你最需要关注和转化的地方。</p>`;
+  }
+
+  // ── 7. Position flow analysis (for 3-card spreads) ──
+  if (cards.length === 3) {
+    const pastOk = cards[0] && !cards[0].isReversed;
+    const presentOk = cards[1] && !cards[1].isReversed;
+    const futureOk = cards[2] && !cards[2].isReversed;
+
+    if (!pastOk && presentOk && futureOk) {
+      syn += `<p>📈 <strong>趋势向好</strong> — 过去的阻碍正在消散，你现在站得更稳，未来的牌面预示着积极的发展。从低谷走向高峰的轨迹已经开启。</p>`;
+    } else if (pastOk && presentOk && !futureOk) {
+      syn += `<p>⚠️ <strong>注意前方</strong> — 过去的积累和当下的稳定值得珍惜，但未来存在需要你主动规避或准备的挑战。提前觉察可以改变走向。</p>`;
+    } else if (!pastOk && !presentOk && futureOk) {
+      syn += `<p>🌈 <strong>风雨后有彩虹</strong> — 过去和当下可能充满了挑战，但未来的牌给了你明亮的方向。这让你当下的坚持有了意义。</p>`;
+    }
+
+    // Element flow
+    if (cards[0].element && cards[1].element && cards[2].element) {
+      const flow = cards.map(c => c.element);
+      if (flow[0] === flow[1] && flow[1] === flow[2]) {
+        syn += `<p>🔗 三张牌的元素一致（均为${flow[0]}），说明这个问题的能量非常聚焦和纯粹。你不需要分散精力——专注于这一条主线即可。</p>`;
+      } else if (flow[0] === '火' && flow[2] === '土') {
+        syn += `<p>🔗 从火到土的演进：牌阵显示你的能量正在从热情冲动走向务实落地。创意和激情正在转化为实际的成果。</p>`;
+      } else if (flow[0] === '风' && flow[2] === '水') {
+        syn += `<p>🔗 从风到水的流转：思维和焦虑正在向情感和直觉让步。头脑的分析该放下了，听从内心的感受会带你找到答案。</p>`;
+      }
+    }
+  }
+
+  // ── 8. Theme-based closing ──
+  const theme = questionThemes[0];
+  const themeClosings = {
+    '爱情': '感情从来不是靠理性算计，而是靠心去感受。牌面的信息关于时机、心态和选择——最终，真爱不会因任何决定而错过，但需要你保持真诚和勇气。',
+    '事业': '职业发展的核心不仅在于外在机会，更在于你内在的成熟和准备。牌的指引帮助你看到自己的力量和盲点。行动加上智慧，再加上耐心，属于你的舞台终将到来。',
+    '财运': '财富是能量的物质显化。牌阵在告诉你：金钱的流动和你内在的能量状态密切相关。理清内在，外在自然会丰盛。',
+    '人生方向': '迷茫时我们总在寻找唯一的"正确答案"。但塔罗的智慧在于——它不会替你选择，而是照亮你忽略的角落，让你更有智慧地为自己做出决定。',
+    '家庭': '家庭是我们最早的根，也是最深的功课。牌阵反映了你与家人之间能量的流动——理解比改变更重要，接纳比评价更深刻。',
+    '健康': '身心健康是一切的基础。牌的讯息不是诊断，而是提醒你关注身体与心灵之间微妙的联系。倾听身体的信号。',
+    '学业': '学习不只是知识的堆积，更是灵魂的扩展。牌阵告诉你：当前最适合的学习方式和方向——保持好奇心和专注力。',
+    '人际': '人际关系是我们投射在他人身上的自己。牌阵揭示了你在人际互动中的模式和盲点——调整你的能量，关系自然会变化。'
+  };
+  const closing = themeClosings[theme] || '每张牌都是一面镜子，映照你内心的某个面向。答案不在牌中，而在你阅读这些文字时内心被触动的那个部分。保持开放的心态，你会在自己的灵魂中找到智慧。';
+
+  syn += `<p style="margin-top:12px;">💫 ${closing}</p>`;
+
+  syn += `<p style="color:var(--text-dim);margin-top:12px;font-size:0.85rem;">※ 塔罗牌是启发性的觉知工具，帮助你看见自己。最终的判断和选择权永远在你手中。保持开放的心态，聆听内在的智慧。</p>`;
+
+  syn += `</div>`;
+  return syn;
+}
+
+// ── Tab 4: Tarot ──────────────────────────────────────────────────────────
+let tarotState = { deck:null, drawn:[], spread:'three', question:'', flipped:0 };
+
+function renderTarotDeck() {
+  // Shuffle and get fresh deck
+  tarotState.deck = shuffle(buildDeck());
+  tarotState.drawn = [];
+  tarotState.flipped = 0;
+  tarotState.question = '';
+
+  drawTarotUI();
+}
+
+function drawTarotUI() {
+  const tab4 = document.getElementById('tab4');
+  let html = '';
+
+  // Question area
+  html += '<div class="tarot-question-area">';
+  html += `<input type="text" id="tarot_question" placeholder="默想你的问题，然后在此输入…" value="${escHtml(tarotState.question)}" onkeydown="if(event.key==='Enter')drawTarotCards()">`;
+  html += '<button class="geo-btn" onclick="drawTarotCards()" id="tarot_draw_btn">🔮 抽牌</button>';
+  html += '</div>';
+
+  // Spread selector
+  html += '<div class="spread-selector">';
+  html += `<span class="spread-opt${tarotState.spread==='one'?' active':''}" onclick="setSpread('one')">单张牌 · 快速指引</span>`;
+  html += `<span class="spread-opt${tarotState.spread==='three'?' active':''}" onclick="setSpread('three')">三张牌 · 过去现在未来</span>`;
+  html += '</div>';
+
+  // Cards area
+  if (tarotState.drawn.length > 0) {
+    const posLabels = tarotState.spread === 'three'
+      ? ['过去的影响','当下的状态','未来的趋势']
+      : ['宇宙的讯息'];
+    html += '<div class="cards-area">';
+    for (let i = 0; i < tarotState.drawn.length; i++) {
+      const card = tarotState.drawn[i];
+      const isFlipped = i < tarotState.flipped;
+      html += '<div style="display:flex;flex-direction:column;align-items:center;">';
+      html += `<div class="tarot-card${isFlipped?' flipped':''}" onclick="flipCard(${i})">`;
+      html += '<div class="tarot-card-inner">';
+      // Back
+      html += '<div class="card-face card-back"></div>';
+      // Front
+      html += '<div class="card-face card-front">';
+      if (isFlipped) {
+        html += `<div class="card-pos-label">${posLabels[i]}</div>`;
+        html += `<div class="card-title">${card.name||(card.suit+card.rank)}</div>`;
+        if (card.isReversed) html += '<span class="reversed-badge" style="margin:2px 0">逆位</span>';
+        html += `<div class="card-suit">${card.type==='major'?card.num:(card.element+'元素')}</div>`;
+        html += `<div class="card-keywords">${card.isReversed?(card.rev||card.up).substring(0,30):card.up.substring(0,30)}…</div>`;
+      }
+      html += '</div>';
+      html += '</div></div>';
+      html += `<div class="card-position-label">${isFlipped ? posLabels[i] : (i+1)}</div>`;
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // Interpretation
+    if (tarotState.flipped >= tarotState.drawn.length) {
+      const themes = analyzeQuestion(tarotState.question || '综合运势');
+      html += '<div class="tarot-interpretation">';
+      html += `<h3>✦ 解读：${tarotState.question||'宇宙给你的信息'}</h3>`;
+      for (let i = 0; i < tarotState.drawn.length; i++) {
+        const card = tarotState.drawn[i];
+        html += '<div class="card-reading">';
+        html += `<h4>${tarotState.spread==='three'?['❶ 过去','❷ 现在','❸ 未来'][i]:'🎴 指引'}</h4>`;
+        html += `<p>${interpretCard(card, card.isReversed, i, themes)}</p>`;
+        html += '</div>';
+      }
+      // Synthesis
+      html += '<div class="synthesis">';
+      html += synthesizeReading(tarotState.drawn, [], tarotState.question || '你的运势', themes);
+      html += '</div>';
+      html += '<div style="text-align:center;margin-top:16px;">';
+      html += '<button class="btn" onclick="renderTarotDeck()" style="padding:10px 30px;font-size:0.9em;">🔄 重新抽牌</button>';
+      html += '</div>';
+      html += '</div>';
+    } else {
+      html += '<p style="text-align:center;color:var(--text-dim);margin-top:12px;">点击卡牌将其翻开，揭示宇宙的讯息 ✨</p>';
+    }
+  } else {
+    html += '<div class="cards-area">';
+    html += '<div style="text-align:center;color:var(--text-dim);padding:40px;">';
+    html += '<div style="font-size:3em;margin-bottom:16px;">🃏</div>';
+    html += '<p>在心中默念你的问题</p><p>然后点击上方「🔮 抽牌」按钮</p>';
+    html += '</div></div>';
+  }
+
+  tab4.innerHTML = html;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setSpread(type) {
+  tarotState.spread = type;
+  tarotState.drawn = [];
+  tarotState.flipped = 0;
+  drawTarotUI();
+}
+
+function drawTarotCards() {
+  const qInput = document.getElementById('tarot_question');
+  const question = qInput ? qInput.value.trim() : '';
+  tarotState.question = question;
+
+  // Shuffle fresh each time
+  tarotState.deck = shuffle(buildDeck());
+  const count = tarotState.spread === 'three' ? 3 : 1;
+  tarotState.drawn = [];
+  for (let i = 0; i < count; i++) {
+    const card = tarotState.deck.pop();
+    card.isReversed = Math.random() < 0.3; // 30% chance of reversed
+    tarotState.drawn.push(card);
+  }
+  tarotState.flipped = 0;
+  drawTarotUI();
+}
+
+function flipCard(index) {
+  if (index < tarotState.flipped) {
+    // Clicked an already-flipped card: unflip this and all after
+    tarotState.flipped = index;
+  } else {
+    // Clicked a face-down card: flip this and all before
+    tarotState.flipped = index + 1;
+  }
+  drawTarotUI();
+}
+
+function renderTab4() {
+  if (!tarotState.deck) {
+    tarotState.deck = shuffle(buildDeck());
+  }
+  drawTarotUI();
+}
+
+// ── Tab Switching ─────────────────────────────────────────────────────────
+function switchTab(idx) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.tab-content').forEach((c, i) => {
+    c.classList.toggle('active', i === idx);
+  });
+  // Re-render on switch to ensure content is fresh (except tarot which is standalone)
+  if (idx === 4) {
+    renderTab4();
+  } else if (chartData1) {
+    [renderTab0, renderTab1, renderTab2, renderTab3][idx]();
+  }
+}
+</script>
+</body>
+</html>
