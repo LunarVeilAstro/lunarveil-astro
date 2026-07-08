@@ -2323,9 +2323,10 @@ function calculateAll() {
             document.getElementById('resultsCard').style.opacity = '1';
           }, 200);
 
-          // Show PDF/email buttons
+          // Show action buttons
           document.getElementById('btnPdf').style.display = 'inline-block';
           document.getElementById('btnEmail').style.display = 'inline-block';
+          document.getElementById('btnCopyMobile').style.display = 'inline-block';
 
           // Collapse input card, show summary bar
           collapseInputCard();
@@ -5627,4 +5628,104 @@ function mailtoFallback(email, plainText) {
   const msg = document.getElementById('emailMsg');
   msg.style.display = 'block';
   msg.innerHTML = '<a href="mailto:' + email + '?subject=星盘解读报告&body=' + encodeURIComponent(plainText.substring(0, 2000)) + '" style="color:var(--accent);font-size:1em;">📧 点击此处打开邮件客户端发送报告</a>';
+}
+
+// ═══ Mobile-friendly report copy ══════════════════════════════════════════
+function copyMobileReport() {
+  if (!chartData1) { alert('请先生成星盘解读报告'); return; }
+  var html = buildReportHTML();
+  var text = htmlToMobileText(html);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      var msg = document.getElementById('emailMsg');
+      msg.style.display = 'block'; msg.style.color = '#7ab87a';
+      msg.textContent = '✓ 手机版报告已复制到剪贴板，直接粘贴到微信/QQ即可';
+      setTimeout(function() { msg.style.display = 'none'; }, 3000);
+    }).catch(function() {
+      alert('复制失败，请重试');
+    });
+  } else {
+    // Fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    var msg = document.getElementById('emailMsg');
+    msg.style.display = 'block'; msg.style.color = '#7ab87a';
+    msg.textContent = '✓ 手机版报告已复制到剪贴板';
+    setTimeout(function() { msg.style.display = 'none'; }, 3000);
+  }
+}
+
+function htmlToMobileText(html) {
+  var W = 34; // max Chinese chars per line for mobile chat readability
+
+  // Step 1: Replace block tags with markers
+  var s = html;
+  s = s.replace(/<h3[^>]*>/gi, '\n\n━━━━━━━━━━━━━━━━━━━━\n');
+  s = s.replace(/<\/h3>/gi, '\n━━━━━━━━━━━━━━━━━━━━\n');
+  s = s.replace(/<h2[^>]*>/gi, '\n\n');
+  s = s.replace(/<\/h2>/gi, '\n');
+  s = s.replace(/<br\s*\/?>/gi, '\n');
+  s = s.replace(/<\/p>/gi, '\n');
+  s = s.replace(/<\/tr>/gi, '\n');
+  s = s.replace(/<\/td>/gi, '  ');
+  s = s.replace(/<\/th>/gi, '  ');
+  s = s.replace(/<hr[^>]*>/gi, '\n─'.repeat(W) + '\n');
+
+  // Step 2: Strip remaining HTML tags
+  s = s.replace(/<[^>]+>/g, '');
+
+  // Step 3: Decode HTML entities
+  s = s.replace(/&nbsp;/g, ' ');
+  s = s.replace(/&lt;/g, '<');
+  s = s.replace(/&gt;/g, '>');
+  s = s.replace(/&amp;/g, '&');
+  s = s.replace(/&#(\d+);/g, function(m, d) { return String.fromCharCode(d); });
+
+  // Step 4: Normalize whitespace — collapse multiple blank lines to 2 max
+  s = s.replace(/\n{3,}/g, '\n\n');
+  s = s.replace(/[ \t]+/g, ' ');
+
+  // Step 5: Wrap long lines
+  var lines = s.split('\n');
+  var out = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    // Don't wrap separator lines
+    if (/^[━─]{5,}$/.test(line.trim())) { out.push(line); continue; }
+    // Don't wrap empty lines
+    if (line.trim() === '') { out.push(''); continue; }
+    out = out.concat(wrapLine(line, W));
+  }
+
+  // Step 6: Add mobile header
+  var now = new Date();
+  var header = '━━━━━━━━━━━━━━━━━━━━\n' +
+    '  🔮 LunarVeilAstro · 星盘报告\n' +
+    '  ' + now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日\n' +
+    '━━━━━━━━━━━━━━━━━━━━';
+
+  return header + '\n' + out.join('\n');
+}
+
+function wrapLine(line, maxLen) {
+  if (line.length <= maxLen) return [line];
+  var result = [];
+  var current = '';
+  var currentWidth = 0;
+  for (var i = 0; i < line.length; i++) {
+    var ch = line[i];
+    var w = (ch.charCodeAt(0) > 127) ? 2 : 1; // CJK chars are width 2
+    if (currentWidth + w > maxLen * 2 - 4) {
+      result.push(current.trim());
+      current = ch;
+      currentWidth = w;
+    } else {
+      current += ch;
+      currentWidth += w;
+    }
+  }
+  if (current.trim()) result.push(current.trim());
+  return result;
 }
