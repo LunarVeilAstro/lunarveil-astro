@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lunarveilastro.github.io/lunarveil-astro/sitemap.xml
