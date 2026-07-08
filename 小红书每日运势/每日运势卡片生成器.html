@@ -66,7 +66,7 @@
   <label>日期：</label>
   <input type="date" id="datePicker" onchange="generateCard()">
   <span class="info-badge" id="moonBadge">🌙 --</span>
-  <span class="info-badge" id="drinkBadge">🥤 --</span>
+  <span class="info-badge" id="tasteBadge">🥤🍽️ --</span>
 </div>
 
 <div class="preview-wrap" id="previewArea"></div>
@@ -188,7 +188,7 @@ var MOON_DATA = [
       "你的直觉比任何逻辑都锋利——今天信任它，哪怕说不上理由。",
       "有些事要在暗中完成蜕变。今天的独处不是逃避，是蓄力。"
     ],
-    yi: ["深度阅读","一个人思考","清理旧物（断舍离）","信任直觉","保守秘密","复盘过去","做财务审计","给自己一个仪式感"],
+    yi: ["深度阅读","一个人思考","清理旧物（断舍离）","信任直觉","保守秘密","复盘过去","写一封不会寄出的信","给自己一个仪式感"],
     ji: ["猜疑心太重","翻旧账","过度控制","窥探他人隐私","情绪报复","压抑不说","熬夜想太多"],
     colors: ["酒红 / 黑"],
     crystal: "黑曜石",
@@ -244,46 +244,69 @@ var MOON_DATA = [
   }
 ];
 
-// Drinks pool — 热门品牌人气单品
-var DRINKS = [
-  // 瑞幸
+// TASTE_POOL — 饮品 + 热门美食 + 家常菜 + 融合菜
+var TASTE_POOL = [
+  // ── 饮品 ──
   "生椰拿铁 · 少冰", "冰吸生椰拿铁 · 少冰", "椰云拿铁 · 少冰",
   "橙C美式 · 冰", "柚C美式 · 冰", "葡萄冰萃 · 少冰",
   "小黄油美式 · 热", "马斯卡彭生酪拿铁 · 少冰", "酱香拿铁 · 热",
   "丝绒拿铁 · 热", "陨石拿铁 · 半糖少冰", "茉莉海盐拿铁 · 少冰",
-  "西瓜生椰 · 冰", "香蕉拿铁 · 少冰",
-  // 星巴克
   "冰震浓缩 · 冰", "抹茶拿铁 · 热", "焦糖玛奇朵 · 半糖",
   "燕麦丝绒拿铁 · 热", "冷萃冰咖啡 · 冰", "红茶拿铁 · 热",
-  "海盐焦糖拿铁 · 少冰", "椰椰双打 · 冰",
-  // 喜茶
   "多肉葡萄 · 少冰", "芝芝莓莓 · 少冰", "满杯红柚 · 少冰",
-  "烤黑糖波波牛乳 · 热", "超多肉芒芒甘露 · 少冰", "初恋瓜瓜甘露 · 冰",
-  "鸭屎香柠檬茶 · 少冰", "水牛乳双拼波波 · 热",
-  // 奈雪
+  "烤黑糖波波牛乳 · 热", "超多肉芒芒甘露 · 少冰", "鸭屎香柠檬茶 · 少冰",
   "霸气橙子 · 少冰", "霸气芝士草莓 · 少冰", "鸭屎香宝藏茶 · 热",
-  "金色山脉珍珠奶茶 · 热", "龙井奶茶 · 热",
-  // 霸王茶姬
   "伯牙绝弦 · 少冰", "桂馥兰香 · 热", "花田乌龙 · 去冰",
-  "万里木兰 · 少冰", "青青糯山 · 热",
-  // 茶百道
   "杨枝甘露 · 少冰", "茉莉奶绿 · 三分糖", "芋圆奶茶 · 热",
-  "乌漆嘛黑 · 冰", "铁观音奶冻 · 去冰",
-  // 古茗
   "超A芝士葡萄 · 少冰", "布蕾脆脆奶芙 · 冰", "云雾栀子青 · 去冰",
-  "生椰抹茶麻薯 · 少冰",
-  // 沪上阿姨 / 一点点 / 库迪
   "血糯米奶茶 · 热", "绿豆牛乳冰 · 冰",
   "四季奶青 · 三分糖", "波霸奶茶 · 热", "冰淇淋红茶 · 去冰",
-  "潘帕斯蓝生酪拿铁 · 少冰", "檬檬拿铁 · 冰",
-  // Manner / M Stand
   "桂花拿铁 · 热", "冰橘皮拿铁 · 冰",
-  "咸芝士拿铁 · 热", "水泥芝士蛋糕拿铁 · 冰",
-  // 蜜雪冰城 / 甜啦啦
-  "柠檬水 · 冰", "满杯百香果 · 少冰",
-  "冰博客拿铁 · 少冰", "海盐凤梨气泡 · 少冰",
-  "桂花酒酿拿铁 · 热", "茉莉奶白 · 去冰"
+  "咸芝士拿铁 · 热", "柠檬水 · 冰", "满杯百香果 · 少冰",
+  "桂花酒酿拿铁 · 热", "茉莉奶白 · 去冰",
+  // ── 中式家常 ──
+  "煎鸡蛋 · 配酱油", "番茄炒蛋 · 盖饭", "臊子面 · 热汤",
+  "葱花蛋炒饭", "糖拌西红柿", "酸辣土豆丝 · 配米饭",
+  "蒜蓉西兰花", "红烧豆腐", "清炒时蔬",
+  "小馄饨 · 紫菜汤底", "葱油拌面", "蛋花汤",
+  "蒸水蛋 · 淋酱油", "拍黄瓜 · 蒜泥", "红烧排骨",
+  "回锅肉", "鱼香肉丝", "宫保鸡丁",
+  "麻婆豆腐 · 配饭", "酸菜鱼 · 微辣",
+  // ── 西式简餐 ──
+  "肉酱意面 · 配帕玛森", "番茄罗勒意面", "奶油培根意面",
+  "凯撒沙拉", "牛油果吐司", "班尼迪克蛋",
+  "法式焦糖烤布蕾", "提拉米苏", "玛格丽特披萨",
+  "芝士焗饭", "薯角 · 蜂蜜芥末酱",
+  // ── 日韩东南亚 ──
+  "味噌拉面 · 溏心蛋", "日式咖喱饭", "寿司拼盘",
+  "石锅拌饭", "韩式炸鸡 · 甜辣", "泡菜豆腐汤",
+  "越南河粉 · 牛肉", "泰式冬阴功汤", "芒果糯米饭",
+  "海南鸡饭", "肉骨茶",
+  // ── 融合与小吃 ──
+  "芝士泡菜炒饭", "黑松露薯条", "咸蛋黄鸡翅",
+  "小龙虾 · 十三香", "烤串 · 孜然", "煎饼果子",
+  "螺蛳粉 · 加炸蛋", "肉夹馍", "凉皮 · 多加辣",
+  "肠粉 · 鲜虾", "虾饺", "叉烧包",
+  "红糖糍粑", "绿豆冰沙", "双皮奶"
 ];
+
+// Everyday accessories — mixed with crystals for 宜佩戴
+var CASUAL_WEAR = [
+  "银色腕表", "皮质细表带手表", "金色小方表", "小天才电话手表",
+  "珊瑚手串", "珍珠手串", "檀木手串",
+  "纯银耳钉", "淡水珍珠耳钉", "小圆环银耳圈",
+  "檀木簪子", "玳瑁发簪", "银质发簪",
+  "鲨鱼夹 · 玳瑁色", "鲨鱼夹 · 哑光黑", "珍珠发夹", "头绳皮筋 · 黑色", "头绳皮筋 · 莫兰迪色",
+  "银质尾戒", "细银素圈戒指",
+  "贝母吊坠项链", "细链锁骨链", "玉石平安扣",
+  "流苏耳环", "编制绳结手链", "素面皮质手环",
+  "水滴形银耳坠", "小米珍珠链", "黑檀木串珠"
+];
+
+function tasteEmoji(item) {
+  if (/·\s*(冰|热|少冰|去冰|半糖|三分糖|半糖少冰)/.test(item)) return '🥤';
+  return '🍽️';
+}
 
 // 引流文案池（小红书安全版 — 无微信/加好友/私信/咨询等敏感词）
 var CTA_POOL = [
@@ -343,7 +366,8 @@ function generateContent(y, m, d){
   var jd = jdFromDate(y, m, d);
   var moonDeg = moonLongitude(jd);
   var moonData = getMoonData(moonDeg);
-  var drink = randPick(DRINKS);
+  var tasteItem = randPick(TASTE_POOL);
+  var wearItem = Math.random() < 0.45 ? randPick(CASUAL_WEAR) : moonData.crystal;
   var cta = randPick(CTA_POOL);
 
   // Tags
@@ -369,8 +393,8 @@ function generateContent(y, m, d){
     year: y, month: m, day: d,
     moonSign: moonData.signName, moonEmoji: moonData.signEmoji, moonDeg: moonData.signDeg,
     moonMsg: moonData.msg, yi: moonData.yi, ji: moonData.ji,
-    colors: moonData.colors, crystal: moonData.crystal,
-    drink: drink, cta: cta, tags: tags, title: title
+    colors: moonData.colors, wearItem: wearItem, tasteItem: tasteItem,
+    tasteEmoji: tasteEmoji(tasteItem), cta: cta, tags: tags, title: title
   };
 }
 // ═══════════════════════════════════════════════════════════════════════════
@@ -429,8 +453,8 @@ function renderPreview(content){
     // Gems
     '<div class="ci-gems">'+
     '<div class="ci-gem"><span class="ci-gem-icon">🎨</span>宜穿戴：'+c.colors+'</div>'+
-    '<div class="ci-gem"><span class="ci-gem-icon">💎</span>宜佩戴：'+c.crystal+'</div>'+
-    '<div class="ci-gem"><span class="ci-gem-icon">🥤</span>宜喝：'+c.drink+'</div>'+
+    '<div class="ci-gem"><span class="ci-gem-icon">💎</span>宜佩戴：'+c.wearItem+'</div>'+
+    '<div class="ci-gem"><span class="ci-gem-icon">'+c.tasteEmoji+'</span>宜品鉴：'+c.tasteItem+'</div>'+
     '</div>'+
 
     // CTA
@@ -451,7 +475,7 @@ function renderPreview(content){
 
   // Badges
   document.getElementById('moonBadge').innerHTML = c.moonEmoji + ' 月亮' + c.moonSign;
-  document.getElementById('drinkBadge').innerHTML = '🥤 ' + c.drink;
+  document.getElementById('tasteBadge').innerHTML = c.tasteEmoji + ' ' + c.tasteItem;
   document.getElementById('tipArea').innerHTML = '发布时：先粘贴标题，再粘贴标签到末尾即可';
 }
 
@@ -608,26 +632,36 @@ function downloadCard(){
   ctx.strokeStyle = d2Grad; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(pad, div2Y); ctx.lineTo(W-pad, div2Y); ctx.stroke();
 
-  // Gems
-  var gemY = div2Y + Math.round(H*0.045);
+  // Gems — vertical stack, each item gets its own row (drink names can be long)
+  var gemY = div2Y + Math.round(H*0.05);
+  var gemH = Math.round(H*0.055);
+  var gemGap = Math.round(H*0.015);
   var gemItems = [
     {icon:'🎨', label:'宜穿戴：'+c.colors},
-    {icon:'💎', label:'宜佩戴：'+c.crystal},
-    {icon:'🥤', label:'宜喝：'+c.drink}
+    {icon:'💎', label:'宜佩戴：'+c.wearItem},
+    {icon: c.tasteEmoji, label:'宜品鉴：'+c.tasteItem}
   ];
-  ctx.font = Math.round(W*0.05)+'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+  var gemFontSz = Math.round(W*0.038);
+  var gemIconSz = Math.round(W*0.06);
+  ctx.textAlign = 'left';
   for (var g=0; g<gemItems.length; g++){
-    var gx = pad + g*Math.round(W*0.32);
-    ctx.fillText(gemItems[g].icon, gx, gemY);
+    var gy = gemY + g*(gemH + gemGap);
+    // Subtle row background
+    ctx.fillStyle = 'rgba(180,140,90,' + (0.04 + g*0.025) + ')';
+    _roundRect(ctx, pad, gy, w, gemH, Math.round(W*0.025));
+    ctx.fill();
+    // Icon
+    ctx.font = gemIconSz+'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+    ctx.fillText(gemItems[g].icon, pad + Math.round(W*0.04), gy + gemH*0.7);
+    // Label
     ctx.fillStyle = '#c0b8d0';
-    ctx.font = Math.round(W*0.032)+'px "Noto Serif SC","STSong","Georgia",serif';
-    ctx.fillText(gemItems[g].label, gx+Math.round(W*0.07), gemY+Math.round(H*0.01));
-    ctx.font = Math.round(W*0.05)+'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+    ctx.font = gemFontSz+'px "Noto Serif SC","STSong","Georgia",serif';
+    ctx.fillText(gemItems[g].label, pad + Math.round(W*0.14), gy + gemH*0.68);
   }
 
   // CTA box
-  var ctaY = gemY + Math.round(H*0.09);
-  var ctaH = Math.round(H*0.08);
+  var ctaY = gemY + gemItems.length*(gemH + gemGap) + Math.round(H*0.045);
+  var ctaH = Math.round(H*0.085);
   ctx.fillStyle = 'rgba(180,140,90,0.08)';
   ctx.strokeStyle = 'rgba(200,160,100,0.25)';
   ctx.lineWidth = 2;
@@ -635,16 +669,16 @@ function downloadCard(){
   ctx.fill(); ctx.stroke();
 
   ctx.fillStyle = '#c0b8d0';
-  ctx.font = Math.round(W*0.03)+'px "Noto Serif SC","STSong","Georgia",serif';
+  ctx.font = Math.round(W*0.034)+'px "Noto Serif SC","STSong","Georgia",serif';
   ctx.textAlign = 'center';
-  ctx.fillText(c.cta, W*0.5, ctaY+ctaH*0.62);
+  ctx.fillText(c.cta, W*0.5, ctaY+ctaH*0.6);
   ctx.textAlign = 'left';
 
   // Bottom watermark
   ctx.fillStyle = 'rgba(180,140,90,0.1)';
-  ctx.font = Math.round(W*0.02)+'px "Noto Serif SC","Georgia","STSong",serif';
+  ctx.font = Math.round(W*0.022)+'px "Noto Serif SC","Georgia","STSong",serif';
   ctx.textAlign = 'center';
-  ctx.fillText('✦ LunarVeilAstro · 全平台同名 ✦', W*0.5, H*0.97);
+  ctx.fillText('✦ LunarVeilAstro · 全平台同名 ✦', W*0.5, H*0.975);
 
   // Download
   var link = document.createElement('a');
