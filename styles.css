@@ -30,22 +30,36 @@ h1, h2, h3, h4, .subtitle, .tab, .fortune-sub-tab, .highlight, .step-label, .car
 }
 
 h1 {
-  font-family: 'Zhi Mang Xing', 'Liu Jian Mao Cao', 'Ma Shan Zheng', 'ZCOOL XiaoWei', 'STKaiti', 'KaiTi', cursive;
-  font-size: 2.4em;
-  letter-spacing: 0.1em;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  background: linear-gradient(180deg, #f7e8b0 0%, #d4a84b 30%, #8b6914 55%, #c49b3c 75%, #f0d68a 100%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+
+.title-main {
+  font-family: 'Cinzel', 'Cormorant Garamond', serif;
+  font-size: 1em;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  background: linear-gradient(180deg, #fdf0c8 0%, #e2bc6e 25%, #b8861e 50%, #d4a840 70%, #f5e6b8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.title-en {
+.title-cn {
   font-family: 'Cinzel', 'Cormorant Garamond', serif;
-  font-size: 0.34em;
   font-weight: 300;
-  letter-spacing: 0.3em;
-  display: block;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  background: linear-gradient(180deg, #e8d5a3 0%, #c9a96e 40%, #8a7040 70%, #c9a96e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.title-sub {
+  font-family: 'Liu Jian Mao Cao', 'Ma Shan Zheng', 'ZCOOL XiaoWei', 'STKaiti', 'KaiTi', cursive;
+  font-size: 0.22em;
+  font-weight: 400;
+  letter-spacing: 0.25em;
   background: linear-gradient(180deg, #d4c090 0%, #a08050 40%, #6b5020 65%, #a08050 85%, #d4c090 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -73,8 +87,7 @@ header {
   text-align: center; padding: 40px 20px 20px;
 }
 header h1 {
-  font-size: 2.4em; color: var(--accent);
-  text-shadow: 0 0 40px rgba(201,169,110,0.3);
+  font-size: 3em;
   letter-spacing: 0.15em; font-weight: normal;
 }
 header .subtitle {
@@ -408,7 +421,7 @@ header .subtitle {
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  header h1 { font-size: 1.6em; }
+  header h1 { font-size: 2em; }
   .form-row { flex-direction: column; gap: 8px; }
   .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
