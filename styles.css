@@ -466,6 +466,19 @@ header .subtitle {
 #inputSummary .summary-icon { font-size: 1.2em; }
 #inputSummary .summary-sep { color: var(--border); }
 
+/* Sample data notice */
+.sample-notice {
+  text-align: center; font-size: 0.8em; color: #d4a84b;
+  background: rgba(200,150,50,0.08); border: 1px dashed rgba(200,150,50,0.3);
+  border-radius: 6px; padding: 8px 16px; margin-bottom: 16px;
+  letter-spacing: 0.04em;
+}
+.sample-tag {
+  display: inline-block; font-size: 0.7em; color: #d4a84b;
+  background: rgba(200,150,50,0.15); border: 1px solid rgba(200,150,50,0.35);
+  border-radius: 10px; padding: 1px 10px; letter-spacing: 0.05em;
+}
+
 /* ── Blueprint Card (Natal progressive disclosure) ──────────────────────── */
 .blueprint-card {
   background: rgba(20,18,42,0.6); border: 1px solid var(--border);
