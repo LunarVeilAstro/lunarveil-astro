@@ -2931,7 +2931,7 @@ function renderTab7() {
   html += '<p style="color:var(--text-dim);font-size:0.85em;line-height:1.8;margin-bottom:24px;">';
   html += '你想问感情、事业、财富、还是人生方向？<br>';
   html += '结合你的出生星盘 + 当前行运 + 塔罗指引<br>';
-  html += '真人一对一为你做多维度深度解读（非AI生成）</p>';
+  html += '一对一多维度深度解读，基于你的完整星盘</p>';
 
   html += renderLockedBlock(
     '预约深度咨询',
@@ -4429,6 +4429,11 @@ function collapseInputCard() {
   const addr = document.getElementById('p1_addr').value || document.getElementById('p1_geo_status').textContent.replace(/^[^]*?(\S+)/, '$1').substring(0, 10) || '?';
 
   document.getElementById('inputSummaryText').textContent = addr.substring(0, 15) + ' · ' + date + ' · ' + time;
+  // Hide sample data tags after user has calculated
+  var stag = document.querySelector('.sample-tag');
+  if (stag) stag.style.display = 'none';
+  var snotice = document.getElementById('sampleNotice');
+  if (snotice) snotice.style.display = 'none';
 
   card.style.transition = 'opacity 0.5s, max-height 0.5s';
   card.style.overflow = 'hidden';
@@ -5160,7 +5165,7 @@ function openDailyRP() {
     html += '<p style="color:var(--text-dim);font-size:0.85em;">你今天已经查过啦</p>';
     html += renderRPResult(score, personalized);
     html += renderShareButton('fortune');
-    html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">每日专属解读</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一真人解读</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">复制微信号</span></div>';
+    html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">每日专属解读</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一专属解读</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">复制微信号</span></div>';
     showGameModal(html);
     return;
   }
@@ -5180,7 +5185,7 @@ function openDailyRP() {
   let html = '<h3>🎲 今日人品</h3>';
   html += renderRPResult(score, personalized);
   html += renderShareButton('fortune');
-  html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">每日专属解读</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一真人解读</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">复制微信号</span></div>';
+  html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">每日专属解读</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一专属解读</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">复制微信号</span></div>';
   showGameModal(html);
 }
 
