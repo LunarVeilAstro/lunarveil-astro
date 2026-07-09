@@ -18,6 +18,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Liu+Jian+Mao+Cao&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>emailjs.init('Gudf5C47NCkRO4qLp');</script>
 </head>
 <body>
 <!-- Loading Ritual Overlay -->
@@ -31,7 +34,6 @@
   <div id="ritualPhrase" class="ritual-phrase">星辰正在排列...</div>
   <div class="ritual-dots"><span>·</span><span>·</span><span>·</span></div>
 </div>
-<canvas id="stars"></canvas>
 <div class="galaxy-bg">
   <div class="nebula nebula-1"></div>
   <div class="nebula nebula-2"></div>
@@ -60,8 +62,13 @@
 
 <div class="container">
   <header>
-    <h1><span class="title-main">LunarVeil<span class="title-cn">Astro</span></span><span class="title-sub">星盘解读 · 命运之轮</span></h1>
-    <div class="subtitle">· 本命星盘 · 运势预测 · 合盘分析 ·</div>
+    <div class="lang-switcher" id="langSwitcher">
+      <span class="lang-opt active" data-lang="zh">中</span>
+      <span class="lang-sep">|</span>
+      <span class="lang-opt" data-lang="en">EN</span>
+    </div>
+    <h1><span class="title-main">LunarVeil<span class="title-cn">Astro</span></span><span class="title-sub" data-i18n="header.tagline">星盘解读 · 命运之轮</span></h1>
+    <div class="subtitle" data-i18n="header.subtitle">· 本命星盘 · 运势预测 · 合盘分析 ·</div>
     <div class="crystal-ball-header">
       <div class="crystal-veil"></div>
       <div class="crystal-mist-header m1"></div>
@@ -72,16 +79,16 @@
 
   <!-- ═══ 灵性驿站 ═══════════════════════════════════════════════════════════ -->
   <div class="card" id="lodgeCard">
-    <h2>🔮 灵 性 驿 站</h2>
-    <p style="text-align:center;color:var(--text-dim);margin-bottom:20px;font-size:0.9em;">无需填写星盘，打开即玩 · 每天回来都有新的启示</p>
+    <h2 data-i18n="lodge.title">🔮 灵 性 驿 站</h2>
+    <p style="text-align:center;color:var(--text-dim);margin-bottom:20px;font-size:0.9em;" data-i18n="lodge.intro">无需填写星盘，打开即玩 · 每天回来都有新的启示</p>
 
     <!-- 福运方位 · 主打横幅 -->
     <div class="lodge-banner" onclick="openFortuneDirection()" id="fortuneDirBanner">
       <div class="lodge-banner-icon">🧭</div>
       <div class="lodge-banner-text">
-        <div class="lodge-banner-title">福运方位 · 罗盘指路</div>
-        <div class="lodge-banner-desc">择一领域，让星盘指向你的幸运方向</div>
-        <div class="lodge-banner-badge" id="compassBadge">今日可探</div>
+        <div class="lodge-banner-title" data-i18n="lodge.bannerTitle">福运方位 · 罗盘指路</div>
+        <div class="lodge-banner-desc" data-i18n="lodge.bannerDesc">择一领域，让星盘指向你的幸运方向</div>
+        <div class="lodge-banner-badge" id="compassBadge" data-i18n="lodge.badge.available">今日可探</div>
       </div>
     </div>
 
@@ -89,36 +96,36 @@
       <!-- Row 1: 答案之书, 魔法八球, 单张塔罗, 星座速配 -->
       <div class="lodge-item" onclick="openAnswerBook()">
         <div class="lodge-icon">📖</div>
-        <div class="lodge-name">答案之书</div>
-        <div class="lodge-desc">默念问题，翻开一页寻找答案</div>
+        <div class="lodge-name" data-i18n="lodge.answerBook">答案之书</div>
+        <div class="lodge-desc" data-i18n="lodge.answerBookDesc">默念问题，翻开一页寻找答案</div>
       </div>
       <div class="lodge-item" onclick="openMagicBall()">
         <div class="lodge-icon">🔮</div>
-        <div class="lodge-name">魔法八球</div>
-        <div class="lodge-desc">问一个是/否问题，让命运回答</div>
+        <div class="lodge-name" data-i18n="lodge.magic8">魔法八球</div>
+        <div class="lodge-desc" data-i18n="lodge.magic8Desc">问一个是/否问题，让命运回答</div>
       </div>
       <div class="lodge-item" onclick="openSingleTarot()">
         <div class="lodge-icon">🃏</div>
-        <div class="lodge-name">单张塔罗</div>
-        <div class="lodge-desc">抽一张牌，获得今日指引</div>
+        <div class="lodge-name" data-i18n="lodge.tarot">单张塔罗</div>
+        <div class="lodge-desc" data-i18n="lodge.tarotDesc">抽一张牌，获得今日指引</div>
       </div>
       <div class="lodge-item" onclick="openZodiacMatch()">
         <div class="lodge-icon">💫</div>
-        <div class="lodge-name">星座速配</div>
-        <div class="lodge-desc">测测你和TA的星座缘分</div>
+        <div class="lodge-name" data-i18n="lodge.zodiacMatch">星座速配</div>
+        <div class="lodge-desc" data-i18n="lodge.zodiacMatchDesc">测测你和TA的星座缘分</div>
       </div>
       <!-- Row 2: 每日一签 + 今日人品 (centered) -->
       <div class="lodge-item lodge-daily" onclick="openDailyFortune()">
         <div class="lodge-icon">🏮</div>
-        <div class="lodge-name">每日一签</div>
-        <div class="lodge-desc">摇一支签，已算星盘者得专属解读</div>
-        <div class="lodge-badge" id="fortuneBadge">今日可抽</div>
+        <div class="lodge-name" data-i18n="lodge.dailyFortune">每日一签</div>
+        <div class="lodge-desc" data-i18n="lodge.dailyFortuneDesc">摇一支签，已算星盘者得专属解读</div>
+        <div class="lodge-badge" id="fortuneBadge" data-i18n="lodge.badge.available.short">今日可抽</div>
       </div>
       <div class="lodge-item lodge-daily" onclick="openDailyRP()">
         <div class="lodge-icon">🎲</div>
-        <div class="lodge-name">今日人品</div>
-        <div class="lodge-desc">已算星盘者基于本命盘专属计算</div>
-        <div class="lodge-badge" id="rpBadge">今日可查</div>
+        <div class="lodge-name" data-i18n="lodge.dailyRP">今日人品</div>
+        <div class="lodge-desc" data-i18n="lodge.dailyRPDesc">已算星盘者基于本命盘专属计算</div>
+        <div class="lodge-badge" id="rpBadge" data-i18n="lodge.badge.rpAvailable">今日可查</div>
       </div>
     </div>
   </div>
@@ -130,16 +137,16 @@
 
   <!-- ── Input Card ─────────────────────────────────────────────────────── -->
   <div class="card" id="inputCard">
-    <h2>📡 输入出生信息</h2>
-    <div class="sample-notice" id="sampleNotice">⚠️ 当前显示为随机示例数据，请修改为你本人的真实出生信息</div>
+    <h2 data-i18n="summary.title">📡 输入出生信息</h2>
+    <div class="sample-notice" id="sampleNotice" data-i18n="sample.notice">⚠️ 当前显示为随机示例数据，请修改为你本人的真实出生信息</div>
     <div class="person-section">
       <div class="person-card">
-        <h3>本人</h3>
+        <h3 data-i18n="person.me">本人</h3>
         <div class="form-row">
-          <div class="form-group"><label>出生日期</label><input type="date" id="p1_date"></div>
-          <div class="form-group"><label>出生时间</label><input type="time" id="p1_time" step="60"></div>
+          <div class="form-group"><label data-i18n="label.birthdate">出生日期</label><input type="date" id="p1_date"></div>
+          <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p1_time" step="60"></div>
           <div class="form-group">
-            <label>时区 (UTC)</label>
+            <label data-i18n="label.timezone">时区 (UTC)</label>
             <select id="p1_tz">
               <option value="-12">UTC-12</option><option value="-11">UTC-11</option><option value="-10">UTC-10 (夏威夷)</option>
               <option value="-9">UTC-9</option><option value="-8">UTC-8 (洛杉矶)</option><option value="-7">UTC-7 (丹佛)</option>
@@ -156,23 +163,23 @@
         </div>
         <div class="form-row">
           <div class="form-group" style="flex:3">
-            <label>出生地点 (城市/地址)</label>
+            <label data-i18n="label.birthplace">出生地点 (城市/地址)</label>
             <div class="geo-row">
-              <div class="form-group" style="margin-bottom:0"><input type="text" id="p1_addr" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p1')"></div>
-              <div class="form-group" style="margin-bottom:0"><button class="geo-btn" onclick="geocode('p1')">🔍 定位</button></div>
+              <div class="form-group" style="margin-bottom:0"><input type="text" id="p1_addr" data-i18n-placeholder="placeholder.birthplace" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p1')"></div>
+              <div class="form-group" style="margin-bottom:0"><button class="geo-btn" onclick="geocode('p1')" data-i18n="btn.geocode">🔍 定位</button></div>
             </div>
             <div class="geo-status" id="p1_geo_status">✅ 宁夏银川 · 38.47°N, 106.27°E · UTC+8</div>
           </div>
         </div>
         <div class="form-row" style="margin-top:10px;">
           <div class="form-group" style="flex:1">
-            <label>当前职业/现状（可选，用于职业天赋诊断）</label>
-            <input type="text" id="p1_job" placeholder="如：办公室文员、全职妈妈、大学生、自由职业...">
+            <label data-i18n="label.job">当前职业/现状（可选，用于职业天赋诊断）</label>
+            <input type="text" id="p1_job" data-i18n-placeholder="placeholder.job" placeholder="如：办公室文员、全职妈妈、大学生、自由职业...">
           </div>
         </div>
         <div class="form-row" style="margin-top:10px;">
           <div class="form-group" style="flex:1">
-            <label>电子邮箱（可选，用于接收PDF报告）</label>
+            <label data-i18n="label.email">电子邮箱（可选，用于接收PDF报告）</label>
             <input type="email" id="p1_email" placeholder="your@email.com">
           </div>
         </div>
@@ -180,22 +187,22 @@
         <input type="hidden" id="p1_lng" value="106.267">
         <div id="p1_manual" style="display:none; margin-top:8px;">
           <div class="form-row">
-            <div class="form-group"><label>纬度</label><input type="number" id="p1_lat_m" step="0.001" placeholder="如 38.466"></div>
-            <div class="form-group"><label>经度</label><input type="number" id="p1_lng_m" step="0.001" placeholder="如 106.267"></div>
+            <div class="form-group"><label data-i18n="label.latitude">纬度</label><input type="number" id="p1_lat_m" step="0.001" placeholder="如 38.466"></div>
+            <div class="form-group"><label data-i18n="label.longitude">经度</label><input type="number" id="p1_lng_m" step="0.001" placeholder="如 106.267"></div>
           </div>
         </div>
       </div>
       <div class="person-card" id="p2Card">
         <h3 style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="toggleP2()">
-          <span id="p2ToggleIcon">▶</span> 合盘对方
-          <span style="font-size:0.6em;color:var(--text-dim);font-weight:normal;">（选填，仅合盘需要）</span>
+          <span id="p2ToggleIcon">▶</span> <span data-i18n="person.partner">合盘对方</span>
+          <span style="font-size:0.6em;color:var(--text-dim);font-weight:normal;" data-i18n="person.optional">（选填，仅合盘需要）</span>
         </h3>
         <div id="p2Content" style="display:none;">
         <div class="form-row">
-          <div class="form-group"><label>出生日期</label><input type="date" id="p2_date"></div>
-          <div class="form-group"><label>出生时间</label><input type="time" id="p2_time" step="60"></div>
+          <div class="form-group"><label data-i18n="label.birthdate">出生日期</label><input type="date" id="p2_date"></div>
+          <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p2_time" step="60"></div>
           <div class="form-group">
-            <label>时区 (UTC)</label>
+            <label data-i18n="label.timezone">时区 (UTC)</label>
             <select id="p2_tz">
               <option value="-12">UTC-12</option><option value="-11">UTC-11</option><option value="-10">UTC-10 (夏威夷)</option>
               <option value="-9">UTC-9</option><option value="-8">UTC-8 (洛杉矶)</option><option value="-7">UTC-7 (丹佛)</option>
@@ -212,9 +219,9 @@
         </div>
         <div class="form-row">
           <div class="form-group" style="flex:3">
-            <label>出生地点 (城市/地址)</label>
+            <label data-i18n="label.birthplace">出生地点 (城市/地址)</label>
             <div class="geo-row">
-              <div class="form-group" style="margin-bottom:0"><input type="text" id="p2_addr" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p2')"></div>
+              <div class="form-group" style="margin-bottom:0"><input type="text" id="p2_addr" data-i18n-placeholder="placeholder.birthplace" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p2')"></div>
               <div class="form-group" style="margin-bottom:0"><button class="geo-btn" onclick="geocode('p2')">🔍 定位</button></div>
             </div>
             <div class="geo-status" id="p2_geo_status"></div>
@@ -224,8 +231,8 @@
         <input type="hidden" id="p2_lng" value="">
         <div id="p2_manual" style="display:none; margin-top:8px;">
           <div class="form-row">
-            <div class="form-group"><label>纬度</label><input type="number" id="p2_lat_m" step="0.001" placeholder="如 38.466"></div>
-            <div class="form-group"><label>经度</label><input type="number" id="p2_lng_m" step="0.001" placeholder="如 106.267"></div>
+            <div class="form-group"><label data-i18n="label.latitude">纬度</label><input type="number" id="p2_lat_m" step="0.001" placeholder="如 38.466"></div>
+            <div class="form-group"><label data-i18n="label.longitude">经度</label><input type="number" id="p2_lng_m" step="0.001" placeholder="如 106.267"></div>
           </div>
         </div>
         </div>
@@ -233,25 +240,28 @@
       </div>
     </div>
     <div class="btn-row" style="gap:12px;flex-wrap:wrap;">
-      <button class="btn" onclick="calculateAll()">✦  解 读 星 盘  ✦</button>
-      <button class="btn btn-secondary" onclick="downloadPDFReport()" id="btnPdf" style="display:none;">📥 下载PDF报告</button>
-      <button class="btn btn-secondary" onclick="sendReportEmail()" id="btnEmail" style="display:none;">📧 发送报告至邮箱</button>
-      <button class="btn btn-accent" onclick="copyMobileReport()" id="btnCopyMobile" style="display:none;">📱 复制手机版</button>
+      <button class="btn" onclick="calculateAll()" data-i18n="btn.calculate">✦  解 读 星 盘  ✦</button>
+      <button class="btn btn-secondary" onclick="downloadPDFReport()" id="btnPdf" style="display:none;" data-i18n="btn.pdf">📥 下载PDF报告</button>
+      <button class="btn btn-secondary" onclick="sendReportEmail()" id="btnEmail" style="display:none;" data-i18n="btn.email">📧 发送报告至邮箱</button>
+      <button class="btn btn-accent" onclick="copyMobileReport()" id="btnCopyMobile" style="display:none;" data-i18n="btn.copyMobile">📱 复制手机版</button>
     </div>
     <p id="emailMsg" style="text-align:center;color:var(--accent);font-size:0.85em;margin-top:8px;display:none;"></p>
   </div>
 
   <!-- ── Results ────────────────────────────────────────────────────────── -->
   <div class="card" id="resultsCard" style="display:none">
+    <div style="text-align:center;margin-bottom:10px;">
+      <button class="btn btn-secondary" onclick="document.getElementById('resultsCard').style.display='none';var c=document.getElementById('inputCard');c.style.display='block';c.style.maxHeight='none';c.style.opacity='1';c.style.overflow='';c.style.transition='';c.style.border='';c.style.padding='';c.style.marginBottom='';c.scrollIntoView({behavior:'smooth'});" style="font-size:0.85em;padding:6px 18px;color:var(--accent);border-color:var(--accent);">↩ 返回修改生日信息</button>
+    </div>
     <div class="tabs">
-      <div class="tab active" onclick="switchTab(0)">本命星盘</div>
-      <div class="tab" onclick="switchTab(1)">五年运势</div>
-      <div class="tab" onclick="switchTab(2)">合盘缘分</div>
-      <div class="tab" onclick="switchTab(3)">星盘指引</div>
-      <div class="tab" onclick="switchTab(4)">塔罗占卜</div>
-      <div class="tab" onclick="switchTab(5)">职业天赋</div>
-      <div class="tab" onclick="switchTab(6)">人际缘分</div>
-      <div class="tab" onclick="switchTab(7)">深度咨询</div>
+      <div class="tab active" onclick="switchTab(0)" data-i18n="tab.natal">本命星盘</div>
+      <div class="tab" onclick="switchTab(1)" data-i18n="tab.forecast">五年运势</div>
+      <div class="tab" onclick="switchTab(2)" data-i18n="tab.synastry">合盘缘分</div>
+      <div class="tab" onclick="switchTab(3)" data-i18n="tab.guidance">星盘指引</div>
+      <div class="tab" onclick="switchTab(4)" data-i18n="tab.tarot">塔罗占卜</div>
+      <div class="tab" onclick="switchTab(5)" data-i18n="tab.career">职业天赋</div>
+      <div class="tab" onclick="switchTab(6)" data-i18n="tab.relationship">人际缘分</div>
+      <div class="tab" onclick="switchTab(7)" data-i18n="tab.consult">深度咨询</div>
     </div>
 
     <div class="tab-content active" id="tab0"></div>
@@ -263,44 +273,39 @@
     <div class="tab-content" id="tab6"></div>
     <div class="tab-content" id="tab7"></div>
   </div>
-  <p style="text-align:center;color:#5a5a70;font-size:0.78em;margin-top:20px;letter-spacing:0.04em;line-height:2;">
-    星辰不为任何人改写轨迹，星盘也从不替你掌舵。<br>
-    它只是一面古老的镜子，映照你来时路上未曾看清的光与影。<br>
-    你看见的每一缕启示，皆为内心的回声；你做出的每一个选择，才是命运的笔锋。<br>
-    本页面的所有解读，仅供自我觉察与灵性探索之参考。
+  <p style="text-align:center;color:#5a5a70;font-size:0.78em;margin-top:20px;letter-spacing:0.04em;line-height:2;" id="footerDisclaimer">
+    <span data-i18n="footer.disclaimer1">星辰不为任何人改写轨迹，星盘也从不替你掌舵。</span><br>
+    <span data-i18n="footer.disclaimer2">它只是一面古老的镜子，映照你来时路上未曾看清的光与影。</span><br>
+    <span data-i18n="footer.disclaimer3">你看见的每一缕启示，皆为内心的回声；你做出的每一个选择，才是命运的笔锋。</span><br>
+    <span data-i18n="footer.disclaimer4">本页面的所有解读，仅供自我觉察与灵性探索之参考。</span>
   </p>
   <!-- Social Contact Footer -->
   <div class="footer-contact">
-    <span class="fc-item" onclick="copySocial('微信','LunarVeilAstro')"><span class="fc-icon">💬</span><span class="fc-label">微信</span>LunarVeilAstro <span style="font-size:0.7em;opacity:0.6;">点击复制</span></span>
-    <span class="fc-item" onclick="copySocial('QQ','3393776733')"><span class="fc-icon">🐧</span><span class="fc-label">QQ</span>3393776733 <span style="font-size:0.7em;opacity:0.6;">点击复制</span></span>
-    <a class="fc-item" href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="text-decoration:none;"><span class="fc-icon">📕</span><span class="fc-label">小红书</span>LunarVeilAstro <span style="font-size:0.7em;opacity:0.6;">点击关注</span></a>
-    <span class="fc-item fc-cta" style="font-size:0.8em;">✦ 加微信解锁深度解读 ✦</span>
+    <span class="fc-item" onclick="copySocial('微信','LunarVeilAstro')"><span class="fc-icon">💬</span><span class="fc-label" data-i18n="social.wechat">微信</span>LunarVeilAstro <span style="font-size:0.7em;opacity:0.6;" data-i18n="social.copy">点击复制</span></span>
+    <span class="fc-item" onclick="copySocial('QQ','3393776733')"><span class="fc-icon">🐧</span><span class="fc-label" data-i18n="social.qq">QQ</span>3393776733 <span style="font-size:0.7em;opacity:0.6;" data-i18n="social.copy">点击复制</span></span>
+    <a class="fc-item" href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="text-decoration:none;"><span class="fc-icon">📕</span><span class="fc-label" data-i18n="social.xiaohongshu">小红书</span>LunarVeilAstro <span style="font-size:0.7em;opacity:0.6;" data-i18n="social.follow">点击关注</span></a>
+    <span class="fc-item" onclick="copySocial('抖音','LunarVeilAstro')"><span class="fc-icon">🎵</span><span class="fc-label" data-i18n="social.douyin">抖音</span>LunarVeilAstro <span style="font-size:0.7em;opacity:0.6;" data-i18n="social.copy">点击复制</span></span>
+    <span class="fc-item fc-cta" style="font-size:0.8em;" data-i18n="social.cta">✦ 加微信解锁深度解读 ✦</span>
   </div>
 </div>
 
 <!-- Back to Top -->
-<button id="btnBackTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+<button id="btnBackTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部" data-i18n="backToTop">↑</button>
 
 <!-- Floating Social Sidebar -->
 <div class="social-float" id="socialFloat">
   <a class="social-float-item" title="微信 LunarVeilAstro" onclick="copySocial('微信','LunarVeilAstro');return false;" href="javascript:void(0)">
-    <span class="sf-icon">💬</span><span class="sf-label">微信</span><span class="sf-id">LunarVeilAstro</span>
+    <span class="sf-icon">💬</span><span class="sf-label" data-i18n="social.wechat">微信</span><span class="sf-id">LunarVeilAstro</span>
   </a>
   <a class="social-float-item" title="小红书 LunarVeilAstro" href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener">
-    <span class="sf-icon">📕</span><span class="sf-label">小红书</span><span class="sf-id">LunarVeilAstro</span>
+    <span class="sf-icon">📕</span><span class="sf-label" data-i18n="social.xiaohongshu">小红书</span><span class="sf-id">LunarVeilAstro</span>
+  </a>
+  <a class="social-float-item" title="抖音 LunarVeilAstro" onclick="copySocial('抖音','LunarVeilAstro');return false;" href="javascript:void(0)">
+    <span class="sf-icon">🎵</span><span class="sf-label" data-i18n="social.douyin">抖音</span><span class="sf-id">LunarVeilAstro</span>
   </a>
   <a class="social-float-item" title="QQ 3393776733" onclick="copySocial('QQ','3393776733');return false;" href="javascript:void(0)">
-    <span class="sf-icon">🐧</span><span class="sf-label">QQ</span><span class="sf-id">3393776733</span>
+    <span class="sf-icon">🐧</span><span class="sf-label" data-i18n="social.qq">QQ</span><span class="sf-id">3393776733</span>
   </a>
-</div>
-
-<!-- Input Summary Bar (shown after calculation) -->
-<div id="inputSummary" onclick="toggleInputCard()">
-  <span class="summary-icon">📡</span>
-  <span id="inputSummaryText">银川 · 1990-05-20 · 12:00</span>
-  <span class="sample-tag">示例数据</span>
-  <span class="summary-sep">|</span>
-  <span style="color:var(--accent);">点击展开修改</span>
 </div>
 
 <script src="app.js"></script>
