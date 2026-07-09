@@ -873,6 +873,13 @@ const SIGN_MEANING_ZH = {
 };
 // ── SIGN_MEANING_EN ───────────────────────────────────────────────────
 
+// ── i18n Proxy for SIGN_MEANING ────────────────────────────────────────
+const SIGN_MEANING = new Proxy({}, {
+  get(target, prop) {
+    const src = (window._lang && window._lang() === "en") ? SIGN_MEANING_EN : SIGN_MEANING_ZH;
+    return src[prop];
+  }
+});
 
 // Planet-to-planet aspect interpretations for synastry
 const SYNASTRY_ASPECTS_ZH = {
@@ -3891,15 +3898,6 @@ function getTransitDomainInsight(domain, positions, houses, asc) {
       return r;
     }
   };
-// ── i18n Proxy for SIGN_MEANING ────────────────────────────────────────
-const SIGN_MEANING = new Proxy({}, {
-  get(target, prop) {
-    const src = (window._lang && window._lang() === "en") ? SIGN_MEANING_EN : SIGN_MEANING_ZH;
-    return src[prop];
-  }
-});
-
-
   const fn = transitMap[domain] || transitMap.self;
   return fn();
 }
