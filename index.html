@@ -251,7 +251,7 @@
   <!-- ── Results ────────────────────────────────────────────────────────── -->
   <div class="card" id="resultsCard" style="display:none">
     <div style="text-align:center;margin-bottom:10px;">
-      <button class="btn btn-secondary" onclick="document.getElementById('resultsCard').style.display='none';var c=document.getElementById('inputCard');c.style.display='block';c.style.maxHeight='none';c.style.opacity='1';c.style.overflow='';c.style.transition='';c.style.border='';c.style.padding='';c.style.marginBottom='';c.scrollIntoView({behavior:'smooth'});" style="font-size:0.85em;padding:6px 18px;color:var(--accent);border-color:var(--accent);">↩ 返回修改生日信息</button>
+      <button class="btn btn-secondary" id="btnBackToEdit" onclick="document.getElementById('resultsCard').style.display='none';var c=document.getElementById('inputCard');c.style.display='block';c.style.maxHeight='none';c.style.opacity='1';c.style.overflow='';c.style.transition='';c.style.border='';c.style.padding='';c.style.marginBottom='';c.scrollIntoView({behavior:'smooth'});" style="font-size:0.85em;padding:6px 18px;color:var(--accent);border-color:var(--accent);" data-i18n="btn.backToEdit">↩ 返回修改生日信息</button>
     </div>
     <div class="tabs">
       <div class="tab active" onclick="switchTab(0)" data-i18n="tab.natal">本命星盘</div>

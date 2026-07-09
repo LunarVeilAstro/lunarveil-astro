@@ -48,6 +48,7 @@
   add('btn.copyMobile', '📱 复制手机版', '📱 Copy Mobile Version');
   add('btn.geocode', '🔍 定位', '🔍 Locate');
   add('btn.expandReport', '✨ 展开完整解读', '✨ Expand Full Reading');
+  add('btn.backToEdit', '↩ 返回修改生日信息', '↩ Back to Edit Birth Info');
   add('btn.viewChartData', '📊 查看星盘数据', '📊 View Chart Data');
   add('btn.hideChartData', '📊 收起星盘数据', '📊 Hide Chart Data');
 

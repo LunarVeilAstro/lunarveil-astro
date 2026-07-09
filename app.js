@@ -342,12 +342,18 @@ function assignHouses(positions, cusps) {
 //  ASPECTS
 // ═══════════════════════════════════════════════════════════════════════════
 const ASPECT_DEFS = [
-  {name:"合", angle:0, orb:8, cls:"aspect-neutral"},
-  {name:"六合", angle:60, orb:6, cls:"aspect-good"},
-  {name:"刑", angle:90, orb:7, cls:"aspect-hard"},
-  {name:"三合", angle:120, orb:8, cls:"aspect-good"},
-  {name:"冲", angle:180, orb:8, cls:"aspect-hard"}
+  {name:"合", en:"Conjunction", angle:0, orb:8, cls:"aspect-neutral"},
+  {name:"六合", en:"Sextile", angle:60, orb:6, cls:"aspect-good"},
+  {name:"刑", en:"Square", angle:90, orb:7, cls:"aspect-hard"},
+  {name:"三合", en:"Trine", angle:120, orb:8, cls:"aspect-good"},
+  {name:"冲", en:"Opposition", angle:180, orb:8, cls:"aspect-hard"}
 ];
+
+const _ASPECT_EN = { '合':'Conjunction','六合':'Sextile','刑':'Square','三合':'Trine','冲':'Opposition' };
+function _aspectName(a) {
+  const name = typeof a === 'string' ? a : a.name;
+  return (window._lang && window._lang() === 'en') ? (_ASPECT_EN[name] || name) : name;
+}
 
 function calcAspects(positions) {
   const aspects = [];
@@ -940,10 +946,10 @@ function detectStelliums(positions, houses) {
   }
   const stelliums = [];
   for (const [si, planets] of Object.entries(signGroups)) {
-    if (planets.length >= 3) stelliums.push({type:'sign', index:parseInt(si), planets, label:getSignNamePure(si)+'群星'});
+    if (planets.length >= 3) stelliums.push({type:'sign', index:parseInt(si), planets, label:ZODIAC_SIGNS_ZH[parseInt(si)]+'群星', enLabel:ZODIAC_SIGNS_EN[parseInt(si)]+' Stellium'});
   }
   for (const [h, planets] of Object.entries(houseGroups)) {
-    if (planets.length >= 3) stelliums.push({type:'house', index:parseInt(h), planets, label:'第'+h+'宫群星'});
+    if (planets.length >= 3) stelliums.push({type:'house', index:parseInt(h), planets, label:'第'+h+'宫群星', enLabel:'House '+h+' Stellium'});
   }
   return stelliums;
 }
@@ -1107,7 +1113,7 @@ function generateDeepNatalReport(positions, houses, aspects, asc, mc) {
         `⭐ <strong>${s.label}</strong>：${s.planets.map(p=>p.name).join('、')} 汇聚于此，` +
         (s.type === 'sign' ? `这个星座的能量在你生命中异常集中。该领域是你灵魂投入了最多"兵力"的地方——既是天赋所在，也是执着所在。` :
          `这个生活领域是你此生的核心舞台。该宫位的议题会反复出现在你人生的关键时刻。`),
-        `⭐ <strong>${s.label}</strong>: ${s.planets.map(p=>p.name).join(', ')} converge here, ` +
+        `⭐ <strong>${s.enLabel||s.label}</strong>: ${s.planets.map(p=>p.name).join(', ')} converge here, ` +
         (s.type === 'sign' ? `The energy of this sign is exceptionally concentrated in your life. This is where your soul has deployed the most "troops" — it is both your greatest talent and your deepest attachment.` :
          `This life area is the central stage of your current incarnation. The themes of this house will repeatedly appear at pivotal moments in your life.`)
       );
@@ -1173,7 +1179,7 @@ function generateDeepNatalReport(positions, houses, aspects, asc, mc) {
     const aspectNames = planetAspects.map(a=>{
       const other = a.p1===pid ? a.p2 : a.p1;
       const otherName = PLANETS.find(x=>x.id===other)?.name||other;
-      return otherName + a.name;
+      return otherName + _aspectName(a);
     });
 
     html += _L(
@@ -1205,7 +1211,7 @@ function generateDeepNatalReport(positions, houses, aspects, asc, mc) {
            a.name==='三合' ? '两个领域的能量流动顺畅，是你可以善用的天赋管道。' :
            a.name==='六合' ? '这是一个"机会窗口"——需要你主动作为才能激活的潜能。' :
            '两股能量合而为一，此领域对你影响深远而持久。') + '</p>',
-          '<p style="font-size:0.85em;color:#8a8aa0;">↳ ' + a.name + ' with ' + otherP.name + ' (' + natureEN + '): This aspect adds a ' + natureEN + ' quality to the interpretation above. ' +
+          '<p style="font-size:0.85em;color:#8a8aa0;">↳ ' + _aspectName(a) + ' with ' + otherP.name + ' (' + natureEN + '): This aspect adds a ' + natureEN + ' quality to the interpretation above. ' +
           (a.name==='冲' ? 'The two planetary domains ask you to continually find balance in life.' :
            a.name==='刑' ? 'The inner tension drives you to grow and break through between these two areas.' :
            a.name==='三合' ? 'Energy flows smoothly between the two domains — a natural talent channel you can draw upon.' :
@@ -1335,7 +1341,7 @@ function generateNatalReport(positions, houses, aspects, asc, mc) {
       (a.name==='合' ? '两股能量融为一体，此领域对你影响深远。' :
        a.name==='三合'||a.name==='六合' ? '能量流动顺畅，是你的天赋所在。' :
        '内在张力推动你不断成长和突破。') + '</p>',
-      `<p><span class="${a.cls}">${n1} ${a.name} ${n2}</span> (orb ${a.orb.toFixed(1)}°) — ` +
+      `<p><span class="${a.cls}">${n1} ${_aspectName(a)} ${n2}</span> (orb ${a.orb.toFixed(1)}°) — ` +
       (a.name==='合' ? 'The two energies merge into one, with profound influence in this area.' :
        a.name==='三合'||a.name==='六合' ? 'Energy flows smoothly — this is where your natural talent lies.' :
        'Inner tension drives you to continually grow and break through.') + '</p>'
@@ -1479,7 +1485,7 @@ function generateDeepForecast(positions, houses, mc) {
         }
         html += _L(
           `<p>${tp.label}${na.aspect}本命${na.planet.name} → ${forecast}</p>`,
-          `<p>${tp.enLabel} ${na.aspect} natal ${na.planet.name} → ${forecastEN}</p>`
+          `<p>${tp.enLabel} ${_aspectName(na.aspect)} natal ${na.planet.name} → ${forecastEN}</p>`
         );
       }
     } else {
@@ -1508,7 +1514,10 @@ function generateDeepForecast(positions, houses, mc) {
     const intT = centuriesSinceJ2000(intJD);
     const intPos = calcAllPlanets(intT);
     const intDate = new Date(now.getTime() + i * 182.625 * 86400000);
-    const label = intDate.getFullYear() + '年' + (intDate.getMonth()+1) + '月';
+    const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const m = intDate.getMonth()+1;
+    const label = intDate.getFullYear() + '年' + m + '月';
+    const enLabel = MONTHS_EN[intDate.getMonth()] + ' ' + intDate.getFullYear();
 
     // Find key aspects at this interval
     const keyTransits = [];
@@ -1522,12 +1531,17 @@ function generateDeepForecast(positions, houses, mc) {
         for (const ad of ASPECT_DEFS) {
           const delta = Math.abs(diff - ad.angle);
           if (delta <= ad.orb + 2) { // slightly wider orb for forecasting
-            const op = PLANETS.find(x=>x.id===oid);
-            const pp = PLANETS.find(x=>x.id===pid);
+            const opZH = PLANETS_ZH.find(x=>x.id===oid);
+            const ppZH = PLANETS_ZH.find(x=>x.id===pid);
+            const opEN = PLANETS_EN.find(x=>x.id===oid);
+            const ppEN = PLANETS_EN.find(x=>x.id===pid);
             keyTransits.push({
-              transitPlanet: op ? op.name : oid,
-              natalPlanet: pp ? pp.name : pid,
+              transitPlanet: opZH ? opZH.name : oid,
+              transitPlanetEN: opEN ? opEN.name : oid,
+              natalPlanet: ppZH ? ppZH.name : pid,
+              natalPlanetEN: ppEN ? ppEN.name : pid,
               aspect: ad.name,
+              aspectEN: ad.en || ad.name,
               orb: delta
             });
           }
@@ -1535,7 +1549,7 @@ function generateDeepForecast(positions, houses, mc) {
       }
     }
 
-    intervals.push({label, keyTransits});
+    intervals.push({label, enLabel, keyTransits});
   }
 
   html += _L(
@@ -1572,13 +1586,13 @@ function generateDeepForecast(positions, houses, mc) {
       else { theme = '稳定发展期 ● '; themeEN = 'Stable Development ● '; }
 
       theme += iv.keyTransits.map(t=>t.transitPlanet+t.aspect+t.natalPlanet).slice(0,4).join('，');
-      themeEN += iv.keyTransits.map(t=>t.transitPlanet+t.aspect+t.natalPlanet).slice(0,4).join(', ');
+      themeEN += iv.keyTransits.map(t=>t.transitPlanetEN+t.aspectEN+t.natalPlanetEN).slice(0,4).join(', ');
       if (iv.keyTransits.length > 4) { theme += ' 等...'; themeEN += ' etc...'; }
     }
 
     html += _L(
       `<tr${rowClass}><td>${iv.label}</td><td>${iv.keyTransits.length === 0 ? '—' : iv.keyTransits.length+'个重要相位'}</td><td>${theme}</td></tr>`,
-      `<tr${rowClass}><td>${iv.label}</td><td>${iv.keyTransits.length === 0 ? '—' : iv.keyTransits.length+' major aspects'}</td><td>${themeEN}</td></tr>`
+      `<tr${rowClass}><td>${iv.enLabel}</td><td>${iv.keyTransits.length === 0 ? '—' : iv.keyTransits.length+' major aspects'}</td><td>${themeEN}</td></tr>`
     );
   }
 
@@ -1808,7 +1822,7 @@ function generateForecast(positions, houses) {
         }
         html += _L(
           `<p>${tp.label}${na.aspect}本命${na.planet.name} → ${forecast}</p>`,
-          `<p>${tp.enLabel} ${na.aspect} natal ${na.planet.name} → ${forecastEN}</p>`
+          `<p>${tp.enLabel} ${_aspectName(na.aspect)} natal ${na.planet.name} → ${forecastEN}</p>`
         );
       }
     } else {
@@ -1928,7 +1942,7 @@ function generateSynastryReport(pos1, pos2, asc1, asc2) {
           const n2 = PLANETS.find(x=>x.id===p2)?.name||p2;
           const cls = (a.name==='三合'||a.name==='六合'||a.name==='合') ? 'aspect-good' : 'aspect-hard';
           const text = (a.name==='三合'||a.name==='六合'||a.name==='合') ? data.good : data.hard;
-          html += `<p><span class="${cls}">${n1} ${a.name} ${n2}</span> — ${text}</p>`;
+          html += `<p><span class="${cls}">${n1} ${_aspectName(a)} ${n2}</span> — ${text}</p>`;
         }
         break;
       }
@@ -2327,7 +2341,7 @@ function generateCareerGenius(positions, houses, aspects, asc, mc, userJob) {
   html += renderLockedBlock(
     _t('locked.unlockCareer'),
     _L('上面四个方向你已经看到了。但具体怎么从「' + (userJob || '现在') + '」一步步跳出去？<br>加微信获取为你量身撰写的四步行动方案、时间线和一句话方向诊断', 'You\'ve seen the four directions above. But how exactly do you leap from 「' + (userJob || 'where you are') + '」step by step?<br>Add us on WeChat for a custom four-step action plan, timeline, and one-line direction diagnosis.'),
-    [{icon:'💬', platform:'微信', id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
+    [{icon:'💬', platform:_L('微信','WeChat'), id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
   );
 
   return html;
@@ -2572,7 +2586,7 @@ function generateRelationships(positions, houses, aspects, asc) {
       const other = a.p1 === 'Mercury' ? a.p2 : a.p1;
       const otherP = PLANETS.find(x => x.id === other);
       if (otherP) {
-        html += '<p style="font-size:0.85em;color:#9a9ab0;">↳ ' + _L('水星','Mercury') + ' ' + a.name + ' ' + otherP.name + ' — ';
+        html += '<p style="font-size:0.85em;color:#9a9ab0;">↳ ' + _L('水星','Mercury') + ' ' + _aspectName(a) + ' ' + otherP.name + ' — ';
         if (a.name === '三合' || a.name === '六合') html += _L('在朋友中你是善于倾听和共情的人，沟通自然流畅。', 'Among friends you\'re a good listener with natural empathy — communication flows smoothly.');
         else if (a.name === '刑') html += _L('你在交流中可能有时过于直率或紧张，但也因此你的真诚让人信赖。', 'You may sometimes be too blunt or intense in conversation, but your sincerity is exactly why people trust you.');
         else if (a.name === '冲') html += _L('你在朋友中的角色常常是"提出不同观点的人"——你的视角能帮朋友看到另一面。', 'Your role among friends is often "the one who offers a different perspective" — your viewpoint helps friends see another side.');
@@ -2690,7 +2704,7 @@ function generateRelationships(positions, houses, aspects, asc) {
   html += renderLockedBlock(
     _t('locked.unlockRel'),
     _t('locked.relDesc'),
-    [{icon:'💬', platform:'微信', id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
+    [{icon:'💬', platform:_L('微信','WeChat'), id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
   );
 
   return html;
@@ -2923,29 +2937,31 @@ function renderTab0() {
   const stelliums = detectStelliums(d.positions, d.houses);
   const keyPatterns = detectKeyPatterns(d.positions, d.aspects);
 
+  const isEn = window._lang && window._lang() === 'en';
+
   html += '<div class="blueprint-card">';
-  html += '<h3>✦ 灵魂蓝图</h3>';
+  html += '<h3>' + _L('✦ 灵魂蓝图','✦ Soul Blueprint') + '</h3>';
 
   // Element & mode summary
   html += '<div class="blueprint-stat-row">';
-  html += '<div class="blueprint-stat"><div class="stat-val">' + domElem[0] + '象主导</div><div class="stat-lbl">' + domElem[1] + '颗行星 · ' + domMode[0] + '星座</div></div>';
+  html += '<div class="blueprint-stat"><div class="stat-val">' + _L(domElem[0]+'象主导', ELEMENTS_EN[domElem[0]]+' Dominant') + '</div><div class="stat-lbl">' + domElem[1] + _L('颗行星 · ',' planets · ') + _L(domMode[0]+'星座', MODES_EN[domMode[0]]) + '</div></div>';
   if (weakElem[1] <= 1) {
-    html += '<div class="blueprint-stat"><div class="stat-val">' + weakElem[0] + '元素薄弱</div><div class="stat-lbl">' + (weakElem[1]===0?'完全缺失':'仅' + weakElem[1] + '颗') + ' · 此生的修行之地</div></div>';
+    html += '<div class="blueprint-stat"><div class="stat-val">' + _L(weakElem[0]+'元素薄弱', ELEMENTS_EN[weakElem[0]]+' Weak') + '</div><div class="stat-lbl">' + _L((weakElem[1]===0?'完全缺失':'仅'+weakElem[1]+'颗')+' · 此生的修行之地', (weakElem[1]===0?'Completely absent':'Only '+weakElem[1])+' · Your life\'s cultivation ground') + '</div></div>';
   }
   html += '</div>';
 
   // Sun/Moon/Asc core
   html += '<div class="blueprint-stat-row">';
-  html += '<div class="blueprint-stat"><div class="stat-val">☉ ' + getSignNamePure(sunSign) + '</div><div class="stat-lbl">太阳 · 第' + (d.houses.Sun||'?') + '宫</div></div>';
-  html += '<div class="blueprint-stat"><div class="stat-val">☽ ' + getSignNamePure(moonSign) + '</div><div class="stat-lbl">月亮 · 第' + (d.houses.Moon||'?') + '宫</div></div>';
-  html += '<div class="blueprint-stat"><div class="stat-val">ASC ' + getSignNamePure(ascSign) + '</div><div class="stat-lbl">上升星座</div></div>';
+  html += '<div class="blueprint-stat"><div class="stat-val">☉ ' + getSignNamePure(sunSign) + '</div><div class="stat-lbl">' + _L('太阳','Sun') + ' · ' + _L('第','House ') + (d.houses.Sun||'?') + '</div></div>';
+  html += '<div class="blueprint-stat"><div class="stat-val">☽ ' + getSignNamePure(moonSign) + '</div><div class="stat-lbl">' + _L('月亮','Moon') + ' · ' + _L('第','House ') + (d.houses.Moon||'?') + '</div></div>';
+  html += '<div class="blueprint-stat"><div class="stat-val">ASC ' + getSignNamePure(ascSign) + '</div><div class="stat-lbl">' + _L('上升星座','Ascendant Sign') + '</div></div>';
   html += '</div>';
 
   // Stelliums
   if (stelliums.length > 0) {
     html += '<div class="blueprint-stat-row">';
     for (const s of stelliums) {
-      html += '<div class="blueprint-stat"><div class="stat-val">⭐ ' + s.label + '</div><div class="stat-lbl">' + s.planets.map(p=>p.name).join('、') + ' 汇聚</div></div>';
+      html += '<div class="blueprint-stat"><div class="stat-val">⭐ ' + (isEn ? (s.enLabel||s.label) : s.label) + '</div><div class="stat-lbl">' + s.planets.map(p=>p.name).join(isEn?', ':'、') + ' ' + _L('汇聚','converge') + '</div></div>';
     }
     html += '</div>';
   }
@@ -2953,11 +2969,11 @@ function renderTab0() {
   // Key patterns count
   if (keyPatterns.length > 0) {
     html += '<div class="blueprint-stat-row">';
-    html += '<div class="blueprint-stat"><div class="stat-val">🔮 ' + keyPatterns.length + '个关键格局</div><div class="stat-lbl">' + keyPatterns.map(k=>k.name).join('、') + '</div></div>';
+    html += '<div class="blueprint-stat"><div class="stat-val">🔮 ' + keyPatterns.length + _L('个关键格局',' Key Patterns') + '</div><div class="stat-lbl">' + keyPatterns.map(k=>isEn?(k.enName||k.name):k.name).join(isEn?', ':'、') + '</div></div>';
     html += '</div>';
   }
 
-  html += '<button class="blueprint-expand-btn" onclick="expandNatalReport()">✨ 展开完整解读</button>';
+  html += '<button class="blueprint-expand-btn" onclick="expandNatalReport()">' + _t('btn.expandReport') + '</button>';
   html += '</div>';
 
   // ═══ Hidden full report ═══
@@ -2967,7 +2983,7 @@ function renderTab0() {
 
   // ═══ Technical tables (initially hidden) ═══
   html += '<div style="text-align:center;margin-top:18px;">';
-  html += '<button class="blueprint-expand-btn" onclick="toggleDataTables()" id="btnToggleData" style="font-size:0.85em;padding:8px 24px;">📊 查看星盘数据</button>';
+  html += '<button class="blueprint-expand-btn" onclick="toggleDataTables()" id="btnToggleData" style="font-size:0.85em;padding:8px 24px;">' + _t('btn.viewChartData') + '</button>';
   html += '</div>';
 
   html += '<div id="dataTablesWrap" style="opacity:0;max-height:0;overflow:hidden;transition:opacity 0.8s ease,max-height 0s 0.8s;">';
@@ -2987,26 +3003,26 @@ function renderTab0() {
     html += `<tr>
       <td>${p.name}</td>
       <td>${getSignName(si)} ${dd}°${String(m).padStart(2,'0')}′</td>
-      <td>第${h}宫</td>
-      <td><span class="tag ${tagCls}">${elem}</span></td>
-      <td>${mode}</td>
+      <td>` + _L('第'+h+'宫','House '+h) + `</td>
+      <td><span class="tag ${tagCls}">` + _L(elem, ELEMENTS_EN[elem]) + `</span></td>
+      <td>` + _L(mode, MODES_EN[mode]) + `</td>
     </tr>`;
   }
   html += '</tbody></table>';
 
   html += '<table class="chart-table" style="margin-top:8px;">';
-  html += '<thead><tr><th>轴点</th><th>位置</th><th></th><th></th><th></th></tr></thead><tbody>';
-  html += `<tr><td>ASC 上升</td><td>${formatPos(d.asc)}</td><td></td><td></td><td></td></tr>`;
-  html += `<tr><td>MC 天顶</td><td>${formatPos(d.mc)}</td><td></td><td></td><td></td></tr>`;
-  html += `<tr><td>DSC 下降</td><td>${formatPos(mod360(d.asc+180))}</td><td></td><td></td><td></td></tr>`;
-  html += `<tr><td>IC 天底</td><td>${formatPos(mod360(d.mc+180))}</td><td></td><td></td><td></td></tr>`;
+  html += '<thead><tr><th>' + _L('轴点','Axis') + '</th><th>' + _L('位置','Position') + '</th><th></th><th></th><th></th></tr></thead><tbody>';
+  html += `<tr><td>ASC ` + _L('上升','Ascendant') + `</td><td>${formatPos(d.asc)}</td><td></td><td></td><td></td></tr>`;
+  html += `<tr><td>MC ` + _L('天顶','Midheaven') + `</td><td>${formatPos(d.mc)}</td><td></td><td></td><td></td></tr>`;
+  html += `<tr><td>DSC ` + _L('下降','Descendant') + `</td><td>${formatPos(mod360(d.asc+180))}</td><td></td><td></td><td></td></tr>`;
+  html += `<tr><td>IC ` + _L('天底','Imum Coeli') + `</td><td>${formatPos(mod360(d.mc+180))}</td><td></td><td></td><td></td></tr>`;
   html += '</tbody></table>';
 
   html += '<table class="chart-table" style="margin-top:8px;">';
-  html += '<thead><tr><th>宫位</th><th>宫头 (Placidus)</th><th>元素/模式</th></tr></thead><tbody>';
+  html += '<thead><tr><th>' + _L('宫位','House') + '</th><th>' + _L('宫头 (Placidus)','Cusp (Placidus)') + '</th><th>' + _L('元素/模式','Element/Mode') + '</th></tr></thead><tbody>';
   for (let h = 1; h <= 12; h++) {
     const {si} = degToSign(d.cusps[h]);
-    html += `<tr><td>第${h}宫</td><td>${formatPos(d.cusps[h])}</td><td>${ELEMENTS[si]}/${MODES[si]}</td></tr>`;
+    html += `<tr><td>` + _L('第'+h+'宫','House '+h) + `</td><td>${formatPos(d.cusps[h])}</td><td>${_L(ELEMENTS[si]+'/'+MODES[si], ELEMENTS_EN[ELEMENTS[si]]+'/'+MODES_EN[MODES[si]])}</td></tr>`;
   }
   html += '</tbody></table>';
   html += '</div>';
@@ -3017,7 +3033,7 @@ function renderTab0() {
   html += renderLockedBlock(
     _t('locked.unlockYearly'),
     _t('locked.natalDesc'),
-    [{icon:'💬', platform:'微信', id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
+    [{icon:'💬', platform:_L('微信','WeChat'), id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
   );
 
   document.getElementById('tab0').innerHTML = html;
@@ -3335,7 +3351,7 @@ function generateWeeklyFortune(positions, houses, asc) {
     if (aspectsToNatal.length > 0) {
       for (const a of aspectsToNatal) {
         const aspectDetail = describeWeeklyAspect(fp.id, a.planet.id, a.aspect, positions, houses);
-        html += '<br><span style="font-size:0.85em;color:#b8b8c8;">' + fpName + ' ' + a.aspect + ' ' + _L('本命','natal') + ' ' + a.planet.name + ' — ' + aspectDetail + '</span>';
+        html += '<br><span style="font-size:0.85em;color:#b8b8c8;">' + fpName + ' ' + _aspectName(a.aspect) + ' ' + _L('本命','natal') + ' ' + a.planet.name + ' — ' + aspectDetail + '</span>';
       }
     }
     html += '</p>';
@@ -3357,11 +3373,13 @@ function describeWeeklyAspect(transitId, natalId, aspect, positions, houses) {
   const hLabel = HOUSE_LABELS[natalH] || (window._lang && window._lang()==='en' ? 'Personal' : '个人领域');
   const areaMap_ZH = {
     Sun: '自我表达和自信心', Moon: '情绪和内心安全感', Mercury: '沟通和思维',
-    Venus: '感情和财务', Mars: '行动力和竞争意识', Jupiter: '成长和机遇', Saturn: '责任和规划'
+    Venus: '感情和财务', Mars: '行动力和竞争意识', Jupiter: '成长和机遇', Saturn: '责任和规划',
+    Uranus: '觉醒与变革', Neptune: '灵性与梦想', Pluto: '蜕变与力量'
   };
   const areaMap_EN = {
     Sun: 'self-expression & confidence', Moon: 'emotions & inner security', Mercury: 'communication & thinking',
-    Venus: 'love & finances', Mars: 'drive & competitiveness', Jupiter: 'growth & opportunity', Saturn: 'responsibility & planning'
+    Venus: 'love & finances', Mars: 'drive & competitiveness', Jupiter: 'growth & opportunity', Saturn: 'responsibility & planning',
+    Uranus: 'awakening & change', Neptune: 'spirituality & dreams', Pluto: 'transformation & power'
   };
   const isEn = window._lang && window._lang() === 'en';
   const areaMap = isEn ? areaMap_EN : areaMap_ZH;
@@ -3568,7 +3586,7 @@ function generateYearlyFortune(positions, houses, asc, mc) {
           const op = PLANETS.find(x=>x.id===oid);
           const h = houses[p.id];
           const hLabel = HOUSE_LABELS[h] || (isEn ? 'Personal' : '个人领域');
-          html += '<p style="font-size:0.85em;color:#b0b0c0;text-indent:0;">↳ ' + (op?op.name:oid) + ad.name + _L('本命', ' natal ') + p.name + ' — ';
+          html += '<p style="font-size:0.85em;color:#b0b0c0;text-indent:0;">↳ ' + (op?op.name:oid) + _aspectName(ad) + _L('本命', ' natal ') + p.name + ' — ';
           if (oid === 'Jupiter') {
             if (ad.name === '三合' || ad.name === '六合') html += _L('幸运之门在此领域为你敞开，适合扩张和尝试新方向。', 'A lucky door opens in this area — ideal for expansion and trying new directions.');
             else if (ad.name === '刑' || ad.name === '冲') html += _L('过度乐观或铺得太开可能带来压力——聚焦一个方向，质量比数量重要。', 'Over-optimism or spreading too thin may bring pressure — focus on one direction; quality matters more than quantity.');
@@ -3612,7 +3630,7 @@ function renderTab2() {
   let html = '';
   if (!chartData2) {
     html += '<div class="report-section">';
-    html += '<p style="text-align:center;color:var(--text-dim);padding:40px;">请在"对方"区域填写第二个人的出生信息，然后点击"解读星盘"查看合盘分析。</p>';
+    html += '<p style="text-align:center;color:var(--text-dim);padding:40px;">' + _t('error.noPartner') + '</p>';
     html += '</div>';
   } else {
     html += generateSynastryReport(chartData1.positions, chartData2.positions, chartData1.asc, chartData2.asc);
@@ -3664,7 +3682,7 @@ function renderTab7() {
   html += renderLockedBlock(
     _t('locked.unlockConsult'),
     _t('consult.lockedDesc'),
-    [{icon:'💬', platform:'微信', id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
+    [{icon:'💬', platform:_L('微信','WeChat'), id:'LunarVeilAstro'}, {icon:'🐧', platform:'QQ', id:'3393776733'}]
   );
 
   html += '<p style="color:var(--text-dim);font-size:0.72em;margin-top:20px;">' + _t('consult.tip') + '</p>';
@@ -5511,7 +5529,7 @@ function drawTarotUI() {
         html += `<div class="card-pos-label">${posLabels[i]}</div>`;
         html += `<div class="card-title">${isEn ? ((card.type==='major'?card.en:'')||(card.suit_en?card.suit_en+' '+card.en:card.name)) : (card.name||(card.suit+card.rank))}</div>`;
         if (card.isReversed) html += '<span class="reversed-badge" style="margin:2px 0">' + _L('逆位','Reversed') + '</span>';
-        html += `<div class="card-suit">${card.type==='major'?card.num:(isEn?(card.element_en||card.element)+' Element':card.element+'元素')}</div>`;
+        html += `<div class="card-suit">${card.type==='major'?card.num:(isEn?(card.suit_en||card.suit):(card.suit||card.element+'元素'))}</div>`;
         html += `<div class="card-keywords">${card.isReversed?(_cardT(card,'rev')||_cardT(card,'up')):_cardT(card,'up')}</div>`;
       }
       html += '</div>';
@@ -5921,28 +5939,28 @@ function COMPASS_CAT_NAMES() { return (window._lang && window._lang() === 'en') 
 function compassChartWeight() {
   if (!chartData1) return null;
   var weights = [0,0,0,0,0,0,0,0]; // E SE S SW W NW N NE
-  var p = chartData1.planets;
+  var h = chartData1.houses;
   // Venus house → love/finance direction
-  if (p.Venus) {
-    var vh = Math.floor(p.Venus.house);
+  if (h.Venus) {
+    var vh = h.Venus;
     if (vh===2||vh===7) { weights[2] += 2; weights[5] += 1; } // S, NW for wealth/love
     if (vh===5||vh===11) { weights[0] += 1; weights[1] += 2; } // E, SE for romance/social
   }
   // Mars → career/action direction
-  if (p.Mars) {
-    var mh = Math.floor(p.Mars.house);
+  if (h.Mars) {
+    var mh = h.Mars;
     if (mh===10||mh===6) { weights[3] += 2; weights[4] += 1; } // SW, W for career/work
     if (mh===1||mh===9) { weights[7] += 1; weights[6] += 2; } // NE, N for initiative/learning
   }
   // Jupiter → expansion/luck direction
-  if (p.Jupiter) {
-    var jh = Math.floor(p.Jupiter.house);
+  if (h.Jupiter) {
+    var jh = h.Jupiter;
     weights[jh % 8] += 3;
     weights[(jh+4) % 8] += 1;
   }
   // Moon → emotional/feminine direction
-  if (p.Moon) {
-    var moh = Math.floor(p.Moon.house);
+  if (h.Moon) {
+    var moh = h.Moon;
     weights[(moh+2) % 8] += 2; // 2 houses away
   }
   return weights;
@@ -6352,25 +6370,27 @@ function computeTransitWeightedRP() {
 
 function getChartLuckyItems(score) {
   const isEn = window._lang && window._lang() === 'en';
-  const venusSign = chartSignName(chartData1.positions.Venus);
-  const SIGN_COLORS_ZH = {
-    '白羊座':'珊瑚红','金牛座':'翡翠绿','双子座':'天青','巨蟹座':'月光银',
-    '狮子座':'琥珀金','处女座':'墨玉黑','天秤座':'玫瑰粉','天蝎座':'深空蓝',
-    '射手座':'紫罗兰','摩羯座':'靛蓝','水瓶座':'杏黄','双鱼座':'珊瑚橙'
-  };
-  const SIGN_COLORS_EN = {
-    '白羊座':'Coral Red','金牛座':'Jade Green','双子座':'Sky Cyan','巨蟹座':'Moonlight Silver',
-    '狮子座':'Amber Gold','处女座':'Onyx Black','天秤座':'Rose Pink','天蝎座':'Deep Space Blue',
-    '射手座':'Violet','摩羯座':'Indigo','水瓶座':'Apricot Yellow','双鱼座':'Coral Orange'
-  };
+  const vIdx = degToSign(chartData1.positions.Venus).si;
+  const SIGN_COLORS = [
+    '珊瑚红','翡翠绿','天青','月光银',
+    '琥珀金','墨玉黑','玫瑰粉','深空蓝',
+    '紫罗兰','靛蓝','杏黄','珊瑚橙'
+  ];
+  const SIGN_COLORS_EN_ARR = [
+    'Coral Red','Jade Green','Sky Cyan','Moonlight Silver',
+    'Amber Gold','Onyx Black','Rose Pink','Deep Space Blue',
+    'Violet','Indigo','Apricot Yellow','Coral Orange'
+  ];
   const DIRS_BY_HOUSE_ZH = ['正东','东北','正北','西北','正西','西南','正南','东南','正东','东北','正北','西北'];
   const DIRS_BY_HOUSE_EN = ['East','Northeast','North','Northwest','West','Southwest','South','Southeast','East','Northeast','North','Northwest'];
   const jupHouse = (chartData1.houses && chartData1.houses.Jupiter) || 1;
   const sunDeg = Math.floor(chartData1.positions.Sun % 30);
+  const luckyColors = LUCKY_COLORS();
+  const luckyDirs = LUCKY_DIRS();
 
   return {
-    color: isEn ? (SIGN_COLORS_EN[venusSign] || LUCKY_COLORS()[Math.floor(score % LUCKY_COLORS.length)]) : (SIGN_COLORS_ZH[venusSign] || LUCKY_COLORS()[Math.floor(score % LUCKY_COLORS.length)]),
-    dir: isEn ? (DIRS_BY_HOUSE_EN[jupHouse - 1] || LUCKY_DIRS()[Math.floor(score % LUCKY_DIRS.length)]) : (DIRS_BY_HOUSE_ZH[jupHouse - 1] || LUCKY_DIRS()[Math.floor(score % LUCKY_DIRS.length)]),
+    color: isEn ? (SIGN_COLORS_EN_ARR[vIdx] || luckyColors[Math.floor(score % luckyColors.length)]) : (SIGN_COLORS[vIdx] || luckyColors[Math.floor(score % luckyColors.length)]),
+    dir: isEn ? (DIRS_BY_HOUSE_EN[jupHouse - 1] || luckyDirs[Math.floor(score % luckyDirs.length)]) : (DIRS_BY_HOUSE_ZH[jupHouse - 1] || luckyDirs[Math.floor(score % luckyDirs.length)]),
     num: (sunDeg + Math.floor(score/10)) % 100
   };
 }
@@ -6429,9 +6449,12 @@ function closeGameModal() {
 
 // ── 每日一签 ─────────────────────────────────────────────────────────
 function drawFortuneSlip() {
+  // Always draw from ZH base for consistent index across languages
   const weights = {上上签:5, 上签:10, 中签:15, 下签:10, 下下签:5};
   const pool = [];
-  for (const s of FORTUNE_SLIPS()) { for (let i=0; i<(weights[s.lv]||1); i++) pool.push(s); }
+  for (let i=0; i<FORTUNE_SLIPS_ZH.length; i++) {
+    for (let j=0; j<(weights[FORTUNE_SLIPS_ZH[i].lv]||1); j++) pool.push(i);
+  }
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -6441,10 +6464,11 @@ function openDailyFortune() {
   let extra = parseInt(localStorage.getItem('fortune_extra_'+today+personKey()) || '0');
 
   if (lastDate === today && localStorage.getItem('fortune_slip'+personKey()) && extra <= 0) {
-    const slip = JSON.parse(localStorage.getItem('fortune_slip'+personKey()));
+    let slipIdx = parseInt(localStorage.getItem('fortune_slip'+personKey()));
+    if (isNaN(slipIdx)) { localStorage.removeItem('fortune_slip'+personKey()); openDailyFortune(); return; }
     let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
     html += '<p style="color:var(--text-dim);font-size:0.85em;">' + _t('fortune.alreadyDrawn') + '</p>';
-    html += renderFortuneResult(slip);
+    html += renderFortuneResult(slipIdx);
     if (chartData1) {
       const annotation = localStorage.getItem('fortune_annotation'+personKey());
       if (annotation) html += annotation;
@@ -6467,12 +6491,12 @@ function openDailyFortune() {
 }
 
 function revealFortune() {
-  const slip = drawFortuneSlip();
+  const slipIdx = drawFortuneSlip();
   localStorage.setItem('fortune_date'+personKey(), todayKey());
-  localStorage.setItem('fortune_slip'+personKey(), JSON.stringify(slip));
+  localStorage.setItem('fortune_slip'+personKey(), String(slipIdx));
 
   let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
-  html += renderFortuneResult(slip);
+  html += renderFortuneResult(slipIdx);
   if (chartData1) {
     const annotation = generateFortuneAnnotation();
     localStorage.setItem('fortune_annotation'+personKey(), annotation);
@@ -6485,7 +6509,9 @@ function revealFortune() {
   document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
 }
 
-function renderFortuneResult(slip) {
+function renderFortuneResult(slipIdx) {
+  const slips = FORTUNE_SLIPS();
+  const slip = slips[slipIdx % slips.length];
   let r = '<div class="fortune-slip">';
   r += '<div class="slip-level">' + slip.lv + '</div>';
   r += '<div class="slip-poem" style="white-space:pre-line;">' + slip.poem + '</div>';
@@ -6539,8 +6565,10 @@ function renderRPResult(score, personalized) {
     const items = getChartLuckyItems(score);
     color = items.color; dir = items.dir; num = items.num;
   } else {
-    color = LUCKY_COLORS()[Math.floor(Math.abs(score * 7) % LUCKY_COLORS.length)];
-    dir = LUCKY_DIRS()[Math.floor(Math.abs(score * 13) % LUCKY_DIRS.length)];
+    const luckyColors = LUCKY_COLORS();
+    const luckyDirs = LUCKY_DIRS();
+    color = luckyColors[Math.floor(Math.abs(score * 7) % luckyColors.length)];
+    dir = luckyDirs[Math.floor(Math.abs(score * 13) % luckyDirs.length)];
     num = Math.floor(Math.abs(score * 17) % 100);
   }
 
@@ -6616,7 +6644,8 @@ const BOOK_ANSWERS_EN = [
 function BOOK_ANSWERS() { return (window._lang && window._lang() === 'en') ? BOOK_ANSWERS_EN : BOOK_ANSWERS_ZH; }
 
 function openAnswerBook() {
-  const answer = BOOK_ANSWERS()[Math.floor(Math.random() * BOOK_ANSWERS.length)];
+  const answers = BOOK_ANSWERS();
+  const answer = answers[Math.floor(Math.random() * answers.length)];
   let html = '<h3>' + _t('book.title') + '</h3>';
   html += '<p style="color:var(--text-dim);font-size:0.85em;margin-bottom:16px;">' + _t('book.prompt') + '</p>';
   html += '<div class="book-stage" id="bookStage" onclick="flipTheBook()">';
@@ -6634,7 +6663,8 @@ function openAnswerBook() {
 }
 
 function pickRandomAnswer() {
-  return BOOK_ANSWERS()[Math.floor(Math.random() * BOOK_ANSWERS.length)];
+  const answers = BOOK_ANSWERS();
+  return answers[Math.floor(Math.random() * answers.length)];
 }
 
 function flipTheBook() {
@@ -6683,7 +6713,8 @@ function shakeBall() {
   win.textContent = '...';
   setTimeout(() => {
     ball.classList.remove('shaking');
-    const answer = BALL_ANSWERS()[Math.floor(Math.random() * BALL_ANSWERS.length)];
+    const answers = BALL_ANSWERS();
+    const answer = answers[Math.floor(Math.random() * answers.length)];
     win.textContent = answer;
     win.style.fontSize = answer.length > 6 ? '0.6em' : '0.7em';
   }, 500);
@@ -6691,17 +6722,12 @@ function shakeBall() {
 
 // ═══ 单张塔罗 ═══════════════════════════════════════════════════════════════
 function openSingleTarot() {
-  // Reuse existing deck if available, or build fresh
-  let deck = window._singleDeck;
-  if (!deck || deck.length < 10) {
-    deck = buildDeck ? buildDeck() : [];
-    // Shuffle
-    for (let i = deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-    window._singleDeck = deck;
+  const deck = buildDeck ? buildDeck() : [];
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
   }
+  window._singleDeck = deck;
 
   let html = '<h3>' + _t('singletarot.title') + '</h3>';
   html += '<p style="color:var(--text-dim);font-size:0.85em;margin-bottom:14px;">' + _t('singletarot.prompt') + '</p>';
@@ -6718,14 +6744,15 @@ function revealTarotCard(idx) {
   if (!deck || deck.length < idx + 1) { deck = buildDeck ? buildDeck() : []; window._singleDeck = deck; }
   const card = deck[idx % deck.length];
   const isRev = Math.random() < 0.2;
-  const name = (card.name || card.suit + card.rank);
-  const desc = isRev ? (card.rev || card.up || '') : (card.up || '');
+  const isEn = window._lang && window._lang() === 'en';
+  const name = isEn ? (card.type==='major' ? (card.en||card.name) : ((card.suit_en||card.suit)+' '+(card.en||card.rank))) : (card.name || card.suit + card.rank);
+  const desc = _cardT(card, isRev ? 'rev' : 'up') || _cardT(card, 'up');
 
   let html = '<h3>' + _t('singletarot.title') + '</h3>';
   html += '<div class="tarot-reveal-card" style="text-align:center;">';
   html += '<p style="color:var(--accent);font-size:1.1em;font-weight:bold;margin-bottom:6px;">' + name + '</p>';
   if (isRev) html += '<span class="reversed-badge" style="display:inline-block;margin-bottom:8px;">' + _t('tarot.reversed') + '</span>';
-  html += '<p style="color:#b8b8c8;font-size:0.82em;line-height:1.7;">' + (desc.length > 120 ? desc.substring(0,120) + '...' : desc) + '</p>';
+  html += '<p style="color:#b8b8c8;font-size:0.82em;line-height:1.7;">' + desc + '</p>';
   html += '</div>';
   html += '<p style="color:var(--text-dim);font-size:0.75em;margin-top:12px;">' + _t('tarot.cardHint') + '</p>';
   html += '<button class="share-btn" onclick="openSingleTarot()">' + _t('singletarot.drawAgain') + '</button>';
@@ -6806,6 +6833,8 @@ function calculateMatch() {
   const idx = Math.floor((score * 7 + i1 * 13 + i2 * 3) % taglines.length);
   const tagline = taglines[idx];
 
+  const s1 = getZodiacSignName(i1);
+  const s2 = getZodiacSignName(i2);
   let clr = score >= 80 ? '#7ab87a' : score >= 60 ? '#c9a96e' : '#c87070';
   let html = '<div class="match-score-ring" style="border-color:' + clr + ';color:' + clr + ';">' + score + '%</div>';
   html += '<div class="match-tagline">' + tagline + '</div>';
