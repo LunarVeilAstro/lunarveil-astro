@@ -881,6 +881,22 @@ const SIGN_MEANING = new Proxy({}, {
   }
 });
 
+// ── i18n Proxy for HOUSE_MEANINGS ────────────────────────────────────────
+const HOUSE_MEANINGS = new Proxy({}, {
+  get(target, prop) {
+    const src = (window._lang && window._lang() === "en") ? HOUSE_MEANINGS_EN : HOUSE_MEANINGS_ZH;
+    return src[prop];
+  }
+});
+
+// ── i18n Proxy for HOUSE_LABELS ────────────────────────────────────────
+const HOUSE_LABELS = new Proxy({}, {
+  get(target, prop) {
+    const src = (window._lang && window._lang() === "en") ? HOUSE_LABELS_EN : HOUSE_LABELS_ZH;
+    return src[prop];
+  }
+});
+
 // Planet-to-planet aspect interpretations for synastry
 const SYNASTRY_ASPECTS_ZH = {
   "Sun_Moon": { good:"你们在情感和意志层面有天然的共鸣。太阳方的自我表达能滋养月亮方的情绪需求，是经典的婚姻相位。", hard:"你们的情感需求和自我表达方式存在冲突。需要学会尊重彼此的根本差异。" },
@@ -894,6 +910,14 @@ const SYNASTRY_ASPECTS_ZH = {
   "Saturn_Moon": { good:"土星方给予月亮方稳定的情感支持。关系严肃认真，有长期承诺的潜力。", hard:"月亮方可能感觉情感上被冷落或不被理解，需要更多温暖。" }
 };
 // ── SYNASTRY_ASPECTS_EN ───────────────────────────────────────────────
+
+// ── i18n Proxy for SYNASTRY_ASPECTS ────────────────────────────────────────
+const SYNASTRY_ASPECTS = new Proxy({}, {
+  get(target, prop) {
+    const src = (window._lang && window._lang() === "en") ? SYNASTRY_ASPECTS_EN : SYNASTRY_ASPECTS_ZH;
+    return src[prop];
+  }
+});
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3702,15 +3726,6 @@ function generateDeepConsultation(question, positions, houses, aspects, asc, mc)
     social: { name:_L('社交人际','Social & Relationships'), kw: ['朋友','社交','人际','人脉','圈子','关系','室友','同学','闺蜜','哥们','人情'] },
     study: { name:_L('学习考试','Study & Exams'), kw: ['学习','考试','复习','考研','考公','考证','毕业','论文','留学','学校','专业','成绩'] }
   };
-// ── i18n Proxy for HOUSE_MEANINGS ────────────────────────────────────────
-const HOUSE_MEANINGS = new Proxy({}, {
-  get(target, prop) {
-    const src = (window._lang && window._lang() === "en") ? HOUSE_MEANINGS_EN : HOUSE_MEANINGS_ZH;
-    return src[prop];
-  }
-});
-
-
   for (const [key, d] of Object.entries(domainKw)) {
     const score = d.kw.reduce((s, w) => s + (q.includes(w) ? 1 : 0), 0);
     if (score > 0) domains.push({ key, name: d.name, score });
@@ -3828,15 +3843,6 @@ function getNatalDomainInsight(domain, positions, houses, aspects, asc, mc) {
       return r;
     }
   };
-// ── i18n Proxy for HOUSE_LABELS ────────────────────────────────────────
-const HOUSE_LABELS = new Proxy({}, {
-  get(target, prop) {
-    const src = (window._lang && window._lang() === "en") ? HOUSE_LABELS_EN : HOUSE_LABELS_ZH;
-    return src[prop];
-  }
-});
-
-
   const fn = insights[domain] || insights.self;
   return fn();
 }
@@ -3948,15 +3954,6 @@ function synthesizeConsultation(domain, question, natal, transit, tarot, positio
       ? 'Your Sun in ' + getSignNamePure(sunSi) + ' and Moon in ' + getSignNamePure(moonSi) + ' together write the duet of your soul — one is who you are becoming, the other is who you have been. The transits are pushing you into a new level of self-awareness. The tarot card did not appear by accident — it is a letter from your subconscious to your conscious mind. Your question "' + question.substring(0, 20) + '..." — the question itself is the beginning of the answer. Because you have paused long enough to ask it. Keep walking — with your chart as the map and your heart as the compass.'
       : '太阳' + getSignNamePure(sunSi) + '和月亮' + getSignNamePure(moonSi) + '共同书写了你灵魂的双重奏——一个是你要成为的，一个是你曾经是的。行运正在推动你进入新的自我认知层面。塔罗的出现不是偶然——它是你潜意识写给意识的一封信。你问的"' + question.substring(0, 20) + '..."——这个问题本身就是答案的开始。因为你已经停了足够久来问自己。继续走，带着你的星盘做地图，带着你的心做指南针。')
   };
-// ── i18n Proxy for SYNASTRY_ASPECTS ────────────────────────────────────────
-const SYNASTRY_ASPECTS = new Proxy({}, {
-  get(target, prop) {
-    const src = (window._lang && window._lang() === "en") ? SYNASTRY_ASPECTS_EN : SYNASTRY_ASPECTS_ZH;
-    return src[prop];
-  }
-});
-
-
   return synthesisMap[domain] || synthesisMap.self;
 }
 
