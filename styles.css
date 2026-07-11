@@ -1103,6 +1103,22 @@ header .subtitle {
 .lodge-grid .lodge-daily:nth-of-type(7) { grid-column: 3; }
 .lodge-daily .lodge-icon { font-size: 2.4em; }
 
+/* ── 灵性驿站 · 星盘联动提示 ────────────────────────────────────── */
+.lodge-chart-hint {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.78em;
+  margin-top: 16px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  opacity: 0.85;
+  transition: color 0.4s, border-color 0.4s;
+}
+.lodge-chart-hint.linked {
+  color: var(--accent);
+  border-top-color: rgba(200,160,100,0.35);
+}
+
 /* ── 福运方位 Banner ──────────────────────────────────────────────── */
 .lodge-banner {
   background: linear-gradient(135deg, rgba(180,140,90,0.12) 0%, rgba(200,160,100,0.05) 50%, rgba(160,120,200,0.08) 100%);
@@ -1515,4 +1531,217 @@ header .subtitle {
 .chart-table th { background: #eee; color: #333; }
   .chart-table td { color: #333; border-color: #ddd; }
   @page { margin: 1.5cm; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — 手机端全面适配
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 平板/大屏手机 (≤768px) ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container { padding: 12px; }
+  .card { padding: 20px 14px; margin-bottom: 14px; }
+  .card h2 { font-size: 1.15em; margin-bottom: 14px; }
+  .card h3 { font-size: 0.95em; }
+
+  /* Header */
+  header { padding: 24px 8px 14px; }
+  header h1 { font-size: 2em; }
+  header .subtitle { font-size: 0.82em; letter-spacing: 0.06em; }
+  .lang-switcher { top: 6px; right: 8px; }
+
+  /* Form */
+  .form-group { min-width: 0; }
+  .form-group input, .form-group select { font-size: 0.88em; padding: 9px 10px; }
+  .btn { padding: 12px 24px; font-size: 0.95em; }
+  .btn-secondary { padding: 9px 18px; font-size: 0.82em; }
+  .btn-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .btn-row .btn { flex: 0 1 auto; }
+  .sample-notice { font-size: 0.72em; padding: 6px 10px; }
+
+  /* Tabs — horizontal scroll with sticky */
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 2px; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; white-space: nowrap; font-size: 0.74em; padding: 10px 6px; min-width: 52px; text-align: center; }
+  .tab:first-child { padding-left: 8px; }
+  .tab:last-child { padding-right: 8px; }
+
+  /* Person section — stack vertically instead of side-by-side */
+  .person-section { flex-direction: column; gap: 12px; }
+
+  /* Lodge grid — 2 columns */
+  .lodge-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .lodge-grid .lodge-daily:nth-of-type(5) { grid-column: span 1; }
+  .lodge-grid .lodge-daily:nth-of-type(6) { grid-column: span 1; }
+  .lodge-grid .lodge-daily:nth-of-type(7) { grid-column: span 1; }
+  .lodge-item { padding: 14px 10px; }
+  .lodge-item .lodge-icon { font-size: 1.7em; margin-bottom: 6px; }
+  .lodge-item .lodge-name { font-size: 0.85em; }
+  .lodge-item .lodge-desc { font-size: 0.7em; }
+  .lodge-banner { flex-direction: column; gap: 8px; padding: 14px 16px; text-align: center; }
+  .lodge-banner-title { font-size: 0.95em; }
+  .lodge-banner-desc { font-size: 0.78em; }
+
+  /* Social float — smaller, less intrusive */
+  .social-float { right: -2px; gap: 2px; }
+  .social-float-item {
+    padding: 7px 8px 7px 6px;
+    min-width: 130px;
+    transform: translateX(calc(100% - 38px));
+    border-radius: 8px 0 0 8px;
+  }
+  .social-float-item .sf-icon { font-size: 1.2em; width: 24px; }
+  .social-float-item .sf-label { font-size: 0.68em; }
+  .social-float-item .sf-id { font-size: 0.62em; display: none; }
+
+  /* Footer contact — stack in rows */
+  .footer-contact { gap: 6px; padding: 12px 4px; flex-wrap: wrap; justify-content: center; }
+  .footer-contact .fc-item { padding: 6px 10px; font-size: 0.68em; }
+  .footer-contact .fc-icon { font-size: 1.1em; }
+  .footer-contact .fc-label { font-size: 0.72em; }
+
+  /* Game modal — full width */
+  .game-modal { max-width: 95vw; max-height: 90vh; padding: 20px 14px; border-radius: 12px; }
+  .game-close { top: 8px; right: 10px; font-size: 1.1em; }
+
+  /* Blueprint / report sections */
+  .blueprint-card { padding: 16px 12px; }
+  .blueprint-stats { flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .blueprint-stat { min-width: 70px; padding: 8px 10px; }
+  .blueprint-stat .stat-val { font-size: 0.85em; }
+  .blueprint-stat .stat-lbl { font-size: 0.7em; }
+
+  /* Report sections */
+  .report-section { padding: 12px 0; }
+  .report-section h3 { font-size: 0.95em; }
+  .report-section p { font-size: 0.88em; line-height: 1.75; text-indent: 1.2em; }
+
+  /* Locked blocks & social teasers */
+  .locked-block { padding: 20px 14px 16px; margin: 16px 0; }
+  .locked-block .lock-title { font-size: 0.9em; }
+  .locked-block .lock-desc { font-size: 0.74em; }
+  .lock-contact-chip { padding: 8px 14px; font-size: 0.78em; }
+  .social-teaser { flex-wrap: wrap; gap: 8px; padding: 14px 16px; }
+  .social-teaser .st-icon { font-size: 1.6em; }
+  .social-teaser .st-title { font-size: 0.82em; }
+  .social-teaser .st-sub { font-size: 0.72em; }
+  .social-teaser .st-action { padding: 8px 14px; font-size: 0.74em; }
+
+  /* Direction cards */
+  .direction-card { padding: 12px 14px; }
+  .direction-card h4 { font-size: 0.88em; }
+  .direction-card p { font-size: 0.78em; }
+  .direction-score { top: 8px; right: 10px; font-size: 0.7em; padding: 2px 8px; }
+
+  /* Action steps */
+  .action-step { padding: 10px 14px; }
+  .action-step .step-label { font-size: 0.82em; }
+  .action-step p { font-size: 0.78em; }
+
+  /* Consultation */
+  .consult-input-area { padding: 14px 16px; }
+  .consult-input-area textarea { font-size: 0.88em; min-height: 60px; }
+  .consult-tags { gap: 6px; }
+  .consult-tag { padding: 4px 10px; font-size: 0.74em; }
+  .consult-submit { padding: 8px 24px; font-size: 0.85em; }
+
+  /* Tarot */
+  .cards-area { gap: 6px; justify-content: center; }
+  .tarot-card { width: 100px; height: 200px; }
+  .card-front { padding: 6px 4px; }
+  .card-front .card-title { font-size: 0.72em; }
+  .card-front .card-keywords { font-size: 0.6em; }
+  .tarot-interpretation { padding: 12px; }
+  .tarot-interpretation .card-reading p { font-size: 0.8em; }
+  .tarot-pick-row { gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .tarot-pick-card { width: 52px; height: 78px; }
+
+  /* Zodiac match */
+  .zodiac-select-row { flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+  /* Compass */
+  .compass-result { padding: 12px; }
+
+  /* Back to top */
+  #btnBackTop { width: 44px; height: 44px; bottom: 20px; right: 12px; font-size: 0.8em; }
+
+  /* Data tables (scrollable) */
+  .chart-table, table.data-table { font-size: 0.72em; }
+  .chart-table th, .chart-table td, table.data-table td, table.data-table th { padding: 5px 6px; }
+
+  /* Lodge chart hint */
+  .lodge-chart-hint { font-size: 0.72em; padding: 6px 10px; margin-top: 12px; }
+}
+
+/* ── 小屏手机 (≤480px) ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .container { padding: 8px; }
+  .card { padding: 16px 10px; margin-bottom: 10px; border-radius: 10px; }
+  .card::before { left: 10px; right: 10px; }
+
+  header h1 { font-size: 1.6em; letter-spacing: 0.08em; }
+  header .subtitle { font-size: 0.7em; }
+  .title-sub { font-size: 0.18em; }
+
+  /* Header crystal ball — smaller */
+  .crystal-ball-header { width: 120px; height: 120px; margin-top: 12px; }
+  .crystal-veil { width: 100px; height: 40px; top: -16px; }
+
+  /* Lodge — single column grid */
+  .lodge-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .lodge-item { padding: 12px 8px; border-radius: 10px; }
+  .lodge-item .lodge-icon { font-size: 1.5em; }
+  .lodge-item .lodge-name { font-size: 0.8em; }
+  .lodge-item .lodge-desc { font-size: 0.66em; }
+  .lodge-banner { padding: 12px 14px; border-radius: 10px; }
+
+  /* Form */
+  .form-group label { font-size: 0.74em; }
+  .form-group input, .form-group select { font-size: 0.84em; padding: 8px; }
+  .geo-btn { padding: 8px 12px; font-size: 0.8em; }
+  .geo-status { font-size: 0.7em; }
+  .btn { padding: 10px 18px; font-size: 0.88em; }
+  .btn-secondary { padding: 8px 14px; font-size: 0.76em; }
+
+  /* Tabs */
+  .tab { font-size: 0.68em; padding: 8px 4px; min-width: 44px; }
+
+  /* Social float — hide on very small screens (users can scroll to footer) */
+  .social-float { display: none; }
+
+  /* Blueprint */
+  .blueprint-card { padding: 12px 8px; border-radius: 10px; }
+  .blueprint-stat { min-width: 60px; padding: 6px 8px; }
+  .blueprint-stat .stat-val { font-size: 0.78em; }
+  .blueprint-stat .stat-lbl { font-size: 0.64em; }
+
+  /* Locked blocks */
+  .locked-block { padding: 16px 10px 12px; }
+  .lock-contact-chip { padding: 7px 10px; font-size: 0.72em; }
+
+  /* Tarot */
+  .tarot-card { width: 80px; height: 170px; }
+  .cards-area { gap: 4px; }
+  .card-front .card-title { font-size: 0.66em; }
+  .card-front .card-keywords { font-size: 0.56em; line-height: 1.25; }
+  .tarot-pick-card { width: 44px; height: 66px; }
+
+  /* Game modal */
+  .game-modal { max-width: 98vw; padding: 16px 10px; border-radius: 10px; }
+
+  /* Fortune sub-tabs */
+  .fortune-sub-tab { font-size: 0.72em; padding: 6px 10px; }
+
+  /* Footer */
+  .footer-contact .fc-item { padding: 5px 8px; font-size: 0.64em; }
+  .footer-contact .fc-cta { font-size: 0.6em !important; }
+
+  /* Report text */
+  .report-section p { font-size: 0.82em; line-height: 1.65; }
+
+  /* Back to top */
+  #btnBackTop { width: 38px; height: 38px; bottom: 14px; right: 8px; }
+
+  /* Lodge chart hint */
+  .lodge-chart-hint { font-size: 0.68em; }
 }
