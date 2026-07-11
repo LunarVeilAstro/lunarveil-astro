@@ -170,91 +170,137 @@ function getInputValues(prefix) {
 let chartData1 = null;
 let chartData2 = null;
 
+// ── Progress ring helpers ──────────────────────────────────────────────
+  var _ritualTotal = 16;
+  var _ritualFilled = 0;
+  var _ritualTimer = null;
+  var _ritualCallback = null;
+
+  function _buildProgressRing() {
+    var container = document.getElementById('ritualProgress');
+    if (!container) return;
+    var n = _ritualTotal;
+    var r = 60; // radius
+    var cx = 70, cy = 70;
+    var html = '';
+    for (var i = 0; i < n; i++) {
+      var angle = (i / n) * Math.PI * 2 - Math.PI / 2; // start from top
+      var x = cx + r * Math.cos(angle) - 6;
+      var y = cy + r * Math.sin(angle) - 6;
+      html += '<div class="ritual-dot" id="rdot' + i + '" style="left:' + x + 'px;top:' + y + 'px;"></div>';
+    }
+    // Center: Astrolabe with moon
+    html += '<div class="ritual-astrolabe">';
+    html += '<div class="ritual-ring ring-outer"></div>';
+    html += '<div class="ritual-ring ring-inner"></div>';
+    html += '<div class="ritual-ring ring-core"></div>';
+    html += '<div class="ritual-center-moon">🌙</div>';
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  function _startProgress(callback) {
+    _ritualFilled = 0;
+    _ritualCallback = callback;
+    var phraseEl = document.getElementById('ritualPhrase');
+    phraseEl.textContent = _L('星辰正在排列...','The stars are aligning...');
+	phraseEl.style.opacity = '1';
+
+    _fillNextDot();
+  }
+
+  function _fillNextDot() {
+    var dot = document.getElementById('rdot' + _ritualFilled);
+    if (dot) { dot.classList.add('filled'); }
+    _ritualFilled++;
+
+    if (_ritualFilled >= _ritualTotal) {
+      _onProgressComplete();
+    } else {
+      _ritualTimer = setTimeout(_fillNextDot, 110);
+    }
+  }
+
+  function _finishProgress() {
+    if (_ritualTimer) { clearTimeout(_ritualTimer); _ritualTimer = null; }
+    // Quickly fill remaining dots
+    var fastFill = function() {
+      var dot = document.getElementById('rdot' + _ritualFilled);
+      if (dot) { dot.classList.add('filled'); dot.style.transition = 'all 0.15s'; }
+      _ritualFilled++;
+      if (_ritualFilled >= _ritualTotal) {
+        _onProgressComplete();
+      } else {
+        setTimeout(fastFill, 50);
+      }
+    };
+    fastFill();
+  }
+
+  function _onProgressComplete() {
+    // Flash all dots green
+    for (var i = 0; i < _ritualTotal; i++) {
+      var d = document.getElementById('rdot' + i);
+      if (d) { d.classList.add('complete'); }
+    }
+    var astrolabe = document.querySelector('.ritual-astrolabe');
+    if (astrolabe) { astrolabe.classList.add('complete'); }
+    var phraseEl = document.getElementById("ritualPhrase");
+	phraseEl.style.opacity = '0';
+    setTimeout(function() {
+      phraseEl.textContent = _L('星盘已就绪 ✦','Chart Ready ✦');
+      phraseEl.style.opacity = '1';
+    }, 250);
+
+    setTimeout(function() {
+      if (_ritualCallback) _ritualCallback();
+    }, 800);
+  }
+
 function calculateAll() {
   try {
     const d1 = getInputValues('p1');
     if (!d1) { alert(_t('error.fillInfo')); return; }
 
-    // Show ritual overlay
+    // Show overlay and build progress ring
     const overlay = document.getElementById('ritualOverlay');
     overlay.style.display = 'flex';
+    _buildProgressRing();
 
-    // Mystical loading phrases
-    const phrases = _t('ritual.phrases');
-    const phraseEl = document.getElementById('ritualPhrase');
-    let phraseIdx = 0;
-    phraseEl.textContent = phrases[0];
+    var computed = false;
+    function onBothReady() {
+      if (!computed) return;
+      _finishProgress();
+    }
 
-    const phraseInterval = setInterval(() => {
-      phraseIdx = (phraseIdx + 1) % phrases.length;
-      phraseEl.style.opacity = '0';
-      setTimeout(() => {
-        phraseEl.textContent = phrases[phraseIdx];
-        phraseEl.style.opacity = '1';
-      }, 400);
-    }, 1800);
+    _startProgress(function() {
+      // Called when ALL dots filled — show results
+      document.getElementById('resultsCard').style.display = 'block';
 
-    // Compute in a small delay to allow UI to update
-    setTimeout(() => {
-      try {
-        chartData1 = computeChart(d1);
-        const d2 = getInputValues('p2');
-        chartData2 = d2 ? computeChart(d2) : null;
+      renderTab0(); renderTab1(); renderTab2(); renderTab3();
+      renderTab4(); renderTab5(); renderTab6(); renderTab7();
 
-        clearInterval(phraseInterval);
+      overlay.style.transition = 'opacity 0.6s';
+      overlay.style.opacity = '0';
+      setTimeout(function() {
+        overlay.style.display = 'none';
+        overlay.style.opacity = '1';
+        overlay.style.transition = '';
+      }, 600);
 
-        // Final phrase
-        phraseEl.style.opacity = '0';
-        setTimeout(() => {
-          phraseEl.textContent = _t('ritual.final');
-          phraseEl.style.opacity = '1';
-        }, 400);
+      document.getElementById('resultsCard').style.opacity = '0';
+      document.getElementById('resultsCard').style.transition = 'opacity 1s';
+      document.getElementById('resultsCard').scrollIntoView({behavior:'smooth'});
+      switchTab(0);
+      setTimeout(function() {
+        document.getElementById('resultsCard').style.opacity = '1';
+      }, 200);
 
-        // Reveal results after a carefully timed pause
-        setTimeout(() => {
-          document.getElementById('resultsCard').style.display = 'block';
+      document.getElementById('btnPdf').style.display = 'inline-block';
+      document.getElementById('btnEmail').style.display = 'inline-block';
+      document.getElementById('btnCopyMobile').style.display = 'inline-block';
 
-          // Render all tabs
-          renderTab0();
-          renderTab1();
-          renderTab2();
-          renderTab3();
-          renderTab4();
-          renderTab5();
-          renderTab6();
-          renderTab7();
-
-          // Fade out overlay
-          overlay.style.transition = 'opacity 0.8s';
-          overlay.style.opacity = '0';
-
-          // Remove overlay after fade
-          setTimeout(() => {
-            overlay.style.display = 'none';
-            overlay.style.opacity = '1';
-            overlay.style.transition = '';
-          }, 800);
-
-          // Stagger-reveal results
-          document.getElementById('resultsCard').style.opacity = '0';
-          document.getElementById('resultsCard').style.transition = 'opacity 1s';
-          document.getElementById('resultsCard').scrollIntoView({behavior:'smooth'});
-
-          // Switch to tab 0 with slight delay
-          switchTab(0);
-
-          // Fade in results
-          setTimeout(() => {
-            document.getElementById('resultsCard').style.opacity = '1';
-          }, 200);
-
-          // Show action buttons
-          document.getElementById('btnPdf').style.display = 'inline-block';
-          document.getElementById('btnEmail').style.display = 'inline-block';
-          document.getElementById('btnCopyMobile').style.display = 'inline-block';
-
-          // Update lodge hint to reflect chart link
-          var hint = document.getElementById('lodgeChartHint');
+      var hint = document.getElementById('lodgeChartHint');
           if (hint) {
             hint.textContent = _t('lodge.chartHintLinked');
             hint.classList.add('linked');
@@ -262,19 +308,28 @@ function calculateAll() {
 
           // Collapse input card, show summary bar
           collapseInputCard();
+        });
 
-        }, 800);
+    // Compute charts while progress dots fill
+    setTimeout(function() {
+      try {
+        chartData1 = computeChart(d1);
+        var d2 = getInputValues('p2');
+        chartData2 = d2 ? computeChart(d2) : null;
+        computed = true;
+        onBothReady();
       } catch(e) {
-        clearInterval(phraseInterval);
+        if (_ritualTimer) clearTimeout(_ritualTimer);
         overlay.style.display = 'none';
         document.getElementById('resultsCard').style.display = 'block';
-        document.getElementById('tab0').innerHTML = '<p style=\"color:#c87070;padding:20px;\">' + _t('error.calculate') + e.message + '</p>';
+        document.getElementById('tab0').innerHTML = '<p style="color:#c87070;padding:20px;">' + _t('error.calculate') + e.message + '</p>';
         console.error(e);
       }
-    }, 200);
+    }, 80);
+
   } catch(e) {
     document.getElementById('resultsCard').style.display = 'block';
-    document.getElementById('tab0').innerHTML = '<p style=\"color:#c87070;padding:20px;\">' + _t('error.calculate') + e.message + '</p>';
+    document.getElementById('tab0').innerHTML = '<p style="color:#c87070;padding:20px;">' + _t('error.calculate') + e.message + '</p>';
     console.error(e);
   }
 }

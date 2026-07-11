@@ -322,30 +322,48 @@ function renderRPResult(score, personalized) {
 
 // ── 分享得次数 ───────────────────────────────────────────────────────
 function shareForExtra(gameType) {
-  const today = todayKey();
+  var shareUrl = 'https://lunarveilastro.github.io/lunarveil-astro/';
 
-  if (navigator.share) {
+  // Grant extra immediately so UI never blocks
+  grantExtra(gameType);
+  showCopyMessage();
+
+  // Try Web Share API first
+  if (navigator.share && window.isSecureContext) {
     navigator.share({
       title: _t('share.title'),
       text: _t('share.text'),
-      url: window.location.href
-    }).then(() => {
-      grantExtra(gameType);
-    }).catch(() => {});
-  } else {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      grantExtra(gameType);
-      const modal = document.getElementById('gameModal');
-      const exist = document.getElementById('copyMsg');
-      if (!exist) {
-        const msg = document.createElement('p');
-        msg.id = 'copyMsg';
-        msg.style.cssText = 'color:#7ab87a;font-size:0.82em;margin-top:8px;';
-        msg.textContent = _t('share.linkCopied');
-        modal.appendChild(msg);
-      }
-    }).catch(() => {});
+      url: shareUrl
+    }).catch(function() {});
+    return;
   }
+
+  // Clipboard in background — don't block UI
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).catch(function() {});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = shareUrl;
+      ta.style.cssText = 'position:fixed;left:-9999px;';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+    }
+  } catch(e) {}
+}
+
+function showCopyMessage() {
+  var modal = document.getElementById('gameModal');
+  if (!modal) return;
+  var exist = document.getElementById('copyMsg');
+  if (exist) return;
+  var msg = document.createElement('p');
+  msg.id = 'copyMsg';
+  msg.style.cssText = 'color:#7ab87a;font-size:0.82em;margin-top:8px;';
+  msg.textContent = _t('share.linkCopied');
+  modal.appendChild(msg);
 }
 
 function grantExtra(gameType) {

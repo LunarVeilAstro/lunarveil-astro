@@ -6,6 +6,9 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
 <title>LunarVeilAstro · 星盘解读 | Natal Chart · Transit · Synastry</title>
 <meta name="description" content="LunarVeilAstro 免费在线星盘解读 — 本命星盘分析、五年运势预测、合盘缘分解读、塔罗占卜、职业天赋诊断。输入出生信息即可获取专属报告。Free online astrology chart readings.">
 <meta name="keywords" content="LunarVeilAstro,星盘解读,本命星盘,运势预测,合盘分析,塔罗占卜,星座,星盘,占星,命运之轮,在线星盘,astrology,birth chart,natal chart,horoscope,tarot,synastry">
@@ -39,15 +42,14 @@
 </head>
 <body>
 <!-- Loading Ritual Overlay -->
-<div id="ritualOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at center,#0d0d24 0%,#050510 70%);flex-direction:column;align-items:center;justify-content:center;gap:30px;">
-  <div class="ritual-astrolabe">
-    <div class="ritual-ring ring-outer"></div>
-    <div class="ritual-ring ring-inner"></div>
-    <div class="ritual-ring ring-core"></div>
-    <div class="ritual-center-star">✦</div>
+<div id="ritualOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at center,#0d0d24 0%,#050510 70%);flex-direction:column;align-items:center;justify-content:center;gap:28px;">
+  <div class="ritual-stage">
+    <div class="ritual-rings-deco">
+      <div class="ritual-deco-ring ring-deco-outer"></div>
+    </div>
+    <div class="ritual-progress" id="ritualProgress"></div>
   </div>
   <div id="ritualPhrase" class="ritual-phrase">星辰正在排列...</div>
-  <div class="ritual-dots"><span>·</span><span>·</span><span>·</span></div>
 </div>
 <div class="galaxy-bg">
   <div class="nebula nebula-1"></div>
@@ -85,12 +87,12 @@
     <h1><span class="title-main">LunarVeil<span class="title-cn">Astro</span></span><span class="title-sub" data-i18n="header.tagline">星盘解读 · 命运之轮</span></h1>
     <div class="subtitle" data-i18n="header.subtitle">· 本命星盘 · 运势预测 · 合盘分析 ·</div>
     <div class="crystal-ball-header">
-      <div class="crystal-veil"></div>
-      <div class="crystal-mist-header m1"></div>
-      <div class="crystal-mist-header m2"></div>
-      <div class="crystal-mist-header m3"></div>
+      <img src="img/avatar.webp" alt="LunarVeil" class="crystal-img">
     </div>
   </header>
+
+  <!-- ═══ 今日星象速览 ═══════════════════════════════════════════════════════════ -->
+  <div class="card" id="dailyCard"></div>
 
   <!-- ═══ 灵性驿站 ═══════════════════════════════════════════════════════════ -->
   <div class="card" id="lodgeCard">
@@ -331,6 +333,7 @@
 <script src="js/tarot.js"></script>
 <script src="js/compass.js"></script>
 <script src="js/fortune.js"></script>
+<script src="js/dailycard.js"></script>
 <script src="js/lodge.js"></script>
 <script src="js/ui.js"></script>
 <script src="app.js"></script>
