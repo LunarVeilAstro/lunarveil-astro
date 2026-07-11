@@ -119,17 +119,29 @@ function selectCompassCategory(catIdx) {
   // Direction marks — seal-script style with calligraphy font
   var markAngles = [0, 90, 180, 270];
   var markNames = [_L('東','E'),_L('南','S'),_L('西','W'),_L('北','N')];
+  var markIds = ['cmN','cmE','cmS','cmW'];
   for (var mi=0; mi<4; mi++) {
-    var rad = markAngles[mi] * Math.PI / 180;
-    var mx = Math.round(120 + Math.sin(rad) * 88 - 14);
-    var my = Math.round(120 - Math.cos(rad) * 88 - 14);
-    stageHtml += '<span class="compass-mark-char" style="left:'+mx+'px;top:'+my+'px;">'+markNames[mi]+'</span>';
+    stageHtml += '<span class="compass-mark-char" id="'+markIds[mi]+'">'+markNames[mi]+'</span>';
   }
   stageHtml += '<div class="compass-pointer" id="compassPointer" style="transform: rotate(0deg);"></div>';
   stageHtml += '<div class="compass-center"></div>';
   stageHtml += '</div>';
 
   document.getElementById('compassStageArea').innerHTML = stageHtml;
+
+  // Position direction marks responsively based on actual container size
+  var stage = document.getElementById('compassStage');
+  var w = stage.offsetWidth;
+  var cx = w / 2;
+  var radius = w * 88 / 240;
+  var halfMark = w * 14 / 240;
+  for (var mi=0; mi<4; mi++) {
+    var rad = markAngles[mi] * Math.PI / 180;
+    var mx = Math.round(cx + Math.sin(rad) * radius - halfMark);
+    var my = Math.round(cx - Math.cos(rad) * radius - halfMark);
+    var mark = document.getElementById(markIds[mi]);
+    if (mark) { mark.style.left = mx + 'px'; mark.style.top = my + 'px'; }
+  }
 
   // Animate: spin pointer to target direction angle
   var angles = {0:0, 1:45, 2:90, 3:135, 4:180, 5:225, 6:270, 7:315};
