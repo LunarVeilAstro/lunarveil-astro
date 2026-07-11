@@ -1191,6 +1191,17 @@ header .subtitle {
   background: rgba(200,160,100,0.12); color: var(--accent);
   border: 1px solid rgba(200,160,100,0.25);
 }
+.daily-phase {
+  color: #b0a0c8; font-size: 0.75em;
+  letter-spacing: 0.05em; margin-bottom: 6px;
+}
+.daily-question {
+  color: var(--text-dim); font-size: 0.78em;
+  font-style: italic; margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(200,160,100,0.12);
+  opacity: 0.85;
+}
 
 /* ── 福运方位 Banner ──────────────────────────────────────────────── */
 .lodge-banner {
