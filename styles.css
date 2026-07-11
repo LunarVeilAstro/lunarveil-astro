@@ -1579,8 +1579,11 @@ header .subtitle {
   .lodge-item .lodge-name { font-size: 0.85em; }
   .lodge-item .lodge-desc { font-size: 0.7em; }
   .lodge-banner { flex-direction: column; gap: 8px; padding: 14px 16px; text-align: center; }
+  .lodge-banner-text { text-align: center; }
+  .lodge-banner-icon { font-size: 2em; }
   .lodge-banner-title { font-size: 0.95em; }
   .lodge-banner-desc { font-size: 0.78em; }
+  .lodge-banner-badge { margin-left: auto; margin-right: auto; }
 
   /* Social float — smaller, less intrusive */
   .social-float { right: -2px; gap: 2px; }
@@ -1660,7 +1663,13 @@ header .subtitle {
   .zodiac-select-row { flex-wrap: wrap; gap: 8px; justify-content: center; }
 
   /* Compass */
+  .compass-stage { width: 200px; height: 200px; }
   .compass-result { padding: 12px; }
+  .category-btns { gap: 10px; }
+  .cat-btn { padding: 12px 8px; }
+  .cat-btn-icon { font-size: 1.8em; }
+  .cat-btn-name { font-size: 1em; }
+  .cat-btn-sub { font-size: 0.76em; }
 
   /* Back to top */
   #btnBackTop { width: 44px; height: 44px; bottom: 20px; right: 12px; font-size: 0.8em; }
@@ -1694,6 +1703,7 @@ header .subtitle {
   .lodge-item .lodge-name { font-size: 0.8em; }
   .lodge-item .lodge-desc { font-size: 0.66em; }
   .lodge-banner { padding: 12px 14px; border-radius: 10px; }
+  .lodge-banner-text { text-align: center; }
 
   /* Form */
   .form-group label { font-size: 0.74em; }
