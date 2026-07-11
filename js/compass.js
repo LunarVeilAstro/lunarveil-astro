@@ -118,7 +118,7 @@ function selectCompassCategory(catIdx) {
   stageHtml += '<div class="compass-ring"></div>';
   // Direction marks — seal-script style with calligraphy font
   var markAngles = [0, 90, 180, 270];
-  var markNames = ['東','南','西','北'];
+  var markNames = [_L('東','E'),_L('南','S'),_L('西','W'),_L('北','N')];
   for (var mi=0; mi<4; mi++) {
     var rad = markAngles[mi] * Math.PI / 180;
     var mx = Math.round(120 + Math.sin(rad) * 88 - 14);

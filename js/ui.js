@@ -49,11 +49,11 @@ function copySocial(platform, id) {
     for (var j = 0; j < fItems.length; j++) {
       if (fItems[j].textContent.indexOf(id) >= 0) {
         var sfId = fItems[j].querySelector('.sf-id');
-        if (sfId) { var orig2 = sfId.textContent; sfId.textContent = '✓ 已复制'; sfId.style.color = '#5a8'; setTimeout(function() { sfId.textContent = orig2; sfId.style.color = ''; }, 2000); }
+        if (sfId) { var orig2 = sfId.textContent; sfId.textContent = _L('✓ 已复制','✓ Copied'); sfId.style.color = '#5a8'; setTimeout(function() { sfId.textContent = orig2; sfId.style.color = ''; }, 2000); }
       }
     }
   }).catch(function() {
-    alert(platform + '号：' + id + '\n请手动复制');
+    alert(_L(platform + '号：' + id + '\n请手动复制', platform + ': ' + id + '\nPlease copy manually'));
   });
 }
 
@@ -95,10 +95,10 @@ async function geocode(prefix) {
   statusEl.className = 'geo-status loading';
 
   try {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&accept-language=zh`;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&accept-language=${(window._lang && window._lang() === 'en') ? 'en' : 'zh'}`;
     const resp = await fetch(url, { headers: { 'User-Agent': 'AstroChart/1.0' } });
     const data = await resp.json();
-    if (data.length === 0) throw new Error('未找到该地点');
+    if (data.length === 0) throw new Error(_L('未找到该地点','Location not found'));
 
     const lat = parseFloat(data[0].lat);
     const lng = parseFloat(data[0].lon);
@@ -627,75 +627,75 @@ function buildReportHTML() {
   let r = '';
 
   r += '<div style="text-align:center;margin-bottom:20px;">';
-  r += '<h2 style="color:#333;">命 运 之 轮 · 星盘解读报告</h2>';
-  r += '<p style="color:#666;">生成日期：' + now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日</p>';
+  r += '<h2 style="color:#333;">' + _L('命 运 之 轮 · 星盘解读报告','Wheel of Fortune · Birth Chart Report') + '</h2>';
+  r += '<p style="color:#666;">' + _L('生成日期：','Generated: ') + now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate() + '</p>';
   r += '</div>';
 
   // ═══ Tab 0: Natal report ═══
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;">✦ 本命星盘深度解读</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;">✦ ' + _L('本命星盘深度解读','Natal Chart Deep Dive') + '</h3>';
   r += generateDeepNatalReport(d.positions, d.houses, d.aspects, d.asc, d.mc);
 
   // ═══ Tab 5: Career Genius ═══
   const userJob = document.getElementById('p1_job') ? document.getElementById('p1_job').value.trim() : '';
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 职业天赋诊断</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('职业天赋诊断','Career Genius Diagnosis') + '</h3>';
   r += generateCareerGenius(d.positions, d.houses, d.aspects, d.asc, d.mc, userJob);
 
   // ═══ Tab 6: Relationships ═══
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 人际缘分分析</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('人际缘分分析','Relationship Analysis') + '</h3>';
   r += generateRelationships(d.positions, d.houses, d.aspects, d.asc);
 
   // ═══ Tab 2: Synastry (if available) ═══
   if (chartData2) {
-    r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 合盘缘分分析</h3>';
+    r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('合盘缘分分析','Synastry Analysis') + '</h3>';
     r += generateSynastryReport(d.positions, chartData2.positions, d.asc, chartData2.asc);
   }
 
   // ═══ Tab 3: Daily Guidance ═══
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 今日星盘指引</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('今日星盘指引','Daily Chart Guidance') + '</h3>';
   r += generateGuidance(d.positions, d.houses, d.asc);
 
   // ═══ Tab 1: Fortune (all sub-modules) ═══
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 本周运势</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('本周运势','Weekly Fortune') + '</h3>';
   r += generateWeeklyFortune(d.positions, d.houses, d.asc);
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 本月运势</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('本月运势','Monthly Fortune') + '</h3>';
   r += generateMonthlyFortune(d.positions, d.houses, d.asc);
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 年度运势</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('年度运势','Yearly Fortune') + '</h3>';
   r += generateYearlyFortune(d.positions, d.houses, d.asc, d.mc);
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 五年运势展望</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('五年运势展望','Five-Year Forecast') + '</h3>';
   r += generateDeepForecast(d.positions, d.houses, d.mc);
 
   // ═══ Tab 4: Tarot (if drawn) ═══
   if (tarotState.drawn.length > 0 && tarotState.flipped >= tarotState.drawn.length) {
-    r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 塔罗占卜</h3>';
-    r += '<p style="color:#666;">问题：' + (tarotState.question || '综合运势') + '</p>';
+    r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('塔罗占卜','Tarot Reading') + '</h3>';
+    r += '<p style="color:#666;">' + _L('问题：','Question: ') + (tarotState.question || _L('综合运势','General Fortune')) + '</p>';
     for (let i = 0; i < tarotState.drawn.length; i++) {
       const card = tarotState.drawn[i];
-      const posLabel = tarotState.spread === 'three' ? ['过去','现在','未来'][i] : '指引';
-      r += '<p><strong>' + posLabel + '：' + card.name + '</strong>' + (card.isReversed ? '（逆位）' : '') + '<br>';
+      const posLabel = tarotState.spread === 'three' ? [_L('过去','Past'),_L('现在','Present'),_L('未来','Future')][i] : _L('指引','Guidance');
+      r += '<p><strong>' + posLabel + '：' + card.name + '</strong>' + (card.isReversed ? '（' + _L('逆位','Reversed') + '）' : '') + '<br>';
       r += (card.isReversed ? (card.rev || card.up) : card.up) + '</p>';
     }
   }
 
   // ═══ Tab 7: Deep Consultation (if there's a current result) ═══
   if (window._consultResult) {
-    r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 深度咨询</h3>';
+    r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('深度咨询','Deep Consultation') + '</h3>';
     r += window._consultResult;
   }
 
   // ═══ Planet data table ═══
-  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ 星盘数据</h3>';
+  r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('星盘数据','Chart Data') + '</h3>';
   r += '<table style="width:100%;border-collapse:collapse;font-size:0.85em;">';
   r += '<tr style="background:#eee;"><th>' + _t('table.planet') + '</th><th>' + _t('table.position') + '</th><th>' + _t('table.house') + '</th><th>' + _t('table.element') + '</th><th>' + _t('table.mode') + '</th></tr>';
   for (const p of PLANETS) {
     const lon = d.positions[p.id];
     const {si, d:dd, m} = degToSign(lon);
     const h = d.houses[p.id] || '?';
-    r += '<tr><td>' + p.name + '</td><td>' + getSignNamePure(si) + ' ' + dd + '°' + String(m).padStart(2,'0') + '′</td><td>第' + h + '宫</td><td>' + ELEMENTS[si] + '</td><td>' + MODES[si] + '</td></tr>';
+    r += '<tr><td>' + p.name + '</td><td>' + getSignNamePure(si) + ' ' + dd + '°' + String(m).padStart(2,'0') + '′</td><td>' + _L('第','House ') + h + _L('宫','') + '</td><td>' + ELEMENTS[si] + '</td><td>' + MODES[si] + '</td></tr>';
   }
   r += '</table>';
 
   // Disclaimer
-  r += '<p style="text-align:center;color:#999;font-size:0.8em;margin-top:30px;">星辰不为任何人改写轨迹，星盘也从不替你掌舵。<br>本报告仅供自我觉察与灵性探索之参考。</p>';
+  r += '<p style="text-align:center;color:#999;font-size:0.8em;margin-top:30px;">' + _L('星辰不为任何人改写轨迹，星盘也从不替你掌舵。<br>本报告仅供自我觉察与灵性探索之参考。','The stars do not rewrite their course for anyone, nor does the birth chart steer your ship.<br>This report is for self-awareness and spiritual exploration only.') + '</p>';
 
   return r;
 }
@@ -704,7 +704,7 @@ function downloadPDFReport() {
   if (!chartData1) { alert(_t('error.fillChart')); return; }
 
   var reportContent = buildReportHTML();
-  var fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>星盘解读报告</title>';
+  var fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + _L('星盘解读报告','Birth Chart Report') + '</title>';
   fullHtml += '<style>';
   fullHtml += ':root { --accent: #8a7040; --gold: #8a7040; --gold-dim: #6a5030; --text-dim: #555; }';
   fullHtml += 'body { font-family: Georgia, "SimSun", serif; color: #222; line-height: 1.8; max-width: 750px; margin: 0 auto; padding: 30px; }';
@@ -732,7 +732,7 @@ function downloadPDFReport() {
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url;
-  a.download = '星盘解读报告_' + new Date().toISOString().slice(0,10) + '.html';
+  a.download = _L('星盘解读报告','Birth_Chart_Report') + '_' + new Date().toISOString().slice(0,10) + '.html';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -813,7 +813,7 @@ function copyMobileReport() {
     navigator.clipboard.writeText(text).then(function() {
       var msg = document.getElementById('emailMsg');
       msg.style.display = 'block'; msg.style.color = '#7ab87a';
-      msg.textContent = '✓ 手机版报告已复制到剪贴板，直接粘贴到微信/QQ即可';
+      msg.textContent = _L('✓ 手机版报告已复制到剪贴板，直接粘贴到微信/QQ即可','✓ Mobile report copied to clipboard — paste directly into chat apps');
       setTimeout(function() { msg.style.display = 'none'; }, 3000);
     }).catch(function() {
       alert(_t('error.copyFailed'));
@@ -826,7 +826,7 @@ function copyMobileReport() {
     document.execCommand('copy'); document.body.removeChild(ta);
     var msg = document.getElementById('emailMsg');
     msg.style.display = 'block'; msg.style.color = '#7ab87a';
-    msg.textContent = '✓ 手机版报告已复制到剪贴板';
+    msg.textContent = _L('✓ 手机版报告已复制到剪贴板','✓ Mobile report copied to clipboard');
     setTimeout(function() { msg.style.display = 'none'; }, 3000);
   }
 }
@@ -876,8 +876,8 @@ function htmlToMobileText(html) {
   // Step 6: Add mobile header
   var now = new Date();
   var header = '━━━━━━━━━━━━━━━━━━━━\n' +
-    '  🔮 LunarVeilAstro · 星盘报告\n' +
-    '  ' + now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日\n' +
+    '  🔮 LunarVeilAstro · ' + _L('星盘报告','Birth Chart Report') + '\n' +
+    '  ' + now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate() + '\n' +
     '━━━━━━━━━━━━━━━━━━━━';
 
   return header + '\n' + out.join('\n');
