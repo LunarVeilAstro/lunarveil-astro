@@ -105,7 +105,7 @@
   add('lodge.title', '🔮 灵 性 驿 站', '🔮 Spiritual Lodge');
   add('lodge.intro', '无需填写星盘，打开即玩 · 每天回来都有新的启示', 'No chart needed — open and play · New insights every day');
   add('lodge.bannerTitle', '福运方位 · 罗盘指路', 'Fortune Compass · Find Your Direction');
-  add('lodge.bannerDesc', '择一领域，让星盘指向你的幸运方向', 'Pick a domain, let the stars guide your fortune');
+  add('lodge.bannerDesc', '择一领域，罗盘指路 · 已算星盘者基于本命盘加权计算', 'Pick a domain · linked to your birth chart for personalized results');
   add('lodge.answerBook', '答案之书', 'Book of Answers');
   add('lodge.answerBookDesc', '默念问题，翻开一页寻找答案', 'Ask a question, turn the page for your answer');
   add('lodge.magic8', '魔法八球', 'Magic 8-Ball');
