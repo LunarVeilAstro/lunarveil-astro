@@ -1578,12 +1578,12 @@ header .subtitle {
   .lodge-item .lodge-icon { font-size: 1.7em; margin-bottom: 6px; }
   .lodge-item .lodge-name { font-size: 0.85em; }
   .lodge-item .lodge-desc { font-size: 0.7em; }
-  .lodge-banner { flex-direction: column; gap: 8px; padding: 14px 16px; text-align: center; }
-  .lodge-banner-text { text-align: center; }
-  .lodge-banner-icon { font-size: 2em; }
+  .lodge-banner { flex-direction: column; gap: 8px; padding: 14px 16px; text-align: center; align-items: stretch; }
+  .lodge-banner-text { text-align: center; width: 100%; }
+  .lodge-banner-icon { font-size: 2em; text-align: center; }
   .lodge-banner-title { font-size: 0.95em; }
   .lodge-banner-desc { font-size: 0.78em; }
-  .lodge-banner-badge { margin-left: auto; margin-right: auto; }
+  .lodge-banner-badge { display: table; margin-left: auto; margin-right: auto; }
 
   /* Social float — smaller, less intrusive */
   .social-float { right: -2px; gap: 2px; }
@@ -1702,8 +1702,8 @@ header .subtitle {
   .lodge-item .lodge-icon { font-size: 1.5em; }
   .lodge-item .lodge-name { font-size: 0.8em; }
   .lodge-item .lodge-desc { font-size: 0.66em; }
-  .lodge-banner { padding: 12px 14px; border-radius: 10px; }
-  .lodge-banner-text { text-align: center; }
+  .lodge-banner { padding: 12px 14px; border-radius: 10px; align-items: stretch; }
+  .lodge-banner-text { text-align: center; width: 100%; }
 
   /* Form */
   .form-group label { font-size: 0.74em; }
