@@ -577,52 +577,57 @@ header .subtitle {
 
 /* Astrological glyphs */
 .side-glyph {
-  position: absolute; color: rgba(210,190,160,0.20);
-  font-size: 2.2em; animation: glyphFloat 8s ease-in-out infinite;
-  text-shadow: 0 0 8px rgba(200,170,130,0.15);
+  position: absolute; font-size: 2.2em;
+  font-family: 'Cormorant Garamond', 'Segoe UI Symbol', serif;
+  font-variant-emoji: text;
+  animation: glyphFloat 8s ease-in-out infinite;
+  -webkit-text-stroke: 0.8px rgba(200,165,110,0.50);
+  text-shadow:
+    0 0 4px rgba(200,165,110,0.30),
+    0 0 10px rgba(200,165,110,0.15);
 }
-.side-glyph.g1 { top: 8%;  left: 15%; animation-delay: 0s; font-size: 2.6em; }
-.side-glyph.g2 { top: 19%; left: 55%; animation-delay: -1.5s; font-size: 1.8em; }
-.side-glyph.g3 { top: 30%; left: 20%; animation-delay: -3s; font-size: 2.4em; }
-.side-glyph.g4 { top: 42%; left: 60%; animation-delay: -4.5s; font-size: 1.9em; }
-.side-glyph.g5 { top: 53%; left: 25%; animation-delay: -6s; font-size: 2.2em; }
-.side-glyph.g6 { top: 64%; left: 50%; animation-delay: -2s; font-size: 2.0em; }
-.side-glyph.g7 { top: 75%; left: 18%; animation-delay: -5s; font-size: 2.5em; }
-.side-glyph.g8 { top: 85%; left: 55%; animation-delay: -3.5s; font-size: 1.7em; }
-.side-glyph.g9 { top: 93%; left: 30%; animation-delay: -7s; font-size: 2.3em; }
+/* positions */
+.side-glyph.g1  { top: 6%;  left: 18%; animation-delay: 0s; font-size: 2.4em; }
+.side-glyph.g2  { top: 13%; left: 52%; animation-delay: -1.2s; font-size: 1.7em; }
+.side-glyph.g3  { top: 20%; left: 22%; animation-delay: -2.4s; font-size: 2.2em; }
+.side-glyph.g4  { top: 27%; left: 58%; animation-delay: -3.6s; font-size: 1.8em; }
+.side-glyph.g5  { top: 34%; left: 15%; animation-delay: -4.8s; font-size: 2.1em; }
+.side-glyph.g6  { top: 41%; left: 50%; animation-delay: -0.6s; font-size: 1.9em; }
+.side-glyph.g7  { top: 48%; left: 25%; animation-delay: -5.4s; font-size: 2.3em; }
+.side-glyph.g8  { top: 55%; left: 55%; animation-delay: -3.0s; font-size: 1.6em; }
+.side-glyph.g9  { top: 62%; left: 20%; animation-delay: -6.6s; font-size: 2.0em; }
+.side-glyph.g10 { top: 69%; left: 48%; animation-delay: -1.8s; font-size: 1.8em; }
+.side-glyph.g11 { top: 76%; left: 28%; animation-delay: -4.2s; font-size: 2.2em; }
+.side-glyph.g12 { top: 83%; left: 52%; animation-delay: -7.0s; font-size: 1.5em; }
+.side-glyph.g13 { top: 88%; left: 18%; animation-delay: -2.8s; font-size: 1.9em; }
+.side-glyph.g14 { top: 93%; left: 45%; animation-delay: -5.8s; font-size: 1.7em; }
+.side-glyph.g15 { top: 97%; left: 32%; animation-delay: -0.9s; font-size: 1.6em; }
+
+/* Color palette — gold / purple / blue / rose gradient distributed across glyphs */
+.side-glyph.g1, .side-glyph.g2, .side-glyph.g3, .side-glyph.g4, .side-glyph.g5,
+.side-glyph.g6, .side-glyph.g7, .side-glyph.g8, .side-glyph.g9, .side-glyph.g10,
+.side-glyph.g11, .side-glyph.g12, .side-glyph.g13, .side-glyph.g14, .side-glyph.g15 {
+  color: rgba(220,195,150,0.38);
+}
+
 @keyframes glyphFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.16; }
-  33%  { opacity: 0.28; }
-  66%  { opacity: 0.10; }
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.22; }
+  33%  { opacity: 0.40; }
+  66%  { opacity: 0.14; }
 }
 
-/* Small twinkling stars */
-.side-star {
-  position: absolute; border-radius: 50%;
-  background: rgba(220,205,170,0.35);
-  box-shadow: 0 0 4px rgba(200,170,130,0.3);
-  animation: sideStarTwinkle 3s ease-in-out infinite;
-}
-.side-star.s1 { width: 4px; height: 4px; top: 12%; left: 40%; animation-delay: 0s; }
-.side-star.s2 { width: 3px; height: 3px; top: 27%; left: 70%; animation-delay: -0.8s; }
-.side-star.s3 { width: 5px; height: 5px; top: 48%; left: 15%; animation-delay: -1.6s; }
-.side-star.s4 { width: 3px; height: 3px; top: 66%; left: 65%; animation-delay: -2.4s; }
-.side-star.s5 { width: 4px; height: 4px; top: 82%; left: 35%; animation-delay: -0.4s; }
-@keyframes sideStarTwinkle {
-  0%, 100% { opacity: 0.2; transform: scale(1); }
-  50%  { opacity: 0.7; transform: scale(2.0); }
-}
-
-/* Gold vertical accent line */
+/* Gold vertical accent lines */
 .side-line {
-  position: absolute; top: 5%; left: 88%;
+  position: absolute; top: 5%;
   width: 1px; height: 90%;
   background: linear-gradient(180deg,
-    transparent 0%, rgba(200,165,110,0.15) 8%,
-    rgba(200,165,110,0.28) 25%, rgba(180,150,100,0.12) 45%,
-    rgba(200,165,110,0.30) 65%, rgba(180,150,100,0.14) 80%,
+    transparent 0%, rgba(200,165,110,0.12) 8%,
+    rgba(200,165,110,0.22) 25%, rgba(180,150,100,0.10) 45%,
+    rgba(200,165,110,0.25) 65%, rgba(180,150,100,0.12) 80%,
     transparent 100%);
 }
+.side-left .side-line { left: auto; right: 6px; }
+.side-right .side-line { left: 6px; right: auto; }
 
 @media (max-width: 1100px) {
   .side-decor { display: none; }
