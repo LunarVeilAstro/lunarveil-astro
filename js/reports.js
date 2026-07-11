@@ -1167,7 +1167,7 @@ function generateGuidance(positions, houses, asc) {
   html += isEn ? wisdomPool_EN[Math.floor(Math.random() * wisdomPool_EN.length)] : wisdomPool_ZH[Math.floor(Math.random() * wisdomPool_ZH.length)];
   html += '</p>';
 
-  html += '<p style="color:var(--text-dim);margin-top:16px;">' + _L('※ 星盘是指南针，不是判决书。你所拥有的自由意志，才是最强大的行星。', '※ Your chart is a compass, not a verdict. The free will you possess is the most powerful planet of all.') + '</p>';
+  html += '<p style="color:var(--text-dim);margin-top:16px;">' + _L('※ 星盘是指南针，不是绝对。你所拥有的自由意志，才是最强大的行星。', '※ Your chart is a compass, not a verdict. The free will you possess is the most powerful planet of all.') + '</p>';
   html += '</div>';
 
   return html;
