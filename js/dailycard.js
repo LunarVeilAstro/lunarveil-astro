@@ -1,18 +1,21 @@
 // dailycard.js — Today's Astrology Overview Card (zero-input quick glance)
 (function () {
+  var SIGN_NAMES_ZH = ['白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座','水瓶座','双鱼座'];
+  var SIGN_NAMES_EN = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+  var SIGN_EMOJI = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
   var moonVibes_ZH = [
-    '今天适合想到就做——犹豫只会把冲动变成遗憾',       // 白羊
-    '今天适合慢慢来——吃顿好的，摸摸植物，世界不会跑掉',  // 金牛
-    '今天适合聊天、发圈、见人——你的表达欲值得被世界听见',  // 双子
-    '今天适合宅着、翻旧照片、给家人发个消息——温柔就是你的超能力', // 巨蟹
-    '今天适合闪闪发光——穿得好看、大方夸人、主动做个决定',   // 狮子
-    '今天适合整理、收纳、划掉清单上第一项——清爽的环境带来清爽的心情', // 处女
-    '今天适合约人喝杯咖啡、换身搭配、对镜子笑一下——好看的一天从好看的心情开始', // 天秤
-    '今天适合一个人沉浸式看剧、删掉不联系的好友、给自己一小时免打扰', // 天蝎
-    '今天适合搜个目的地、吃个没吃过的东西、对陌生人笑一下——出发就是意义', // 射手
-    '今天适合做计划、提前十分钟到、完成一件拖延的小事——踏实是最好的安全感', // 摩羯
-    '今天适合换个头像、尝试奇怪组合、一个人逛逛——你的独特不需要解释',  // 水瓶
-    '今天适合睡午觉、听纯音乐、给自己买支花——生活需要一点无用的美好'   // 双鱼
+    '今天适合想到就做——犹豫只会把冲动变成遗憾',
+    '今天适合慢慢来——吃顿好的，摸摸植物，世界不会跑掉',
+    '今天适合聊天、发圈、见人——你的表达欲值得被世界听见',
+    '今天适合宅着、翻旧照片、给家人发个消息——温柔就是你的超能力',
+    '今天适合闪闪发光——穿得好看、大方夸人、主动做个决定',
+    '今天适合整理、收纳、划掉清单上第一项——清爽的环境带来清爽的心情',
+    '今天适合约人喝杯咖啡、换身搭配、对镜子笑一下——好看的一天从好看的心情开始',
+    '今天适合一个人沉浸式看剧、删掉不联系的好友、给自己一小时免打扰',
+    '今天适合搜个目的地、吃个没吃过的东西、对陌生人笑一下——出发就是意义',
+    '今天适合做计划、提前十分钟到、完成一件拖延的小事——踏实是最好的安全感',
+    '今天适合换个头像、尝试奇怪组合、一个人逛逛——你的独特不需要解释',
+    '今天适合睡午觉、听纯音乐、给自己买支花——生活需要一点无用的美好'
   ];
   var moonVibes_EN = [
     "Do it now — hesitation is the only thing between you and a great idea",
@@ -28,57 +31,72 @@
     "Change your avatar, try a weird combo, browse alone — your uniqueness needs no explanation",
     "Take a nap, listen to instrumental music, buy yourself a flower — life needs a touch of useless beauty"
   ];
-  var moonEmoji = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+
+  function isEn() {
+    return window._lang && typeof window._lang === 'function' && window._lang() === 'en';
+  }
 
   function renderDailyCard() {
-    var now = new Date();
-    var jd = julianDay(now.getFullYear(), now.getMonth() + 1, now.getDate(),
-      now.getHours() + now.getMinutes() / 60);
-    var T = centuriesSinceJ2000(jd);
-    var moonLon = calcAllPlanets(T).Moon;
-    var si = Math.floor(mod360(moonLon) / 30) % 12;
+    try {
+      var container = document.getElementById('dailyCard');
+      if (!container) return;
 
-    var isEn = window._lang && window._lang() === 'en';
-    var vibe = isEn ? moonVibes_EN[si] : moonVibes_ZH[si];
-    var sep = isEn ? ' — ' : '——';
-    var parts = vibe.split(sep);
-    var action = parts[0];
-    var explain = parts.slice(1).join(sep);
-    var signName = isEn
-      ? ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'][si]
-      : SIGN_PURE[si];
-    var month = now.getMonth() + 1;
-    var day = now.getDate();
-    var dateStr = isEn
-      ? (['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][now.getMonth()] + ' ' + day)
-      : (month + '月' + day + '日');
+      var now = new Date();
+      var jd, T, moonLon, si;
+      try {
+        jd = julianDay(now.getFullYear(), now.getMonth() + 1, now.getDate(),
+          now.getHours() + now.getMinutes() / 60);
+        T = centuriesSinceJ2000(jd);
+        moonLon = calcAllPlanets(T).Moon;
+        si = Math.floor(mod360(moonLon) / 30) % 12;
+      } catch (e) {
+        // Fallback: use a simple hash of today's date
+        si = (now.getFullYear() * 397 + (now.getMonth() + 1) * 43 + now.getDate()) % 12;
+      }
 
-    var html = '';
-    html += '<div class="daily-card">';
-    html += '<div class="daily-moon">🌙</div>';
-    html += '<div class="daily-text">';
-    html += '<div class="daily-title">✨ ' + _L('今日星象','Today\'s Stars') + ' · ' + dateStr + ' ✨</div>';
-    html += '<div class="daily-vibe"><span class="daily-do">' + action + '</span><br><span class="daily-explain">' + explain + '</span></div>';
-    html += '</div>';
-    html += '<div class="daily-sign-badge">' + moonEmoji[si] + ' ' + signName + '</div>';
-    html += '</div>';
+      var en = isEn();
+      var vibe = en ? moonVibes_EN[si] : moonVibes_ZH[si];
+      var sep = en ? ' — ' : '——';
+      var parts = vibe.split(sep);
+      var action = parts[0];
+      var explain = parts.slice(1).join(sep);
+      var signName = en ? SIGN_NAMES_EN[si] : SIGN_NAMES_ZH[si];
+      var month = now.getMonth() + 1;
+      var day = now.getDate();
+      var dateStr = en
+        ? (['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][now.getMonth()] + ' ' + day)
+        : (month + '月' + day + '日');
 
-    var container = document.getElementById('dailyCard');
-    if (container) container.innerHTML = html;
+      var html = '';
+      html += '<div class="daily-card">';
+      html += '<div class="daily-moon">🌙</div>';
+      html += '<div class="daily-text">';
+      html += '<div class="daily-title">✨ ' + (en ? "Today's Stars" : '今日星象') + ' · ' + dateStr + ' ✨</div>';
+      html += '<div class="daily-vibe"><span class="daily-do">' + action + '</span><br><span class="daily-explain">' + explain + '</span></div>';
+      html += '</div>';
+      html += '<div class="daily-sign-badge">' + SIGN_EMOJI[si] + ' ' + signName + '</div>';
+      html += '</div>';
+
+      container.innerHTML = html;
+    } catch (e) {
+      // Silent fail — card will remain hidden
+    }
   }
 
   window._renderDailyCard = renderDailyCard;
 
-  // Render after DOM ready (after i18n restores language preference)
   function init() {
     renderDailyCard();
-    // Re-render on manual language switch
+    // Re-render on language switch
     var _origSetLang = window.setLanguage;
-    window.setLanguage = function(lang) {
-      _origSetLang(lang);
-      renderDailyCard();
-    };
+    if (_origSetLang) {
+      window.setLanguage = function(lang) {
+        _origSetLang(lang);
+        renderDailyCard();
+      };
+    }
   }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
