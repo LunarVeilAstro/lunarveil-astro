@@ -78,7 +78,12 @@ function openFortuneDirection() {
   updateCompassBadge();
   var html = '<h3>' + _t('compass.title') + '</h3>';
   var catSubs = _t('compass.subs');
-  html += '<p style="text-align:center;color:var(--text-dim);font-size:0.92em;margin-bottom:16px;letter-spacing:0.06em;">' + _t('compass.prompt') + '</p>';
+  html += '<p style="text-align:center;color:var(--text-dim);font-size:0.92em;margin-bottom:6px;letter-spacing:0.06em;">' + _t('compass.prompt') + '</p>';
+  html += '<p style="text-align:center;color:rgba(200,165,110,0.55);font-size:0.76em;margin-bottom:16px;letter-spacing:0.04em;">' +
+    (chartData1
+      ? _L('✦ 已关联你的星盘——方位基于本命盘加权计算','✦ Linked to your birth chart — directions are weighted by your natal placements')
+      : _L('✦ 填写出生信息计算星盘后，罗盘会更精准——与你的本命盘联动','✦ Enter your birth info for a personalized reading — this compass links to your chart'))
+    + '</p>';
   html += '<div class="category-btns">';
   for (var i=0;i<4;i++) {
     // TEST MODE: skip used check
