@@ -794,6 +794,50 @@ header .subtitle {
 .consult-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .consult-result { margin-top: 20px; }
+
+/* About Page (Tab 8) */
+.about-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 10px;
+}
+.about-heading {
+  text-align: center;
+  color: var(--accent);
+  font-size: 1.4em;
+  letter-spacing: 0.08em;
+  margin-bottom: 32px;
+  font-family: "ZCOOL XiaoWei","Noto Serif SC",serif;
+}
+.about-content { line-height: 2; }
+.about-p {
+  color: var(--text);
+  font-size: 0.95em;
+  margin-bottom: 12px;
+  letter-spacing: 0.03em;
+  text-indent: 2em;
+}
+.about-break { margin-top: 24px; }
+.about-first { text-indent: 0; }
+.about-closing-line {
+  text-align: center;
+  font-size: 1.05em;
+  font-weight: bold;
+  color: var(--accent);
+  margin-top: 32px;
+  letter-spacing: 0.06em;
+  text-indent: 0;
+}
+.about-signature {
+  text-align: right;
+  color: var(--text-dim);
+  font-size: 0.85em;
+  margin-top: 20px;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  text-indent: 0;
+}
+
 .consult-domain-badge {
   display: inline-block; padding: 4px 14px; border-radius: 12px;
   font-size: 0.8em; background: rgba(180,150,100,0.15);
@@ -1059,6 +1103,12 @@ header .subtitle {
   .footer-contact { gap: 8px; padding: 14px 8px; }
   .footer-contact .fc-item { padding: 7px 12px; font-size: 0.72em; }
   .footer-contact .fc-cta { font-size: 0.68em !important; }
+
+  .about-page { padding: 16px 6px; }
+  .about-heading { font-size: 1.2em; margin-bottom: 24px; }
+  .about-p { font-size: 0.88em; text-indent: 2em; }
+  .about-closing-line { font-size: 0.95em; }
+  .about-signature { font-size: 0.78em; }
 }
 
 /* ── 灵性驿站 (Mini Games Lodge) ─────────────────────────────────────── */
@@ -1747,6 +1797,13 @@ header .subtitle {
 
   /* Tabs */
   .tab { font-size: 0.68em; padding: 8px 4px; min-width: 44px; }
+
+  /* About page */
+  .about-page { padding: 12px 4px; }
+  .about-heading { font-size: 1.1em; margin-bottom: 20px; }
+  .about-p { font-size: 0.82em; text-indent: 2em; margin-bottom: 10px; }
+  .about-closing-line { font-size: 0.9em; margin-top: 24px; }
+  .about-signature { font-size: 0.72em; margin-top: 14px; }
 
   /* Social float — hide on very small screens (users can scroll to footer) */
   .social-float { display: none; }

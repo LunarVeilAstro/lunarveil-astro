@@ -571,6 +571,23 @@ function renderTab7() {
   } catch(e) { document.getElementById('tab7').innerHTML = '<p style=\"color:#c87070;padding:20px;\">' + _t('error.render') + e.message + '</p>'; console.error(e); }
 }
 
+// ── Tab 8: About / Brand Story ─────────────────────────────────────────────
+function renderTab8() {
+  var aboutHTML = '<div class="about-page">';
+  aboutHTML += '<h2 class="about-heading">' + _t('about.heading') + '</h2>';
+  aboutHTML += '<div class="about-content">';
+  aboutHTML += '<p class="about-p about-first">' + _t('about.p1') + '</p>';
+  aboutHTML += '<p class="about-p about-break">' + _t('about.p2') + '</p>';
+  aboutHTML += '<p class="about-p">' + _t('about.p3') + '</p>';
+  aboutHTML += '<p class="about-p about-break">' + _t('about.p4') + '</p>';
+  aboutHTML += '<p class="about-p">' + _t('about.p5') + '</p>';
+  aboutHTML += '<p class="about-p about-break">' + _t('about.p6') + '</p>';
+  aboutHTML += '<p class="about-p about-closing-line">' + _t('about.p7') + '</p>';
+  aboutHTML += '<p class="about-signature">' + _t('about.closing') + '</p>';
+  aboutHTML += '</div></div>';
+  document.getElementById('tab8').innerHTML = aboutHTML;
+}
+
 // Global submit handler for consultation
 
 // ── Tab Switching ─────────────────────────────────────────────────────────
@@ -581,9 +598,11 @@ function switchTab(idx) {
   document.querySelectorAll('.tab-content').forEach((c, i) => {
     c.classList.toggle('active', i === idx);
   });
-  // Re-render on switch to ensure content is fresh (except tarot which is standalone)
+  // Re-render on switch to ensure content is fresh
   if (idx === 4) {
     renderTab4();
+  } else if (idx === 8) {
+    renderTab8();
   } else if (chartData1) {
     [renderTab0, renderTab1, renderTab2, renderTab3, null, renderTab5, renderTab6, renderTab7][idx]();
   }
