@@ -663,6 +663,21 @@ function collapseInputCard() {
       btn.style.display = window.scrollY > 400 ? 'block' : 'none';
     }
   });
+
+  // Repaint lodge grid when it enters viewport — fixes Chrome mobile GPU
+  // compositing bug where grid items after the first 2 render as blank
+  var lodgeGrid = document.querySelector('.lodge-grid');
+  if (lodgeGrid && window.IntersectionObserver) {
+    var observer = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        lodgeGrid.style.transform = 'translate3d(0, 0, 0.001px)';
+        requestAnimationFrame(function() {
+          lodgeGrid.style.transform = 'translate3d(0, 0, 0)';
+        });
+      }
+    });
+    observer.observe(lodgeGrid);
+  }
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════
