@@ -657,24 +657,11 @@ function collapseInputCard() {
 
 // ── Back to Top visibility ────────────────────────────────────────────────
 (function() {
-  var scrollTimer;
   window.addEventListener('scroll', function() {
     const btn = document.getElementById('btnBackTop');
     if (btn) {
       btn.style.display = window.scrollY > 400 ? 'block' : 'none';
     }
-    // Force repaint of lodge grid after scroll stops — fixes mobile Safari
-    // compositing bug where grid items disappear
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(function() {
-      var grid = document.querySelector('.lodge-grid');
-      if (grid) {
-        grid.style.transform = 'scale(0.9999)';
-        requestAnimationFrame(function() {
-          grid.style.transform = '';
-        });
-      }
-    }, 150);
   });
 })();
 
