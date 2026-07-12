@@ -1125,10 +1125,12 @@ header .subtitle {
 
 /* ── 灵性驿站 (Mini Games Lodge) ─────────────────────────────────────── */
 .lodge-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-  transform: translate3d(0, 0, 0);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
 }
 .lodge-item {
+  flex: 0 0 calc((100% - 42px) / 4);
   background: rgba(15,15,30,0.7); border: 1px solid var(--border);
   border-radius: 12px; padding: 20px 14px; text-align: center;
   cursor: pointer; transition: all 0.3s; position: relative;
@@ -1147,11 +1149,8 @@ header .subtitle {
 }
 .lodge-badge.used { background: rgba(120,120,120,0.1); color: #666; }
 
-/* Daily row — centered pair: 每日一签 at col 2, 今日人品 at col 3 */
-.lodge-daily { grid-column: span 1; }
-.lodge-grid .lodge-daily:nth-of-type(5) { grid-column: 2; }
-.lodge-grid .lodge-daily:nth-of-type(6) { grid-column: 3; }
-.lodge-grid .lodge-daily:nth-of-type(7) { grid-column: 3; }
+/* Center items 5-6 in last row — push item 5 to column 2 */
+.lodge-daily:nth-of-type(5) { margin-left: calc((100% - 42px) / 4 + 14px); }
 .lodge-daily .lodge-icon { font-size: 2.4em; }
 
 /* ── 灵性驿站 · 星盘联动提示 ────────────────────────────────────── */
@@ -1664,10 +1663,9 @@ header .subtitle {
   .person-section { flex-direction: column; gap: 12px; }
 
   /* Lodge grid — 2 columns */
-  .lodge-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .lodge-grid .lodge-daily:nth-of-type(5) { grid-column: span 1; }
-  .lodge-grid .lodge-daily:nth-of-type(6) { grid-column: span 1; }
-  .lodge-grid .lodge-daily:nth-of-type(7) { grid-column: span 1; }
+  .lodge-grid { gap: 10px; }
+  .lodge-item { flex: 0 0 calc((100% - 10px) / 2); }
+  .lodge-daily:nth-of-type(5) { margin-left: 0; }
   .lodge-item { padding: 14px 10px; }
   .lodge-item .lodge-icon { font-size: 1.7em; margin-bottom: 6px; }
   .lodge-item .lodge-name { font-size: 0.85em; }
@@ -1795,8 +1793,9 @@ header .subtitle {
   /* Header crystal ball — smaller */
   .crystal-ball-header { width: 120px; height: 120px; margin-top: 12px; }
 
-  /* Lodge — single column grid */
-  .lodge-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  /* Lodge — 2 columns */
+  .lodge-grid { gap: 8px; }
+  .lodge-item { flex: 0 0 calc((100% - 8px) / 2); }
   .lodge-item { padding: 12px 8px; border-radius: 10px; }
   .lodge-item .lodge-icon { font-size: 1.5em; }
   .lodge-item .lodge-name { font-size: 0.8em; }
