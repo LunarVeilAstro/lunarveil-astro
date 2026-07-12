@@ -298,7 +298,7 @@ function calculateAll() {
 
       var hint = document.getElementById('lodgeChartHint');
           if (hint) {
-            hint.textContent = _t('lodge.chartHintLinked');
+            hint.innerHTML = _t('lodge.chartHintLinked');
             hint.classList.add('linked');
           }
 
