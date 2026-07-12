@@ -1,16 +1,12 @@
 // ui.js — Error trap, formatting, geocoding, tab rendering, export
 // Global state: chartData1, chartData2
 // Depends on: ALL other modules (loaded last)
-// ── Early error trap: catch all errors and show them on page ────────────
-var _earlyErrors = [];
+// ── Error trap: log to console only, not visible to visitors ────────────
 window.onerror = function(msg, url, line, col, err) {
-  _earlyErrors.push({msg:String(msg),line:line,col:col});
-  var el = document.getElementById('errorLog');
-  if (el) el.innerHTML = _earlyErrors.map(function(e){return '<div style="color:#f66;font-size:0.7em;">JS Error line '+e.line+': '+e.msg+'</div>';}).join('');
+  console.error('JS Error line ' + line + ': ' + msg, err || '');
 };
 window.addEventListener('unhandledrejection', function(e) {
-  var el = document.getElementById('errorLog');
-  if (el) el.innerHTML += '<div style="color:#f66;font-size:0.7em;">Promise Error: ' + String(e.reason) + '</div>';
+  console.error('Promise Error: ' + String(e.reason));
 });
 
 

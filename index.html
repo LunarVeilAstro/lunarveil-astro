@@ -400,15 +400,5 @@ try {
 })();
 </script>
 
-<!-- Inline error log for debugging — hidden in production -->
-<div id="errorLog" style="position:fixed;bottom:0;left:0;right:0;background:rgba(40,0,0,0.95);color:#f88;font-size:0.65em;padding:6px 12px;z-index:99999;display:none;max-height:120px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;"></div>
-<script>
-(function(){
-  if (_earlyErrors.length > 0) {
-    var el = document.getElementById('errorLog');
-    if (el) { el.style.display = 'block'; }
-  }
-})();
-</script>
 </body>
 </html>

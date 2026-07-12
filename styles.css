@@ -1126,14 +1126,11 @@ header .subtitle {
 /* ── 灵性驿站 (Mini Games Lodge) ─────────────────────────────────────── */
 .lodge-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-  transform: translateZ(0);
-  backface-visibility: hidden;
 }
 .lodge-item {
   background: rgba(15,15,30,0.7); border: 1px solid var(--border);
   border-radius: 12px; padding: 20px 14px; text-align: center;
   cursor: pointer; transition: all 0.3s; position: relative;
-  transform: translateZ(0);
 }
 .lodge-item:hover {
   border-color: var(--gold-dim); transform: translateY(-4px);
