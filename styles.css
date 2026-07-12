@@ -22,7 +22,6 @@ body {
   font-family: 'Cormorant Garamond', 'Georgia', 'Noto Serif SC', 'STSong', 'Microsoft YaHei', 'PingFang SC', serif;
   min-height: 100vh;
   overflow-x: hidden;
-  overflow-x: clip;
 }
 
 h1, h2, h3, h4, .subtitle, .tab, .fortune-sub-tab, .highlight, .step-label, .card h3, .direction-card h4 {
@@ -164,6 +163,10 @@ header .subtitle {
 .geo-status.success { color: #6a9a6a; }
 .geo-status.error { color: #c87070; }
 .geo-status.loading { color: var(--gold-dim); }
+
+.date-hint {
+  display: block; font-size: 0.7em; color: #6a6a80; margin-top: 3px; letter-spacing: 0.03em;
+}
 .geo-btn {
   padding: 10px 16px; font-size: 0.9em; font-family: inherit;
   background: var(--purple); color: var(--accent);
@@ -1147,17 +1150,19 @@ header .subtitle {
 /* ── 灵性驿站 · 星盘联动提示 ────────────────────────────────────── */
 .lodge-chart-hint {
   text-align: center;
-  color: var(--text-dim);
+  color: var(--gold);
+  font-weight: bold;
   font-size: 0.78em;
   margin-top: 16px;
   padding: 8px 16px;
-  border-top: 1px solid var(--border);
-  opacity: 0.85;
+  border-top: 1px solid var(--gold-dim);
+  opacity: 1;
   transition: color 0.4s, border-color 0.4s;
 }
 .lodge-chart-hint.linked {
-  color: var(--accent);
-  border-top-color: rgba(200,160,100,0.35);
+  color: var(--gold);
+  font-weight: bold;
+  border-top-color: rgba(200,160,100,0.5);
 }
 
 /* ── 今日星象速览卡片 ──────────────────────────────────────────── */

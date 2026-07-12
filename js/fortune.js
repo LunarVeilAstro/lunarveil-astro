@@ -144,8 +144,8 @@ function generateFortuneAnnotation() {
   const hName = getHouseName(house);
 
   return (isEn
-    ? '<div class="fortune-annotation" style="margin-top:12px;padding:10px 14px;background:rgba(201,169,110,0.08);border-left:3px solid var(--gold);border-radius:4px;font-size:0.82em;color:var(--accent);line-height:1.6;">✨ Chart-Specific Insight: Transiting ' + transitName + ' is forming a ' + aspectName + ' with your ' + insight.nt.nameEN + ' — this fortune slip applies especially to your ' + hName + '. ' + sunSign + ', today is for quiet inner reflection — follow the stars\' guidance.</div>'
-    : '<div class="fortune-annotation" style="margin-top:12px;padding:10px 14px;background:rgba(201,169,110,0.08);border-left:3px solid var(--gold);border-radius:4px;font-size:0.82em;color:var(--accent);line-height:1.6;">✨ 星盘专属解读：行运' + transitName + '正' + insight.aspectName + '你的' + insight.nt.name + '——这张签文对你的' + hName + '尤其适用。' + sunSign + '今日宜静心内观，跟随星辰指引。</div>');
+    ? '<div class="fortune-annotation" style="margin-top:12px;padding:10px 14px;background:rgba(201,169,110,0.08);border-left:3px solid var(--gold);border-radius:4px;font-size:0.82em;color:var(--accent);line-height:1.6;text-align:left;text-indent:2em;">✨ Chart-Specific Insight: Transiting ' + transitName + ' is forming a ' + aspectName + ' with your ' + insight.nt.nameEN + ' — this fortune slip applies especially to your ' + hName + '. ' + sunSign + ', today is for quiet inner reflection — follow the stars\' guidance.</div>'
+    : '<div class="fortune-annotation" style="margin-top:12px;padding:10px 14px;background:rgba(201,169,110,0.08);border-left:3px solid var(--gold);border-radius:4px;font-size:0.82em;color:var(--accent);line-height:1.6;text-align:left;text-indent:2em;">✨ 星盘专属解读：行运' + transitName + '正' + insight.aspectName + '你的' + insight.nt.name + '——这张签文对你的' + hName + '尤其适用。' + sunSign + '今日宜静心内观，跟随星辰指引。</div>');
 }
 
 // ── Badge update ──────────────────────────────────────────────────────

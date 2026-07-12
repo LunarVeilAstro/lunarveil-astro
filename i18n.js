@@ -58,6 +58,7 @@
   // ══════════════════════════════════════════════════════════════════════════
   add('label.birthdate', '出生日期', 'Birth Date');
   add('label.birthtime', '出生时间', 'Birth Time');
+  add('hint.datePicker', '💡 点击日期框左上角年份可快速切换年份', '💡 Tap the year in the top-left corner to quickly jump years');
   add('label.timezone', '时区 (UTC)', 'Timezone (UTC)');
   add('label.birthplace', '出生地点 (城市/地址)', 'Birthplace (City/Address)');
   add('label.job', '当前职业/现状（可选，用于职业天赋诊断）', 'Current Job (optional, for Career Genius)');

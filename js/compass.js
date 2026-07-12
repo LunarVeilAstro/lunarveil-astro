@@ -123,7 +123,7 @@ function selectCompassCategory(catIdx) {
   stageHtml += '<div class="compass-ring"></div>';
   // Direction marks — seal-script style with calligraphy font
   var markAngles = [0, 90, 180, 270];
-  var markNames = [_L('東','E'),_L('南','S'),_L('西','W'),_L('北','N')];
+  var markNames = [_L('东','E'),_L('南','S'),_L('西','W'),_L('北','N')];
   var markIds = ['cmN','cmE','cmS','cmW'];
   for (var mi=0; mi<4; mi++) {
     stageHtml += '<span class="compass-mark-char" id="'+markIds[mi]+'">'+markNames[mi]+'</span>';

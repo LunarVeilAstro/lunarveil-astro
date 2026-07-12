@@ -830,8 +830,8 @@ function sendReportEmail() {
   const reportContent = buildReportHTML();
   const wrappedContent = wrapReportForLightBg(reportContent);
 
-  // Try EmailJS if configured, otherwise use copy-to-clipboard + mailto
-  if (typeof emailjs !== 'undefined') {
+  // Skip EmailJS if CDN failed to load
+  if (typeof emailjs !== 'undefined' && !window._emailjsDisabled) {
     // EmailJS path — requires user to set up free account at emailjs.com
     const templateParams = {
       to_email: email,
