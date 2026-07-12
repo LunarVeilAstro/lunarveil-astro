@@ -664,29 +664,6 @@ function collapseInputCard() {
     }
   });
 
-  // Repaint lodge grid when it enters viewport — fixes Chrome mobile GPU
-  // compositing bug where grid items render as blank after staying off-screen
-  var lodgeGrid = document.querySelector('.lodge-grid');
-  if (lodgeGrid && window.IntersectionObserver) {
-    var observer = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting) {
-        // Delay to let the browser finish initial layout before repaint
-        setTimeout(function() {
-          lodgeGrid.offsetHeight; // force synchronous reflow
-          var items = lodgeGrid.querySelectorAll('.lodge-item');
-          for (var i = 0; i < items.length; i++) {
-            items[i].style.transform = 'translateZ(0)';
-          }
-          requestAnimationFrame(function() {
-            for (var i = 0; i < items.length; i++) {
-              items[i].style.transform = '';
-            }
-          });
-        }, 100);
-      }
-    });
-    observer.observe(lodgeGrid);
-  }
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════

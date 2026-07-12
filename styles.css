@@ -1124,6 +1124,9 @@ header .subtitle {
 }
 
 /* ── 灵性驿站 (Mini Games Lodge) ─────────────────────────────────────── */
+#lodgeCard {
+  transform: translateZ(0);
+}
 .lodge-grid {
   display: flex;
   flex-wrap: wrap;
