@@ -390,3 +390,231 @@ function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+//  SPECIAL DAY DETECTION — Solar Return, Saturn/Jupiter Return, Prog Moon
+// ═══════════════════════════════════════════════════════════════════════════
+
+function getCurrentJD() {
+  var now = new Date();
+  return julianDay(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours() + now.getMinutes() / 60.0);
+}
+
+function getCurrentT() {
+  return centuriesSinceJ2000(getCurrentJD());
+}
+
+// Solar Return: always show current year's SR, with birthday bonus if ±3 days
+function isSolarReturnWindow(birthM, birthD) {
+  return true; // Always compute current year solar return
+}
+
+function isBirthdayNear(birthM, birthD) {
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var birthday = new Date(now.getFullYear(), birthM - 1, birthD);
+  var diffMs = Math.abs(today - birthday);
+  return (diffMs / 86400000) <= 3;
+}
+
+// Saturn Return: transiting Saturn within 5° of natal Saturn
+function isSaturnReturn(natalSaturnLon) {
+  var T = getCurrentT();
+  var transSat = calcPlanet("Saturn", T);
+  var diff = Math.abs(transSat - natalSaturnLon);
+  if (diff > 180) diff = 360 - diff;
+  return diff <= 5;
+}
+
+// Jupiter Return: transiting Jupiter within 5° of natal Jupiter
+function isJupiterReturn(natalJupiterLon) {
+  var T = getCurrentT();
+  var transJup = calcPlanet("Jupiter", T);
+  var diff = Math.abs(transJup - natalJupiterLon);
+  if (diff > 180) diff = 360 - diff;
+  return diff <= 5;
+}
+
+// Progressed Moon within 1° of sign boundary (changing signs)
+function isProgressedMoonChangingSign(birthJd) {
+  var ageDays = getCurrentJD() - birthJd;
+  var progressedJd = birthJd + ageDays / 365.2422;
+  var progressedT = centuriesSinceJ2000(progressedJd);
+  var progMoon = calcMoon(progressedT);
+  var posInSign = progMoon % 30;
+  return posInSign <= 1 || posInSign >= 29;
+}
+
+// Get progressed moon details
+function getProgressedMoonInfo(birthJd) {
+  var ageDays = getCurrentJD() - birthJd;
+  var progressedJd = birthJd + ageDays / 365.2422;
+  var progressedT = centuriesSinceJ2000(progressedJd);
+  var progMoon = calcMoon(progressedT);
+  var si = Math.floor(progMoon / 30) % 12;
+  var d = Math.floor(progMoon % 30);
+  var m = Math.floor(((progMoon % 30) - d) * 60);
+  var nextSi = (si + 1) % 12;
+  var degInSign = progMoon % 30;
+  var degUntil = 30 - degInSign;
+  var monthsUntil = Math.round(degUntil * 1.0);
+  return { sign: si, degree: d, minute: m, nextSign: nextSi, degreesUntilBoundary: parseFloat(degUntil.toFixed(1)), monthsUntil: monthsUntil };
+}
+
+// Compute approximate Solar Return chart for current year
+function computeSolarReturnApprox(birthY, birthM, birthD, birthUtcH, natalSunLon, lat, lng) {
+  var now = new Date();
+  var srYear = now.getFullYear();
+  // Estimate: birthday in current year at same UTC time
+  var srJd = julianDay(srYear, birthM, birthD, birthUtcH);
+  var srT = centuriesSinceJ2000(srJd);
+  var srSun = calcSun(srT);
+  // Adjust by the difference so Sun matches natal Sun
+  var sunDiff = natalSunLon - srSun;
+  srJd += sunDiff / 360.0 * 365.2422;
+  srT = centuriesSinceJ2000(srJd);
+  var eps = obliquity(srT);
+  var positions = calcAllPlanets(srT);
+  var houses = calcHouses(srJd, lat, lng, eps);
+  var ascSign = Math.floor(houses.asc / 30) % 12;
+  var srSunSi = Math.floor(positions.Sun / 30) % 12;
+  var srSunHouse = assignHouses(positions, houses.cusps).Sun || 1;
+  return { jd: srJd, ascSign: ascSign, srSunSign: srSunSi, srSunHouse: srSunHouse, positions: positions, houses: houses, asc: houses.asc, mc: houses.mc };
+}
+
+// Detect all active special days, returns sorted array (most significant first)
+// Solar Return always included for current year; birthdayNear adds the 🎂 flavor
+function detectSpecialDays(birthY, birthM, birthD, birthJd, natalPositions) {
+  var days = [];
+  var nearBirthday = isBirthdayNear(birthM, birthD);
+  days.push({ type: 'solar', emoji: nearBirthday ? '🎂' : '☀️', key: nearBirthday ? 'birthday' : 'solarYearly' });
+  if (isSaturnReturn(natalPositions.Saturn)) {
+    days.push({ type: 'saturn', emoji: '🪐', key: 'saturnReturn' });
+  }
+  if (isJupiterReturn(natalPositions.Jupiter)) {
+    days.push({ type: 'jupiter', emoji: '🌟', key: 'jupiterReturn' });
+  }
+  // Always show progressed moon status alongside solar return
+  var pmChanging = isProgressedMoonChangingSign(birthJd);
+  if (pmChanging) {
+    days.push({ type: 'progMoon', emoji: '🌙', key: 'progMoonChange' });
+  } else {
+    var pmInfo = getProgressedMoonInfo(birthJd);
+    days.push({
+      type: 'progMoon', emoji: '🌙', key: 'progMoonStatus',
+      reps: { sign: SIGN_PURE[pmInfo.sign], months: pmInfo.monthsUntil, deg: pmInfo.degreesUntilBoundary + '°' }
+    });
+  }
+  return days;
+}
+
+// ── Predict next special day arrivals ─────────────────────────────────────
+
+// Predict when transiting planet next conjuncts natal position
+function predictNextConjunction(natalLon, planetId, orbDeg) {
+  var T = getCurrentT();
+  var currentLon = calcPlanet(planetId, T);
+  // Angular distance from current transit to natal (going forward)
+  var dist = natalLon - currentLon;
+  if (dist < 0) dist += 360;
+  // Planet's daily motion (approximate degrees per day)
+  var dailyMotion = { Jupiter: 0.083, Saturn: 0.033, Uranus: 0.012, Neptune: 0.006, Pluto: 0.004 };
+  var dpm = dailyMotion[planetId] || 0.03;
+  var daysUntil = dist / dpm;
+  // If we're already within orb, it's happening now
+  if (dist <= orbDeg || (360 - dist) <= orbDeg) return { happening: true, daysUntil: 0 };
+  return { happening: false, daysUntil: Math.round(daysUntil), yearsUntil: parseFloat((daysUntil / 365.25).toFixed(1)) };
+}
+
+// Predict next progressed moon sign change
+function predictNextProgMoonChange(birthJd) {
+  var info = getProgressedMoonInfo(birthJd);
+  return {
+    currentSign: info.sign,
+    nextSign: info.nextSign,
+    degreesUntil: info.degreesUntilBoundary,
+    monthsUntil: info.monthsUntil,
+    imminent: info.monthsUntil <= 3
+  };
+}
+
+// Compute major upcoming transits for next 12 months
+function computeUpcomingTransits(natalPositions, natalHouses, asc) {
+  var T0 = getCurrentT();
+  var results = [];
+  var slowPlanets = ['Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];
+  var natalKeys = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];
+  // Step through 12 months at ~10 day intervals
+  for (var step = 0; step <= 36; step++) {
+    var daysAhead = step * 10;
+    var futureJd = getCurrentJD() + daysAhead;
+    var T = centuriesSinceJ2000(futureJd);
+    for (var si = 0; si < slowPlanets.length; si++) {
+      var sp = slowPlanets[si];
+      var transLon = calcPlanet(sp, T);
+      for (var ni = 0; ni < natalKeys.length; ni++) {
+        var nk = natalKeys[ni];
+        var natalLon = natalPositions[nk];
+        var diff = Math.abs(transLon - natalLon);
+        if (diff > 180) diff = 360 - diff;
+        // Check conj (0°), opp (180°), tri (120°), sq (90°), sex (60°)
+        var angles = [0, 60, 90, 120, 180];
+        var angleNames = ['合', '六合', '刑', '三合', '冲'];
+        var angleNamesEn = ['Conjunction', 'Sextile', 'Square', 'Trine', 'Opposition'];
+        for (var ai = 0; ai < angles.length; ai++) {
+          if (Math.abs(diff - angles[ai]) <= 2) {
+            var date = new Date();
+            date.setDate(date.getDate() + daysAhead);
+            var dateStr = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+            var natalHouse = natalHouses[nk] || '';
+            // Avoid duplicates
+            var dup = false;
+            for (var ri = 0; ri < results.length; ri++) {
+              if (results[ri].transPlanet === sp && results[ri].natalPlanet === nk && results[ri].angle === ai) { dup = true; break; }
+            }
+            if (!dup) {
+              results.push({
+                transPlanet: sp, natalPlanet: nk, angle: ai,
+                angleName: angleNames[ai], angleNameEn: angleNamesEn[ai],
+                date: dateStr, natalHouse: natalHouse
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+  // Sort: conjunctions first, then by date proximity
+  results.sort(function(a, b) {
+    if (a.angle !== b.angle) return a.angle - b.angle;
+    return a.date.localeCompare(b.date);
+  });
+  return results.slice(0, 8);
+}
+
+// Pick one "hidden gift" aspect — a notable aspect that's not commonly discussed
+function findHiddenGift(positions, aspects) {
+  var candidates = [];
+  var commonPatterns = ['Sun','Moon','Mercury','Venus','Mars']; // personal planets
+  var outerPatterns = ['Uranus','Neptune','Pluto']; // generational
+  // Look for positive aspects from outer to personal planets
+  for (var ai = 0; ai < aspects.length; ai++) {
+    var a = aspects[ai];
+    var hasOuter = outerPatterns.indexOf(a.p1) >= 0 || outerPatterns.indexOf(a.p2) >= 0;
+    var hasPersonal = commonPatterns.indexOf(a.p1) >= 0 || commonPatterns.indexOf(a.p2) >= 0;
+    if (hasOuter && hasPersonal && (a.name === '三合' || a.name === '六合')) {
+      candidates.push(a);
+    }
+  }
+  if (candidates.length === 0) {
+    // Fallback: any aspect involving an outer planet
+    for (var bi = 0; bi < aspects.length; bi++) {
+      var b = aspects[bi];
+      if (outerPatterns.indexOf(b.p1) >= 0 || outerPatterns.indexOf(b.p2) >= 0) {
+        candidates.push(b);
+      }
+    }
+  }
+  if (candidates.length === 0) return null;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+

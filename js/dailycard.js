@@ -125,12 +125,11 @@
       html += '<div class="daily-card">';
       html += '<div class="daily-moon">🌙</div>';
       html += '<div class="daily-text">';
-      html += '<div class="daily-title">✨ ' + (en ? "Today's Stars" : '今日星象') + ' · ' + dateStr + ' ✨</div>';
+      html += '<div class="daily-title">✨ ' + (en ? "Today's Stars" : '今日星象') + ' · ' + dateStr + ' · ' + SIGN_EMOJI[si] + ' ' + signName + ' ✨</div>';
       if (phaseHTML) html += phaseHTML;
       html += '<div class="daily-vibe"><span class="daily-do">' + action + '</span><br><span class="daily-explain">' + explain + '</span></div>';
       html += '<div class="daily-question">' + dailyQ + '</div>';
       html += '</div>';
-      html += '<div class="daily-sign-badge">' + SIGN_EMOJI[si] + ' ' + signName + '</div>';
       html += '</div>';
 
       container.innerHTML = html;

@@ -165,6 +165,7 @@ function getInputValues(prefix) {
 
 let chartData1 = null;
 let chartData2 = null;
+let _birthInput1 = null;
 
 // ── Progress ring helpers ──────────────────────────────────────────────
   var _ritualTotal = 16;
@@ -310,6 +311,7 @@ function calculateAll() {
     setTimeout(function() {
       try {
         chartData1 = computeChart(d1);
+        _birthInput1 = d1;
         var d2 = getInputValues('p2');
         chartData2 = d2 ? computeChart(d2) : null;
         computed = true;
@@ -398,6 +400,16 @@ function renderTab0() {
   html += '<div id="fullNatalReport">';
   html += generateDeepNatalReport(d.positions, d.houses, d.aspects, d.asc, d.mc);
   html += '</div>';
+
+  // ═══ Special Day Reading — auto-detect ═══
+  if (_birthInput1) {
+    var specialDays = detectSpecialDays(_birthInput1.y, _birthInput1.m, _birthInput1.d, d.jd, d.positions);
+    if (specialDays.length > 0) {
+      html += '<div id="specialDayReading">';
+      html += generateSpecialDayReading(d, _birthInput1, specialDays);
+      html += '</div>';
+    }
+  }
 
   // ═══ Technical tables (initially hidden) ═══
   html += '<div style="text-align:center;margin-top:18px;">';
@@ -707,6 +719,15 @@ function buildReportHTML() {
   // ═══ Tab 0: Natal report ═══
   r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;">✦ ' + _L('本命星盘深度解读','Natal Chart Deep Dive') + '</h3>';
   r += generateDeepNatalReport(d.positions, d.houses, d.aspects, d.asc, d.mc);
+
+  // Special day reading in PDF export
+  if (_birthInput1) {
+    var pdfSpecialDays = detectSpecialDays(_birthInput1.y, _birthInput1.m, _birthInput1.d, d.jd, d.positions);
+    if (pdfSpecialDays.length > 0) {
+      r += '<h3 style="border-bottom:1px solid #ccc;padding-bottom:6px;margin-top:24px;">✦ ' + _L('你的宇宙时钟','Your Cosmic Clock') + '</h3>';
+      r += generateSpecialDayReading(d, _birthInput1, pdfSpecialDays);
+    }
+  }
 
   // ═══ Tab 5: Career Genius ═══
   const userJob = document.getElementById('p1_job') ? document.getElementById('p1_job').value.trim() : '';

@@ -359,8 +359,8 @@
   // ══════════════════════════════════════════════════════════════════════════
   //  PLANETS (UI labels — not interpretation content)
   // ══════════════════════════════════════════════════════════════════════════
-  DICT.zh['planets'] = ['','太阳☉','月亮☽','水星☿','金星♀','火星♂','木星♃','土星♄','天王星♅','海王星♆','冥王星♇'];
-  DICT.en['planets'] = ['','Sun ☉','Moon ☽','Mercury ☿','Venus ♀','Mars ♂','Jupiter ♃','Saturn ♄','Uranus ♅','Neptune ♆','Pluto ♇'];
+  DICT.zh['planets'] = ['','太阳☀️','月亮☽','水星☿','金星♀','火星♂','木星♃','土星♄','天王星♅','海王星♆','冥王星♇'];
+  DICT.en['planets'] = ['','Sun ☀️','Moon ☽','Mercury ☿','Venus ♀','Mars ♂','Jupiter ♃','Saturn ♄','Uranus ♅','Neptune ♆','Pluto ♇'];
 
   // ══════════════════════════════════════════════════════════════════════════
   //  ZODIAC SIGNS
@@ -569,6 +569,61 @@
   add('misc.hour', '时', ':');
   add('misc.minute', '分', '');
   add('misc.degree', '°', '°');
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  SPECIAL DAY READING — 生日/土归/木归/次限月亮换座
+  // ══════════════════════════════════════════════════════════════════════════
+  add('specialDay.title', '✨ 你的宇宙时钟', '✨ Your Cosmic Clock');
+  add('specialDay.subtitle', '太阳回归在生日、土归29年一考、木归12年一轮、次限月亮2.5年一换——你的宇宙有自己的时钟，这些钟只为你走。', 'Solar Return each birthday, Saturn Return every 29 years, Jupiter Return every 12, Progressed Moon shifts every 2.5 — your cosmos has its own clock, and it ticks only for you.');
+  add('specialDay.multiple', '多个特殊天象在今天交汇，这让此刻的能量格外值得留意。', 'Multiple special transits converge today — this moment carries extra significance.');
+  // Solar Return
+  add('specialDay.birthday.tagline', '一年才一次的宇宙新年，太阳回到了你出生时的那一度——星盘重启，许愿最灵。', 'Your cosmic new year — once a year, the Sun returns to your natal degree. The chart resets; wishes made now carry extra weight.');
+  add('specialDay.birthday.badge', '太阳回归日', 'Solar Return');
+  add('specialDay.solarYearly.tagline', '太阳回归日就在你生日附近——太阳精准回到你出生时的那一度，每年一张全新的宇宙新年星图，描述从这次生日到下次生日之间你的个人主题和能量走向。', 'Your Solar Return falls near your birthday — the Sun returns to your exact natal degree, giving you a fresh cosmic chart each year that describes your personal themes from one birthday to the next.');
+  add('specialDay.solarYearly.badge', '年度太阳回归', 'Annual Solar Return');
+  // Saturn Return
+  add('specialDay.saturnReturn.tagline', '人生大考来了。二十而立、三十而惑、六十耳顺——几乎所有人都在等这一天。土星回到你出生时的位置，逼你交出答卷，也给你打开下一关的钥匙。', 'The big test arrives. Around 29 and 58, Saturn returns to its natal spot — the exam everyone waits for. It demands your answers, and hands you the key to the next level.');
+  add('specialDay.saturnReturn.badge', '土星回归', 'Saturn Return');
+  add('specialDay.saturnReturn.lesson', '土星的教诲', 'Saturn\'s Lesson');
+  // Jupiter Return
+  add('specialDay.jupiterReturn.tagline', '十二年一轮的本命年，木星回家了。接下来一年是新一轮大运的开局——该膨胀的就让它膨胀，该出发的别再犹豫。', 'Once every 12 years, Jupiter comes home. The year ahead opens a new cycle of growth — let what wants to expand, expand. Don\'t hesitate to begin.');
+  add('specialDay.jupiterReturn.badge', '木星回归', 'Jupiter Return');
+  // Progressed Moon
+  add('specialDay.progMoonChange.tagline', '你的心要搬家了。未来两年半，你的情感重心、安全感来源、直觉方向全部切换频道。旧的不去，新的不来。', 'Your heart is moving house. For the next 2.5 years, your emotional center, sense of security, and intuitive direction all shift. Out with the old, in with the new.');
+  add('specialDay.progMoonChange.badge', '次限月亮换座中', 'Prog Moon Changing Signs');
+  add('specialDay.progMoonStatus.badge', '次限月亮在{sign}', 'Prog Moon in {sign}');
+  add('specialDay.progMoonStatus.tagline', '次限月亮是你的情绪导航——大约每两年半换一个星座，标记你当前的情感重心和直觉方向。此刻它在{sign}，距下次换座约{months}个月。', 'Your Progressed Moon is your emotional compass — it shifts signs every ~2.5 years, marking your emotional center and intuitive direction. It\'s currently in {sign}, ~{months} months from the next shift.');
+  // Section headers
+  add('specialDay.section.solarReturn', '☀️ 太阳回归盘 — 今年的宇宙主题', '☀️ Solar Return — This Year\'s Cosmic Theme');
+  add('specialDay.section.predictions', '🔮 特殊周期预告 — 值得提前知道的大事', '🔮 Cycle Forecast — Big Events Worth Knowing in Advance');
+  add('specialDay.section.deepestWell', '🕳 最深的井 — 最值得深挖的命盘配置', '🕳 The Deepest Well — Your Most Worth-Exploring Configuration');
+  add('specialDay.section.timeline', '⏳ 精准时间线 — 未来12个月重要行运节点', '⏳ Timeline — Major Transit Dates in the Next 12 Months');
+  add('specialDay.section.progMoon', '🌙 次限月亮 — 你的情绪导航', '🌙 Progressed Moon — Your Emotional Compass');
+  add('specialDay.section.hiddenGift', '🎁 被忽略的礼物 — 一颗值得重新发现的星盘彩蛋', '🎁 The Hidden Gift — A Chart Easter Egg Worth Rediscovering');
+  // Solar Return chart text
+  add('specialDay.sr.ascSign', '今年你的太阳回归上升星座是', 'Your Solar Return Ascendant this year is ');
+  add('specialDay.sr.sunHouse', '太阳落在第{house}宫', 'Sun in the {house}th House');
+  add('specialDay.sr.theme', '年度主题', 'Annual Theme');
+  // Predictions
+  add('specialDay.pred.saturnComing', '🪐 <strong>土星回归</strong>预计在约<strong>{years}年后</strong>（{age}岁前后，约{date}）到来。土星将回到{sign}，触发你第{house}宫的人生课题——它是一次"人生质检"，逼你交出答卷，也给你打开下一关的钥匙。提前知道，提前准备。', '🪐 <strong>Saturn Return</strong>预计在约<strong>{years} years</strong> (around age {age}, ~{date}). Saturn returns to {sign}, activating your {house}th House — it\'s a "life audit" that demands answers and hands you the key to the next level.');
+  add('specialDay.pred.saturnNow', '🪐 <strong>土星回归正在进行中</strong>——此刻土星正踩在你出生时的土星位置上。这是人生最重要的转折点之一。', '🪐 <strong>Saturn Return in progress</strong> — Saturn is currently crossing your natal Saturn position. One of life\'s most important turning points.');
+  add('specialDay.pred.jupiterComing', '🌟 <strong>木星回归</strong>预计在约<strong>{years}年后</strong>（约{date}）到来。木星将回到{sign}，触发你第{house}宫的扩张领域——那是一轮新大运的起点，该出发的时候别犹豫。', '🌟 <strong>Jupiter Return</strong>预计在约<strong>{years} years</strong> (~{date}). Jupiter returns to {sign}, activating your {house}th House — the start of a new growth cycle. Don\'t hesitate to begin.');
+  add('specialDay.pred.jupiterNow', '🌟 <strong>木星回归正在进行中</strong>——木星正站在你出生时的位置，开启新一轮12年的成长周期。', '🌟 <strong>Jupiter Return in progress</strong> — Jupiter stands at your natal position, opening a new 12-year growth cycle.');
+  add('specialDay.pred.progMoonComing', '🌙 <strong>次限月亮</strong>预计在约<strong>{months}个月后</strong>（约{date}）从{current}换入{next}——届时你的情绪操作系统将全面切换，安全感来源和直觉方向都会改变。', '🌙 <strong>Progressed Moon</strong>预计在约<strong>{months} months</strong> (~{date}) from {current} into {next} — when your emotional OS fully switches, along with your sense of security and intuition.');
+  add('specialDay.pred.progMoonNow', '🌙 <strong>次限月亮正在换座</strong>——就在此刻，你的情绪操作系统正在从{current}迁移到{next}。', '🌙 <strong>Progressed Moon is changing signs</strong> — your emotional OS is migrating from {current} to {next} right now.');
+  // Progressed moon text
+  add('specialDay.pm.current', '当前次限月亮位于', 'Your progressed Moon is currently in ');
+  add('specialDay.pm.nextSign', '，正靠近{sign}的边界——再过约{months}个月，它将正式进入', ', approaching the boundary of {sign} — in about {months} months, it will enter ');
+  add('specialDay.pm.boundary', '，距换座还有{deg}°', ', {deg}° from the next sign');
+  // Timeline
+  add('specialDay.tl.item', '{trans} {angle} 本命{natal}', '{trans} {angleEN} natal {natal}');
+  add('specialDay.tl.none', '未来12个月没有特别紧密的外行星行运——这是一段整合期，适合巩固已有成果而非急于求变。', 'No particularly tight outer-planet transits in the next 12 months — a period for consolidation rather than dramatic change.');
+  // Hidden gift text
+  add('specialDay.gift.intro', '在看遍了你命盘里那些被反复讨论的重磅配置之后，有一组相位不太起眼，却可能是你真正的隐藏技能点：', 'After reviewing the heavily discussed configurations in your chart, one aspect stands quietly in the corner — it might be your real hidden skill:');
+  add('specialDay.gift.none', '你的每颗行星都在以自己的方式发光——不必强求"额外"的礼物，此刻的重点是善用你已经拥有的配置。', 'Every planet in your chart shines in its own way — no need to force an "extra" gift. The focus now is using what you already have well.');
+  // Fallback / generic
+  add('specialDay.generic.title', '✨ 你的宇宙时钟', '✨ Your Cosmic Clock');
+  add('specialDay.generic.tagline', '太阳回归盘人人都有——你的宇宙时钟正在走，这一刻的星空也在讲属于你的故事。', 'Everyone has a Solar Return chart — your cosmic clock is ticking, and the sky is telling your story right now.');
 
   // ══════════════════════════════════════════════════════════════════════════
   //  PUBLIC API

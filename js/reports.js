@@ -2700,4 +2700,246 @@ function getActionableAdvice(domain, positions, houses, card, asc) {
   return fn();
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+//  SPECIAL DAY READING — 太阳回归/土归/木归/次限月亮换座
+// ═══════════════════════════════════════════════════════════════════════════
 
+// Transit description — one-line interpretation for timeline items
+function getTransitDescription(t) {
+  var isEn = window._lang && window._lang() === 'en';
+  var map = {
+    'Jupiter_0': ['机遇放大——信心和好运在一条轨道上，适合迈出那一步','Opportunity amplifier — confidence and luck align, step forward'],
+    'Jupiter_1': ['顺势窗口——小幸运在你放松不追的时候悄悄赶到','A gentle boost — small blessings arrive when you least chase them'],
+    'Jupiter_2': ['想法容易膨胀——别让"都能做"盖过"先做哪一个"','Ideas inflate easily — pick one before trying to do them all'],
+    'Jupiter_3': ['好运流通——信任你的直觉，它在这段时间比你的计划更准','Good fortune flows — trust your instincts over your plans right now'],
+    'Jupiter_4': ['过度扩张被照见——做减法比做加法更需要勇气','Overexpansion exposed — subtracting takes more courage than adding'],
+    'Saturn_0': ['责任落地——不是限制，是把真正重要的事定下来','Responsibility lands — not a limit, but locking in what truly matters'],
+    'Saturn_1': ['稳扎稳打的回报——之前坚持在做的事正在结出果子','Steady rewards — what you\'ve been persisting at is bearing fruit'],
+    'Saturn_2': ['压力逼你做取舍——能被动摇的，本来就不属于你','Pressure forces choices — what crumbles wasn\'t yours to keep'],
+    'Saturn_3': ['自律红利期——你之前的积累正在被看见和认可','Discipline pays off — your prior efforts are being recognized'],
+    'Saturn_4': ['责任与自由的拉扯——不是你不够好，是标准设得太高了','Duty vs freedom tug-of-war — not you falling short, the bar is just high'],
+    'Uranus_0': ['计划外的突破——一个意外可能改写你的方向','Breakthrough out of nowhere — a surprise could rewrite your direction'],
+    'Uranus_1': ['灵光乍现——某个闪念可能比你深思熟虑的方案更准','A flash of insight — a hunch may beat your most careful plan'],
+    'Uranus_2': ['不安是信号——提醒你某个地方该换了，不是吓唬你','Restlessness is a signal — something needs changing, don\'t ignore it'],
+    'Uranus_3': ['直觉式跳跃——不用每一步都讲得出道理，跳就是了','Intuitive leap — you don\'t need to explain every step, just jump'],
+    'Uranus_4': ['新旧拉扯——一边想稳住一边想掀桌，两种冲动都正常','Old vs new tug-of-war — wanting stability and revolution at once is normal'],
+    'Neptune_0': ['直觉被放大——感受得到但不容易说清楚，那就先不说','Intuition amplified — you sense it but can\'t quite explain it, that\'s okay'],
+    'Neptune_1': ['灵感悄悄流入——放松的时候点子会自己来找你','Inspiration seeps in — ideas find you when you finally relax'],
+    'Neptune_2': ['边界模糊期——别人的情绪不是你的，先分清楚再行动','Boundaries blur — their emotions aren\'t yours, sort first then act'],
+    'Neptune_3': ['创造力峰值——写作、艺术、玄学的直觉力在线','Creative peak — writing, art, and intuitive work are heightened'],
+    'Neptune_4': ['理想与现实落差放大——不是理想错了，是落脚点需要微调','Ideals meet reality — the dream isn\'t wrong, just needs a finer aim'],
+    'Pluto_0': ['底层翻新——某个你以为过去了的事原来还在后台运行','Deep renovation — something you thought was gone still runs in the background'],
+    'Pluto_1': ['隐藏的资源被唤醒——你比你以为的多一层力量','Hidden reserves awaken — you have more strength than you knew'],
+    'Pluto_2': ['深层不安浮上来——不是退步，是大扫除的必经阶段','Deep unease surfaces — not regression, just a necessary deep-cleaning'],
+    'Pluto_3': ['转化的绿色通道——旧模式松动了，趁现在重新选择','Transformation green light — old patterns loosen, choose again now'],
+    'Pluto_4': ['权力关系被照见——谁掌控谁、谁依赖谁，该坐下来重谈了','Power dynamics illuminated — who controls whom, time to renegotiate']
+  };
+  var key = t.transPlanet + '_' + t.angle;
+  var entry = map[key];
+  if (!entry) return '';
+  return isEn ? entry[1] : entry[0];
+}
+
+// Progressed Moon sign description — what it feels like emotionally
+function getProgMoonSignDescription(signIdx) {
+  var isEn = window._lang && window._lang() === 'en';
+  var descs = [
+    ['白羊——情绪直接、急躁，需要学会理直气壮说"我要"而不愧疚','Aries — emotions turn direct and impatient; learn to say "I want" without guilt'],
+    ['金牛——情绪需要稳定和实质安抚，物质安全感直接影响心情水位','Taurus — emotions need stability and tangible comfort; material security shapes your mood'],
+    ['双子——情绪通过说话来消化，交流和表达是你这段时间最好的出口','Gemini — emotions digest through talking; expression is your best outlet now'],
+    ['巨蟹——情绪更敏感怀旧，归属感和"被接住"的感觉是刚需','Cancer — emotions grow sensitive and nostalgic; belonging is an essential need'],
+    ['狮子——情绪渴望被看见和认可，创造力是你最好的情绪出口','Leo — emotions crave recognition; creativity is your best emotional outlet right now'],
+    ['处女——情绪通过做事来消化，容易为细节焦虑也从整理中获得平静','Virgo — emotions process through doing; prone to detail-anxiety but find calm in order'],
+    ['天秤——情绪在关系中寻找平衡，陪伴和公平对待这段时间尤其重要','Libra — emotions seek balance through relationships; companionship matters more now'],
+    ['天蝎——情绪深沉激烈，表面不动底下在翻，适合做深度心灵工作','Scorpio — emotions run deep and intense, still surface while churning below; ideal for depth work'],
+    ['射手——情绪需要自由和远方，受困时会特别烦躁，定期放风很重要','Sagittarius — emotions need freedom and horizons; feeling trapped brings restlessness'],
+    ['摩羯——情绪被理性管控，容易把"我没事"挂嘴边，允许自己偶尔不扛','Capricorn — emotions managed by reason; easy to say "I\'m fine" — give yourself a break sometimes'],
+    ['水瓶——情绪需要抽离和理性化，不是冷，是你处理得跟别人不一样','Aquarius — emotions need detachment; not cold, just processed differently from others'],
+    ['双鱼——情绪边界模糊，容易吸收别人能量，先分清谁的情绪是谁的','Pisces — emotional boundaries blur, absorbing others\' energy; sort whose feelings are whose first']
+  ];
+  var entry = descs[signIdx];
+  if (!entry) return '';
+  return isEn ? entry[1] : entry[0];
+}
+
+function generateSpecialDayReading(chartData, birthInput, specialDays) {
+  if (!chartData || !birthInput || !specialDays || specialDays.length === 0) return '';
+  var isEn = window._lang && window._lang() === 'en';
+  var positions = chartData.positions;
+  var houses = chartData.houses;
+  var aspects = chartData.aspects;
+  var asc = chartData.asc;
+  var mc = chartData.mc;
+  var html = '';
+
+  // ═══ Header ═══
+  html += '<div class="special-day-card">';
+  html += '<div class="special-day-header">';
+  html += '<div class="special-day-title">' + _t('specialDay.title') + '</div>';
+  html += '<div class="special-day-subtitle">' + _t('specialDay.subtitle') + '</div>';
+
+  // Badges
+  html += '<div class="special-day-badges">';
+  for (var i = 0; i < specialDays.length; i++) {
+    var sd = specialDays[i];
+    html += '<span class="special-day-badge badge-' + sd.type + '">' + sd.emoji + ' ' + _t('specialDay.' + sd.key + '.badge', sd.reps) + '</span>';
+  }
+  html += '</div>';
+
+  // Taglines
+  for (var i = 0; i < specialDays.length; i++) {
+    var sd2 = specialDays[i];
+    html += '<p class="special-day-tagline">' + _t('specialDay.' + sd2.key + '.tagline', sd2.reps) + '</p>';
+  }
+  if (specialDays.length > 2) {
+    html += '<p class="special-day-extra">' + _t('specialDay.multiple') + '</p>';
+  }
+  html += '</div>';
+
+  var primary = specialDays[0]; // most significant
+
+  // ═══ Section 1: Solar Return Chart (always) ═══
+  var srChart = computeSolarReturnApprox(birthInput.y, birthInput.m, birthInput.d, birthInput.utcH, positions.Sun, birthInput.lat, birthInput.lng);
+  html += '<div class="special-day-section">';
+  html += '<h4>' + _t('specialDay.section.solarReturn') + '</h4>';
+  html += '<p>' + _t('specialDay.sr.ascSign') + '<strong>' + getSignNamePure(srChart.ascSign) + '</strong>。';
+  html += _L('太阳回归上升星座决定你这一整年的个人风格和外在呈现——你以什么面貌进入新的一年。','Your Solar Return Ascendant sets your personal style and outward expression for the year — the face you wear into your new cycle.') + '</p>';
+  html += '<p>' + _t('specialDay.sr.sunHouse', {house: srChart.srSunHouse}) + ' — ';
+  var srThemes_ZH = ['重新定义自我，外在形象和行动力的焕新之年','积累资源，建立安全感和自我价值的关键年','学习、表达、短途移动——拥抱好奇心和灵活性的一年','家庭、根基、内在安全感——向内扎根的一年','创造力、恋爱、自我表达——活出光芒的一年','健康、日常、服务——打磨技艺和习惯的工匠之年','合作关系、一对一互动——学会在关系中平衡的一年','深度转化、共享资源——直面阴影和欲望的蜕变之年','信念、远行、高等教育——拓展世界观的一年','事业、社会形象、责任——站上更大舞台的一年','社群、理想、志同道合者——找到你的族群的连接之年','灵性、潜意识、退隐——与内在智慧和解的沉淀之年'];
+  var srThemes_EN = ['Redefine yourself — a year of fresh image and initiative','Build resources, establish security and self-worth','Learn, express, move — embrace curiosity and flexibility','Home, roots, inner security — a year of turning inward','Creativity, romance, self-expression — shine your light','Health, routine, service — the craftsman\'s year of refining habits','Partnership, one-on-one dynamics — learn balance in relationship','Deep transformation, shared resources — face your shadows and desires','Belief, travel, higher education — expand your worldview','Career, public image, responsibility — step onto a bigger stage','Community, ideals, kindred spirits — find your tribe','Spirituality, subconscious, retreat — a year of making peace with inner wisdom'];
+  html += (isEn ? srThemes_EN[srChart.srSunHouse - 1] : srThemes_ZH[srChart.srSunHouse - 1]) + '</p>';
+  html += '</div>';
+
+  // ═══ Section 2: Predictions — upcoming special cycles ═══
+  html += '<div class="special-day-section">';
+  html += '<h4>' + _t('specialDay.section.predictions') + '</h4>';
+
+  // Saturn return prediction
+  var satPred = predictNextConjunction(positions.Saturn, 'Saturn', 5);
+  var satSign = getSignNamePure(Math.floor(positions.Saturn / 30) % 12);
+  var satHouse = houses.Saturn || 1;
+  var currentAge = (new Date()).getFullYear() - birthInput.y;
+  var satAge = Math.round(currentAge + satPred.yearsUntil);
+  if (satPred.happening) {
+    html += '<p>' + _t('specialDay.pred.saturnNow') + '</p>';
+    // Add lesson for currently happening Saturn return
+    var satLessons_ZH = ['土星在一宫：你需要重新定义"我是谁"。外表、身体、自我认同——这些领域土星在要求你交出真诚的答卷。','土星在二宫：你对金钱和自我价值的信念正在接受压力测试。你真正看重什么？你的才华值多少钱？','土星在三宫：沟通方式、学习习惯、思维模式——这些看似基础的东西，土星偏偏要你重修一遍。','土星在四宫：家庭、根基、原生家庭的课题浮上水面。你需要在内心建立一个不会被外界动摇的家。','土星在五宫：创造力、恋爱、自我表达的方式受到审视。不是不让你玩，是让你玩出真东西来。','土星在六宫：工作、健康、日常习惯——土星要你在这些琐碎中建立秩序，秩序会给你自由。','土星在七宫：伴侣关系是你最重的功课。不是找不到人，而是找到的人都是来逼你成长的。','土星在八宫：对亲密、共享、放手的恐惧正在被剥开。你在学习信任——信任他人，也信任生命。','土星在九宫：信仰和世界观正在被重塑。旧的意义体系崩塌了，但新的、更坚固的正在建构。','土星在十宫：事业和人生方向是你土归的核心考场。这个世界等着看你能扛起多少责任——而你也确实能扛。','土星在十一宫：朋友圈在换血，志同道合的人正在重新筛选。留下来的都是真朋友，离开的本就不属于你。','土星在十二宫：最深处的不安和潜意识的模式被翻搅出来。这不是崩溃，是大扫除——扫完你会轻很多。'];
+    var satLessons_EN = ['Saturn in 1st: Redefine "who am I." Appearance, body, identity — Saturn demands your honest answer.','Saturn in 2nd: Your beliefs about money and self-worth are stress-tested. What do you truly value?','Saturn in 3rd: Communication, learning habits, thought patterns — Saturn makes you redo the basics.','Saturn in 4th: Family, roots, childhood patterns surface. Build an inner home that no one can shake.','Saturn in 5th: Creativity, romance, self-expression under review. Not forbidden to play — but make it real.','Saturn in 6th: Work, health, daily routines — Saturn wants order in the mundane. Order will give you freedom.','Saturn in 7th: Partnership is your heaviest lesson. People come into your life to make you grow.','Saturn in 8th: Fear of intimacy, sharing, letting go — being stripped away. Learning to trust others and life itself.','Saturn in 9th: Beliefs and worldview being reshaped. Old meaning systems crumble — a stronger one is building.','Saturn in 10th: Career and life direction is your core exam. The world is watching to see how much you can carry — and you can carry it.','Saturn in 11th: Your friend circle is turning over. Kindred spirits are being re-sorted. Those who stay are real.','Saturn in 12th: Deepest anxieties and subconscious patterns stirred up. Not a breakdown — a deep clean. You\'ll feel lighter after.'];
+    html += '<p style="font-size:0.85em;color:#c8c0b8;">' + (isEn ? satLessons_EN[satHouse - 1] : satLessons_ZH[satHouse - 1]) + '</p>';
+  } else {
+    var satDate = new Date();
+    satDate.setDate(satDate.getDate() + Math.round(satPred.yearsUntil * 365.25));
+    var satDateStr = isEn ? (satDate.getFullYear() + '-' + (satDate.getMonth()+1)) : (satDate.getFullYear() + '年' + (satDate.getMonth()+1) + '月');
+    html += '<p>' + _t('specialDay.pred.saturnComing', {years: satPred.yearsUntil, age: satAge, date: satDateStr, sign: satSign, house: satHouse}) + '</p>';
+  }
+
+  // Jupiter return prediction
+  var jupPred = predictNextConjunction(positions.Jupiter, 'Jupiter', 5);
+  var jupSign = getSignNamePure(Math.floor(positions.Jupiter / 30) % 12);
+  var jupHouse = houses.Jupiter || 1;
+  if (jupPred.happening) {
+    html += '<p>' + _t('specialDay.pred.jupiterNow') + '</p>';
+  } else {
+    var jupYears = parseFloat((jupPred.daysUntil / 365.25).toFixed(1));
+    var jupDate = new Date();
+    jupDate.setDate(jupDate.getDate() + jupPred.daysUntil);
+    var jupDateStr = isEn ? (jupDate.getFullYear() + '-' + (jupDate.getMonth()+1)) : (jupDate.getFullYear() + '年' + (jupDate.getMonth()+1) + '月');
+    html += '<p>' + _t('specialDay.pred.jupiterComing', {years: jupYears, date: jupDateStr, sign: jupSign, house: jupHouse}) + '</p>';
+  }
+
+  // Progressed moon prediction
+  var pmPred = predictNextProgMoonChange(chartData.jd);
+  if (pmPred.imminent) {
+    html += '<p>' + _t('specialDay.pred.progMoonNow', {current: getSignNamePure(pmPred.currentSign), next: getSignNamePure(pmPred.nextSign)}) + '</p>';
+  } else {
+    var pmDate = new Date();
+    pmDate.setMonth(pmDate.getMonth() + pmPred.monthsUntil);
+    var pmDateStr = isEn ? (pmDate.getFullYear() + '-' + (pmDate.getMonth()+1)) : (pmDate.getFullYear() + '年' + (pmDate.getMonth()+1) + '月');
+    html += '<p>' + _t('specialDay.pred.progMoonComing', {months: pmPred.monthsUntil, date: pmDateStr, current: getSignNamePure(pmPred.currentSign), next: getSignNamePure(pmPred.nextSign)}) + '</p>';
+  }
+  html += '</div>';
+
+  // ═══ Section 3: Deepest Well ═══
+  html += '<div class="special-day-section">';
+  html += '<h4>' + _t('specialDay.section.deepestWell') + '</h4>';
+  var stelliums = detectStelliums(positions, houses);
+  var keyPatterns = detectKeyPatterns(positions, aspects);
+  if (stelliums.length > 0) {
+    var dw = stelliums[0];
+    html += '<p>' + _L('你的命盘中最值得深挖的是<strong>' + dw.label + '</strong>——' + dw.planets.length + '颗行星的能量集中于此。', 'The configuration most worth exploring in your chart is <strong>' + (dw.enLabel||dw.label) + '</strong> — ' + dw.planets.length + ' planets concentrated here.') + ' ';
+    var stellHouse = houses[dw.planets[0].id];
+    html += _L('这股能量通过第' + stellHouse + '宫的生活领域表达出来。你这一生的很多重要决定和转折，源头都可以追溯到这个配置。', 'This energy expresses through the life area of House ' + stellHouse + '. Many of the important decisions and turning points in your life can be traced back to this configuration.') + '</p>';
+  } else if (keyPatterns.length > 0) {
+    var kp = keyPatterns[0];
+    html += '<p><strong>' + (isEn ? (kp.enName||kp.name) : kp.name) + '</strong> — ' + kp.text.substring(0, 200) + '</p>';
+  } else {
+    var sunSignIdx = Math.floor(positions.Sun / 30) % 12;
+    html += '<p>' + _L('你的太阳' + getSignNamePure(sunSignIdx) + '落第' + (houses.Sun||'?') + '宫是你命盘中最核心的能量输出口。这不仅是你的"星座"，更是你此生需要活出来的英雄之旅。', 'Your Sun in ' + getSignNamePure(sunSignIdx) + ' in House ' + (houses.Sun||'?') + ' is the core energy output of your chart. This is not just your "sign" — it\'s the hero\'s journey you\'re here to live.') + '</p>';
+  }
+  html += '</div>';
+
+  // ═══ Section 3: Timeline (skip if progMoon only) ═══
+  if (primary.type !== 'progMoon') {
+    html += '<div class="special-day-section">';
+    html += '<h4>' + _t('specialDay.section.timeline') + '</h4>';
+    var transits = computeUpcomingTransits(positions, houses, asc);
+    if (transits.length > 0) {
+      html += '<div class="sr-timeline">';
+      for (var ti = 0; ti < Math.min(transits.length, 5); ti++) {
+        var t = transits[ti];
+        var transName = isEn ? t.transPlanet : (PLANETS.find(function(p){return p.id===t.transPlanet;})||{name:t.transPlanet}).name;
+        var natalName = isEn ? t.natalPlanet : (PLANETS.find(function(p){return p.id===t.natalPlanet;})||{name:t.natalPlanet}).name;
+        html += '<div class="sr-timeline-item"><span class="tl-date">' + t.date + '</span> ';
+        html += '<span class="tl-event">' + transName + ' ' + (isEn ? t.angleNameEn : t.angleName) + ' ' + natalName + '</span>';
+        var td = getTransitDescription(t);
+        if (td) html += '<div class="tl-desc">' + td + '</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+    } else {
+      html += '<p>' + _t('specialDay.tl.none') + '</p>';
+    }
+    html += '</div>';
+  }
+
+  // ═══ Section 4: Progressed Moon ═══
+  html += '<div class="special-day-section">';
+  html += '<h4>' + _t('specialDay.section.progMoon') + '</h4>';
+  var pmInfo = getProgressedMoonInfo(chartData.jd);
+  html += '<p>' + _t('specialDay.pm.current') + '<strong>' + getSignNamePure(pmInfo.sign) + ' ' + pmInfo.degree + '°' + String(pmInfo.minute).padStart(2,'0') + '′</strong>';
+  if (pmInfo.monthsUntil <= 3 && pmInfo.monthsUntil > 0) {
+    html += _t('specialDay.pm.nextSign', {sign: getSignNamePure(pmInfo.sign), months: pmInfo.monthsUntil}) + '<strong>' + getSignNamePure(pmInfo.nextSign) + '</strong>。';
+    html += _L('次限月亮换座是情绪的"搬家"——你的安全感水源正在从一个星座流向另一个星座。留意未来三个月内的梦境和情绪波动，它们是导航仪。', 'The progressed Moon changing signs is an emotional "move" — your source of security is flowing from one sign to another. Pay attention to dreams and emotional waves in the coming months — they are your compass.');
+    var pmbDesc = getProgMoonSignDescription(pmInfo.sign);
+    if (pmbDesc) html += ' <br><span class="tl-desc">' + _L('当前' + getSignNamePure(pmInfo.sign) + '情绪基调：', 'Current ' + getSignNamePure(pmInfo.sign) + ' mood: ') + pmbDesc + '</span>';
+    html += '</p>';
+  } else if (pmInfo.monthsUntil === 0) {
+    var pmcDesc = getProgMoonSignDescription(pmInfo.sign);
+    if (pmcDesc) html += '<span class="tl-desc">' + pmcDesc + '</span><br>';
+    html += _L('——就在此刻，你的次限月亮正在跨越星座边界。这是情绪层面的"换季"，旧的感受模式正在退场，新的还没完全到位。给自己一点过渡的时间。', '— right now, your progressed Moon is crossing the sign boundary. This is an emotional "season change." Old feeling patterns are exiting; new ones haven\'t fully arrived. Give yourself transition time.') + '</p>';
+  } else {
+    html += _t('specialDay.pm.boundary', {deg: pmInfo.degreesUntilBoundary + '°'}) + ' ' + _L('进入' + getSignNamePure(pmInfo.nextSign) + '。', 'from entering ' + getSignNamePure(pmInfo.nextSign) + '.');
+    var pmdDesc = getProgMoonSignDescription(pmInfo.sign);
+    if (pmdDesc) html += ' <br><span class="tl-desc">' + _L('当前' + getSignNamePure(pmInfo.sign) + '情绪基调：', 'Current ' + getSignNamePure(pmInfo.sign) + ' mood: ') + pmdDesc + '</span>';
+    html += '</p>';
+  }
+  html += '</div>';
+
+  // ═══ Section 5: Hidden Gift ═══
+  html += '<div class="special-day-section">';
+  html += '<h4>' + _t('specialDay.section.hiddenGift') + '</h4>';
+  var gift = findHiddenGift(positions, aspects);
+  if (gift) {
+    var gp1 = isEn ? gift.p1 : (PLANETS.find(function(p){return p.id===gift.p1;})||{name:gift.p1}).name;
+    var gp2 = isEn ? gift.p2 : (PLANETS.find(function(p){return p.id===gift.p2;})||{name:gift.p2}).name;
+    html += '<p>' + _t('specialDay.gift.intro') + '</p>';
+    html += '<p class="sr-highlight"><strong>' + gp1 + ' ' + (isEn ? (gift.name==='合'?'Conjunct':gift.name==='六合'?'Sextile':gift.name==='刑'?'Square':gift.name==='三合'?'Trine':'Opposite') : gift.name) + ' ' + gp2 + '</strong> ';
+    html += _L('— 两颗行星之间的' + gift.name + '相，精密度' + (gift.orb ? gift.orb.toFixed(1) + '°' : '') + '。不要因为它不常被提起就忽略它——在不经意的时刻，这个相位可能会成为你解决问题的"非主流"路径。','— A ' + gift.name + ' aspect between these two planets. Don\'t overlook it just because it\'s not often discussed — in unexpected moments, this aspect might become your unconventional path to solving problems.') + '</p>';
+  } else {
+    html += '<p>' + _t('specialDay.gift.none') + '</p>';
+  }
+  html += '</div>';
+
+  html += '</div>'; // close special-day-card
+  return html;
+}
