@@ -1174,6 +1174,7 @@ header .subtitle {
   border-top-color: rgba(200,160,100,0.5);
 }
 .lodge-scroll-hint {
+  display: block;
   text-align: center;
   color: var(--text-dim);
   font-size: 0.72em;
