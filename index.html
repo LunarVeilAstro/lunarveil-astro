@@ -34,7 +34,8 @@
 <link rel="canonical" href="https://lunarveilastro.github.io/lunarveil-astro/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Liu+Jian+Mao+Cao&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Liu+Jian+Mao+Cao&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Liu+Jian+Mao+Cao&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet"></noscript>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7M6096TY6B"></script>
 <script>
@@ -168,7 +169,7 @@
         <h3 data-i18n="person.me">本人</h3>
         <div class="form-row">
           <div class="form-group"><label data-i18n="label.birthdate">出生日期</label><input type="date" id="p1_date"><span class="date-hint" data-i18n="hint.datePicker">💡 点击日期框左上角年份可快速切换年份</span></div>
-          <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p1_time" step="60"></div>
+          <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p1_time" step="60" value="12:00"><span class="date-hint" data-i18n="hint.birthtime">知道几点就填几点，不确定就按12:00——行星位置依然准确，上升和宫位仅供参考</span></div>
           <div class="form-group">
             <label data-i18n="label.timezone">时区 (UTC)</label>
             <select id="p1_tz">
@@ -224,7 +225,7 @@
         <div id="p2Content" style="display:none;">
         <div class="form-row">
           <div class="form-group"><label data-i18n="label.birthdate">出生日期</label><input type="date" id="p2_date"><span class="date-hint" data-i18n="hint.datePicker">💡 点击日期框左上角年份可快速切换年份</span></div>
-          <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p2_time" step="60"></div>
+          <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p2_time" step="60" value="12:00"><span class="date-hint" data-i18n="hint.birthtime">知道几点就填几点，不确定就按12:00——行星位置依然准确，上升和宫位仅供参考</span></div>
           <div class="form-group">
             <label data-i18n="label.timezone">时区 (UTC)</label>
             <select id="p2_tz">
@@ -360,10 +361,8 @@ try {
   var dd = String(d).padStart(2,'0');
   document.getElementById('p1_date').value = y + '-' + mm + '-' + dd;
 
-  // Random time
-  var h = Math.floor(Math.random() * 24);
-  var min = Math.floor(Math.random() * 60);
-  document.getElementById('p1_time').value = String(h).padStart(2,'0') + ':' + String(min).padStart(2,'0');
+  // Default to noon — accurate planet positions, ASC/houses approximate
+  document.getElementById('p1_time').value = '12:00';
 
   // Random city with coords + timezone
   var cities = [
