@@ -322,7 +322,7 @@
   add('consult.submit', '✦ 开始深度解读', '✦ Begin Reading');
   add('consult.loading', '✦ 解读中...', '✦ Reading...');
   add('consult.askAgain', '✦ 再次提问', '✦ Ask Again');
-  add('consult.lockedDesc', '加微信发送你的出生信息和想问的问题<br>24小时内回复，每次解读约1500-3000字<br><span style="font-size:0.85em;color:#8a8aaa;">📕 小红书 LunarVeilAstro 每日推送运势，不提供私信解读</span>', 'Add WeChat with your birth info and questions<br>Reply within 24h, ~1500-3000 words per reading<br><span style="font-size:0.85em;color:#8a8aaa;">📕 Xiaohongshu LunarVeilAstro — daily posts, no DM readings</span>');
+  add('consult.lockedDesc', '加微信发送你的出生信息和想问的问题<br>24小时内回复，每次解读约6000-10000字<br><span style="font-size:0.85em;color:#8a8aaa;">📕 小红书 · 🎵 抖音 LunarVeilAstro 每日推送运势，不提供私信解读</span>', 'Add WeChat with your birth info and questions<br>Reply within 24h, ~6000-10000 words per reading<br><span style="font-size:0.85em;color:#8a8aaa;">📕 Xiaohongshu · 🎵 Douyin LunarVeilAstro — daily posts, no DM readings</span>');
 
   // ══════════════════════════════════════════════════════════════════════════
   //  BACK TO TOP
@@ -499,8 +499,8 @@
   // ══════════════════════════════════════════════════════════════════════════
   //  LOCKED BLOCK DESCRIPTIONS (with HTML)
   // ══════════════════════════════════════════════════════════════════════════
-  add('locked.natalDesc', '本命星盘只是开始。加微信发送你的出生信息，获取为你量身撰写的<br>年度运势、行运解读和灵魂功课指引（约3000字深度报告）', 'Your natal chart is just the beginning. Add WeChat with your birth info<br>to receive a personalized yearly forecast, transit reading, and soul lesson guide (~3000 words).');
-  add('locked.relDesc', '想知道你的金星/火星配置如何影响择偶模式？<br>加微信获取专属合盘解读、桃花运分析和关系疗愈建议<br><span style="font-size:0.85em;color:#8a8aaa;">📕 小红书 LunarVeilAstro 每日推送运势，不提供私信解读</span>', 'Want to know how your Venus/Mars shapes your love patterns?<br>Add WeChat for a personalized synastry reading, romance forecast, and relationship healing advice<br><span style="font-size:0.85em;color:#8a8aaa;">📕 Xiaohongshu LunarVeilAstro — daily posts, no DM readings</span>');
+  add('locked.natalDesc', '本命星盘只是开始。加微信发送你的出生信息，获取为你量身撰写的<br>年度运势、行运解读和灵魂功课指引（约6000-10000字深度报告）', 'Your natal chart is just the beginning. Add WeChat with your birth info<br>to receive a personalized yearly forecast, transit reading, and soul lesson guide (~6000-10000 words).');
+  add('locked.relDesc', '想知道你的金星/火星配置如何影响择偶模式？<br>加微信获取专属合盘解读、桃花运分析和关系疗愈建议<br><span style="font-size:0.85em;color:#8a8aaa;">📕 小红书 · 🎵 抖音 LunarVeilAstro 每日推送运势，不提供私信解读</span>', 'Want to know how your Venus/Mars shapes your love patterns?<br>Add WeChat for a personalized synastry reading, romance forecast, and relationship healing advice<br><span style="font-size:0.85em;color:#8a8aaa;">📕 Xiaohongshu · 🎵 Douyin LunarVeilAstro — daily posts, no DM readings</span>');
 
   // ══════════════════════════════════════════════════════════════════════════
   //  DYNAMIC STRINGS — templates with {placeholder} variables
