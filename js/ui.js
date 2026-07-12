@@ -594,6 +594,11 @@ function switchTab(idx) {
   document.querySelectorAll('.tab-content').forEach((c, i) => {
     c.classList.toggle('active', i === idx);
   });
+  // Tab swipe hint — only shown on synastry tab when partner data exists
+  var tabHint = document.getElementById('tabHint');
+  if (tabHint) {
+    tabHint.style.display = (idx === 2 && chartData2) ? 'block' : 'none';
+  }
   // Re-render on switch to ensure content is fresh
   if (idx === 4) {
     renderTab4();

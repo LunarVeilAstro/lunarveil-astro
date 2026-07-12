@@ -1173,6 +1173,24 @@ header .subtitle {
   font-weight: bold;
   border-top-color: rgba(200,160,100,0.5);
 }
+.lodge-scroll-hint {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.7em;
+  margin-top: 6px;
+  opacity: 0.6;
+}
+
+/* ── Tab swipe hint ──────────────────────────────────────────────── */
+.tab-hint {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.78em;
+  margin: 6px 0 2px;
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+}
+}
 
 /* ── 今日星象速览卡片 ──────────────────────────────────────────── */
 .daily-card {

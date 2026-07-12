@@ -60,6 +60,8 @@
   add('label.birthtime', '出生时间', 'Birth Time');
   add('hint.datePicker', '💡 点击日期框左上角年份可快速切换年份', '💡 Tap the year in the top-left corner to quickly jump years');
   add('hint.birthtime', '记得就填，不记得也没关系，<strong class="time-gold">12:00</strong>就够了。行星照样准，只有上升和宫位是估算的。', 'Know it? Enter it. Forgot? No worries — <strong class="time-gold">12:00</strong> works fine. Planets are still spot on; only the ASC and houses are approximate.');
+  add('hint.swipeTabs', '← 左右滑动标签栏，可切换查看个人星盘、运势等更多解读 →', '← Swipe the tab bar to view your personal chart, fortune & more →');
+  add('hint.scrollLodge', '如模块显示不全，上下滑动页面即可完整加载', 'If items don\'t fully display, scroll up & down to reload');
   add('label.timezone', '时区 (UTC)', 'Timezone (UTC)');
   add('label.birthplace', '出生地点 (城市/地址)', 'Birthplace (City/Address)');
   add('label.job', '当前职业/现状（可选，用于职业天赋诊断）', 'Current Job (optional, for Career Genius)');
