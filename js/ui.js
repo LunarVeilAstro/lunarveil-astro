@@ -695,7 +695,7 @@ let _birthInput1 = null;
     var phraseEl = document.getElementById("ritualPhrase");
 	phraseEl.style.opacity = '0';
     setTimeout(function() {
-      phraseEl.textContent = _L('星盘已就绪 ✦','Chart Ready ✦');
+      phraseEl.textContent = _L('✦ 星盘已就绪 ✦','✦ Chart Ready ✦');
       phraseEl.style.opacity = '1';
     }, 250);
 
