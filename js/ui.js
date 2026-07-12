@@ -287,7 +287,7 @@ function calculateAll() {
       document.getElementById('resultsCard').style.opacity = '0';
       document.getElementById('resultsCard').style.transition = 'opacity 1s';
       document.getElementById('resultsCard').scrollIntoView({behavior:'smooth'});
-      switchTab(0);
+      switchTab(chartData2 ? 2 : 0);
       setTimeout(function() {
         document.getElementById('resultsCard').style.opacity = '1';
       }, 200);
