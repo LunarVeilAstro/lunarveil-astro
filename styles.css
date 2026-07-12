@@ -152,6 +152,15 @@ header .subtitle {
   box-shadow: 0 0 12px rgba(201,169,110,0.15);
 }
 .form-group input::placeholder { color: #3a3a50; }
+.form-group input[type="time"],
+.form-group input[type="date"] {
+  font-size: 1.15em; font-weight: bold; letter-spacing: 0.04em; color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.time-gold {
+  color: var(--gold); font-size: 1.6em; font-weight: bold;
+}
 
 .geo-row { display: flex; gap: 8px; align-items: flex-end; }
 .geo-row .form-group:first-child { flex: 3; }
