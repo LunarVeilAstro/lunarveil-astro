@@ -588,13 +588,12 @@ function getInputValues(prefix) {
   const dateVal = document.getElementById(prefix + '_date').value;
   const timeVal = document.getElementById(prefix + '_time').value;
   const tzVal = parseFloat(document.getElementById(prefix + '_tz').value);
-  let lat = parseFloat(document.getElementById(prefix + '_lat').value);
-  let lng = parseFloat(document.getElementById(prefix + '_lng').value);
-
-  // Fallback to manual entry if geocoding failed
+  // Manual entry takes priority, then auto-generated hidden fields
+  var lat = parseFloat(document.getElementById(prefix + '_lat_m').value);
+  var lng = parseFloat(document.getElementById(prefix + '_lng_m').value);
   if (isNaN(lat) || isNaN(lng)) {
-    lat = parseFloat(document.getElementById(prefix + '_lat_m').value);
-    lng = parseFloat(document.getElementById(prefix + '_lng_m').value);
+    lat = parseFloat(document.getElementById(prefix + '_lat').value);
+    lng = parseFloat(document.getElementById(prefix + '_lng').value);
   }
 
   // Fallback to p1 coordinates for p2 (most couples share a location)
