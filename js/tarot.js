@@ -31,14 +31,14 @@ function buildDeck() {
 function analyzeQuestion(question) {
   const q = question.toLowerCase();
   const themes = [];
-  if (/爱|情|恋|对象|男朋友|女朋友|老公|老婆|伴侣|分手|复合|婚姻|结婚|单相思|暗恋|喜欢/.test(q)) themes.push('爱情');
-  if (/工作|事业|职业|老板|同事|跳槽|面试|升职|加薪|辞职|创业/.test(q)) themes.push('事业');
-  if (/钱|财|收入|投资|理财|经济|债务|贷款|工资/.test(q)) themes.push('财运');
-  if (/家人|父母|孩子|亲戚|家庭|妈|爸|兄弟|姐妹/.test(q)) themes.push('家庭');
-  if (/健康|身体|病|不舒服|累|疲惫|失眠/.test(q)) themes.push('健康');
-  if (/学习|考试|学校|大学|读书|成绩|毕业/.test(q)) themes.push('学业');
-  if (/朋友|社交|人际|圈子|闺蜜|兄弟|关系/.test(q)) themes.push('人际');
-  if (/自己|迷茫|人生|方向|意义|目标|选择|决定|怎么办/.test(q)) themes.push('人生方向');
+  if (/爱|情|恋|对象|男朋友|女朋友|老公|老婆|伴侣|分手|复合|婚姻|结婚|单相思|暗恋|喜欢|love|romance|relationship|boyfriend|girlfriend|partner|marriage|breakup|crush|dating|soulmate/i.test(q)) themes.push('爱情');
+  if (/工作|事业|职业|老板|同事|跳槽|面试|升职|加薪|辞职|创业|work|career|job|boss|colleague|interview|promotion|raise|resign|startup|business/i.test(q)) themes.push('事业');
+  if (/钱|财|收入|投资|理财|经济|债务|贷款|工资|money|finance|income|invest|wealth|debt|loan|salary|budget/i.test(q)) themes.push('财运');
+  if (/家人|父母|孩子|亲戚|家庭|妈|爸|兄弟|姐妹|family|parent|child|kid|relative|mom|dad|brother|sister|mother|father/i.test(q)) themes.push('家庭');
+  if (/健康|身体|病|不舒服|累|疲惫|失眠|health|sick|tired|insomnia|sleep|body|illness|fatigue/i.test(q)) themes.push('健康');
+  if (/学习|考试|学校|大学|读书|成绩|毕业|study|exam|school|university|college|test|grade|graduate|learn/i.test(q)) themes.push('学业');
+  if (/朋友|社交|人际|圈子|闺蜜|兄弟|关系|friend|social|circle|bestie|connection|network/i.test(q)) themes.push('人际');
+  if (/自己|迷茫|人生|方向|意义|目标|选择|决定|怎么办|lost|confused|purpose|meaning|direction|goal|choice|decision|path|life/i.test(q)) themes.push('人生方向');
   return themes.length > 0 ? themes : ['综合'];
 }
 
@@ -51,7 +51,7 @@ function interpretCard(card, isReversed, position, questionThemes) {
 
   if (card.type === 'major') {
     const meaning = rev ? _cardT(card,'rev') : _cardT(card,'up');
-    reading += `<strong>${cardLabel}</strong> ${rev?('<span class="reversed-badge">'+_L('逆位','Reversed')+'</span>'):''} — ${meaning}。`;
+    reading += `<strong>${cardLabel}</strong> ${rev?('<span class="reversed-badge">'+_L('逆位','Reversed')+'</span>'):''} — ${meaning}` + _L('。', '.');
 
     const primaryTheme = questionThemes[0];
     if (primaryTheme === '爱情' && _cardT(card,'love')) {
@@ -64,7 +64,7 @@ function interpretCard(card, isReversed, position, questionThemes) {
     }
   } else {
     const meaning = rev ? (_cardT(card,'rev') || _cardT(card,'up') + _L('（逆位）',' (Reversed)')) : _cardT(card,'up');
-    const elemLabel = (isEn ? (card.element_en||card.element) : card.element) + (isEn ? ' Element' : '元素');
+    const elemLabel = (isEn ? (card.element_en||card.element) : card.element) + (isEn ? '' : '元素');
     const themeLabel = isEn ? (card.suitTheme_en||card.suitTheme) : card.suitTheme;
     reading += `<strong>${cardLabel}</strong> ${rev?('<span class="reversed-badge">'+_L('逆位','Reversed')+'</span>'):''} <span style="color:var(--text-dim)">${elemLabel} · ${themeLabel}</span>`;
     reading += `<br><br>${meaning}`;
@@ -106,7 +106,7 @@ function synthesizeReading(cards, positions, question, questionThemes) {
       ? `<p>🔥 <strong>All Major Arcana</strong> — this is not about daily trivialities, but a major turning point at the level of destiny. The Universe is speaking directly to you. Every card is a milestone on your soul\'s journey. Take this reading very seriously.</p>`
       : `<p>🔥 <strong>全部为大阿卡纳</strong> — 这不是日常小事，而是命运层面的重要转折。宇宙在直接对你说话，每一张牌都是灵魂旅程中的一个里程碑。请格外重视这次解读。</p>`);
   } else if (hasMajor >= 2) {
-    const majorNames = majorCards.map(c => isEn ? (c.en||c.name) : c.name).join('、');
+    const majorNames = majorCards.map(c => isEn ? (c.en||c.name) : c.name).join(isEn ? ', ' : '、');
     syn += (isEn
       ? `<p>🌟 <strong>${hasMajor} Major Arcana cards</strong> (${majorNames}) appearing together — this question goes far beyond daily trivialities. It touches the core themes of your life. The Major Arcana are soul teachers — their presence means you stand at an important point of growth.</p>`
       : `<p>🌟 <strong>${hasMajor}张大阿卡纳</strong>（${majorNames}）同时出现 — 这个问题远超日常琐事，它触及你生命中的核心课题。大阿卡纳是灵魂的导师，它们的出现意味着你正站在一个重要的成长节点上。</p>`);
@@ -167,8 +167,8 @@ function synthesizeReading(cards, positions, question, questionThemes) {
     if (missing.length >= 2) {
       const missReadings_ZH = { '火':'行动力的缺失', '水':'情感连接的缺失', '风':'理性思考的缺失', '土':'务实落地能力的缺失' };
       const missReadings_EN = { '火':'lack of action drive', '水':'lack of emotional connection', '风':'lack of rational thinking', '土':'lack of grounded practicality' };
-      const missDesc = missing.map(e => isEn ? missReadings_EN[e] : missReadings_ZH[e]).join('、');
-      const missLabels = missing.map(e => elemLabel(e)).join('、');
+      const missDesc = missing.map(e => isEn ? missReadings_EN[e] : missReadings_ZH[e]).join(isEn ? ', ' : '、');
+      const missLabels = missing.map(e => elemLabel(e)).join(isEn ? ', ' : '、');
       syn += (isEn
         ? `<p>⚠️ The spread <strong>lacks ${missLabels}</strong> (${missDesc}). This is not a flaw — the cards are pointing out which energies you need to borrow from outside or consciously cultivate for your current lesson.</p>`
         : `<p>⚠️ 牌阵中<strong>缺少${missLabels}元素</strong>（${missDesc}）。这不是缺陷，而是牌阵在提醒你——当前课题中哪些能量是你需要从外部借力或有意识培养的。</p>`);
@@ -245,7 +245,7 @@ function synthesizeReading(cards, positions, question, questionThemes) {
       ? `<p>🔄 <strong>All cards reversed</strong> — this is a strong signal: your current inner resistance or external obstacles are significant. But reversed cards are not "bad" — they are invitations to inner work. Every reversed card asks you: What are you resisting? What needs to be transformed?</p>`
       : `<p>🔄 <strong>全部逆位</strong> — 这是一个强烈的信号：你当前的内在阻力或外在障碍比较显著。但逆位并非坏牌——它们是内在功课的邀请函。每一张逆位的牌都在问你：你在抗拒什么？你需要转化什么？</p>`);
   } else if (hasReversed >= 2) {
-    const revNames = reversedCards.map(c => isEn ? (c.en||c.name||'') : (c.name||`${c.suit||''}${c.rank||''}`)).join('、');
+    const revNames = reversedCards.map(c => isEn ? (c.en||c.name||'') : (c.name||`${c.suit||''}${c.rank||''}`)).join(isEn ? ', ' : '、');
     syn += (isEn
       ? `<p>🔄 <strong>${hasReversed} reversed cards</strong> (${revNames}) — these areas contain inner resistance or external delays that need your attention. Reversed doesn\'t mean "bad" — it tells you: this lesson requires more inner work and awareness before it can turn upright.</p>`
       : `<p>🔄 <strong>${hasReversed}张逆位牌</strong>（${revNames}）— 这些领域存在需要你面对的内在阻力或外在延迟。逆位不是"不好"，而是在告诉你：这个课题需要更多的内在工作和觉察才能转正。</p>`);
@@ -567,13 +567,9 @@ function drawTarotCards() {
 }
 
 function flipCard(index) {
-  if (index < tarotState.flipped) {
-    // Clicked an already-flipped card: unflip this and all after
-    tarotState.flipped = index;
-  } else {
-    // Clicked a face-down card: flip this and all before
-    tarotState.flipped = index + 1;
-  }
+  if (index < tarotState.flipped) return; // already flipped — ignore
+  // Clicked a face-down card: flip this and all before
+  tarotState.flipped = index + 1;
   drawTarotUI();
 }
 
@@ -833,7 +829,7 @@ function synthesizeSynastryReading(cards, positions, question, questionThemes, s
       : synData.compatPct >= 55 ? _L('✨ 契合度中等偏上','✨ Above Average Compatibility')
       : synData.compatPct >= 40 ? _L('🌗 契合度中等','🌗 Moderate Compatibility')
       : _L('🌑 契合度充满挑战','🌑 Challenging Compatibility');
-    html += '<p class="synastry-score">' + scoreText + '（' + synData.compatPct + '%）'
+    html += '<p class="synastry-score">' + scoreText + ' (' + synData.compatPct + '%)'
           + ' · ' + _L('和谐','Harmony') + ' ' + synData.goodScore
           + ' / ' + _L('紧张','Tension') + ' ' + synData.hardScore + '</p>';
 

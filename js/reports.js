@@ -1287,7 +1287,7 @@ function generateCareerGenius(positions, houses, aspects, asc, mc, userJob) {
     html += '<tr><td>' + _L('情感连接','Emotional Connection') + '</td><td>★★☆☆☆</td><td>' + (needsConnection ? '★★★★★' : '★★★☆☆') + '</td></tr>';
     html += '</tbody></table>';
 
-    html += '<p style="color:#c87070;text-indent:0;margin-top:12px;"><strong>' + _L('差距诊断：', 'Gap Diagnosis: ') + '</strong>' + _L('你目前的「' + userJob + '」与你的星盘能力结构存在明显错位。这不是你能力不够——而是位置错了。你的星盘配置需要的是创造、表达和成长空间，而非重复执行和被动等待。', 'Your current role as 「' + userJob + '」 is clearly misaligned with your chart\'s ability structure. It\'s not that you\'re not capable — you\'re just in the wrong place. Your chart configuration calls for creativity, expression, and growth, not repetitive execution and passive waiting.') + '</p>';
+    html += '<p style="color:#c87070;text-indent:0;margin-top:12px;"><strong>' + _L('差距诊断：', 'Gap Diagnosis: ') + '</strong>' + _L('你目前的「' + userJob + '」与你的星盘能力结构存在明显错位。这不是你能力不够——而是位置错了。你的星盘配置需要的是创造、表达和成长空间，而非重复执行和被动等待。', 'Your current role as "' + userJob + '" is clearly misaligned with your chart\'s ability structure. It\'s not that you\'re not capable — you\'re just in the wrong place. Your chart configuration calls for creativity, expression, and growth, not repetitive execution and passive waiting.') + '</p>';
     html += '</div>';
   }
 
@@ -1529,7 +1529,7 @@ function generateCareerActionPlan(positions, houses, userJob, topDirections) {
 
   html += '<p style="font-size:1.05em;border-left:3px solid var(--gold-dim);padding-left:18px;color:var(--accent);text-indent:0;">';
   if (userJob && userJob.trim()) {
-    html += _L('「' + userJob + '」不是你该待的地方。', '「' + userJob + '」is not where you belong.');
+    html += _L('「' + userJob + '」不是你该待的地方。', '"' + userJob + '" is not where you belong.');
   } else {
     html += _L('你的灵魂知道哪里不对——即使说不清楚。', 'Your soul knows something is off — even if it can\'t quite articulate it.');
   }
@@ -1796,7 +1796,7 @@ function generateWeeklyFortune(positions, houses, asc) {
   let html = '<div class="report-section">';
   // Daily Moon sign changes — trendy compact edition
   html += '<h3>✦ ' + _L('星象小抄 · 本周糊弄学', 'Astro Cheat Sheet · Wing It This Week') + '</h3>';
-  html += '<table class="chart-table" style="font-size:0.8em;"><thead><tr><th>' + _L('日期','Date') + '</th><th>' + _L('月亮星座','Moon Sign') + '</th><th>' + _L('宜','DO') + '</th><th>' + _L('忌','DON\'T') + '</th></tr></thead><tbody>';
+  html += '<table class="chart-table" style="font-size:0.8em;"><thead><tr><th>' + _L('日期','Date') + '</th><th>' + _L('月亮星座','Moon Sign') + '</th><th>' + _L('宜','DO') + '</th><th>' + _L('忌','DO NOT') + '</th></tr></thead><tbody>';
   const dayNames_ZH = ['周日','周一','周二','周三','周四','周五','周六'];
   const dayNames_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const dayNames = isEn ? dayNames_EN : dayNames_ZH;
@@ -1814,7 +1814,7 @@ function generateWeeklyFortune(positions, houses, asc) {
     return '';
   }
 
-  // 12 Moon-sign-based DO/DON'T — 6 variants per sign, playful & witty
+  // 12 Moon-sign-based DO/DO NOT — 6 variants per sign, playful & witty
   const signDos_ZH = [
     ['<span class="dos-bold">想到就去做</span><br><span class="dos-italic">别想太多是今天的超能力</span>','<span class="dos-bold">穿件亮色</span><br><span class="dos-italic">红色橘色都行，先镇住场子</span>','<span class="dos-bold">把最难的事第一个干掉</span><br><span class="dos-italic">然后一整天空气都是甜的</span>','<span class="dos-bold">运动出汗</span><br><span class="dos-italic">白羊的身体不动会生锈</span>','<span class="dos-bold">说走就走</span><br><span class="dos-italic">换个地方待着也算旅行</span>','<span class="dos-bold">发一条朋友圈</span><br><span class="dos-italic">今天你的表达欲值得被看见</span>'],
     ['<span class="dos-bold">吃顿好的</span><br><span class="dos-italic">今天不将就，从午餐开始升级</span>','<span class="dos-bold">整理一个抽屉</span><br><span class="dos-italic">扔一件就算断舍离</span>','<span class="dos-bold">给自己买杯好咖啡</span><br><span class="dos-italic">坐下来慢慢喝，不准边走边喝</span>','<span class="dos-bold">换上刚洗的床单</span><br><span class="dos-italic">今晚你值得五星级待遇</span>','<span class="dos-bold">摸一摸植物或泥土</span><br><span class="dos-italic">接地气是金牛的充电方式</span>','<span class="dos-bold">列一个"不做什么"清单</span><br><span class="dos-italic">比待办清单更管用</span>'],
@@ -2933,8 +2933,9 @@ function generateSpecialDayReading(chartData, birthInput, specialDays) {
     var gp1 = isEn ? gift.p1 : (PLANETS.find(function(p){return p.id===gift.p1;})||{name:gift.p1}).name;
     var gp2 = isEn ? gift.p2 : (PLANETS.find(function(p){return p.id===gift.p2;})||{name:gift.p2}).name;
     html += '<p>' + _t('specialDay.gift.intro') + '</p>';
+    var giftNameEN = gift.name==='合'?'Conjunction':gift.name==='六合'?'Sextile':gift.name==='刑'?'Square':gift.name==='三合'?'Trine':'Opposition';
     html += '<p class="sr-highlight"><strong>' + gp1 + ' ' + (isEn ? (gift.name==='合'?'Conjunct':gift.name==='六合'?'Sextile':gift.name==='刑'?'Square':gift.name==='三合'?'Trine':'Opposite') : gift.name) + ' ' + gp2 + '</strong> ';
-    html += _L('— 两颗行星之间的' + gift.name + '相，精密度' + (gift.orb ? gift.orb.toFixed(1) + '°' : '') + '。不要因为它不常被提起就忽略它——在不经意的时刻，这个相位可能会成为你解决问题的"非主流"路径。','— A ' + gift.name + ' aspect between these two planets. Don\'t overlook it just because it\'s not often discussed — in unexpected moments, this aspect might become your unconventional path to solving problems.') + '</p>';
+    html += _L('— 两颗行星之间的' + gift.name + '相，精密度' + (gift.orb ? gift.orb.toFixed(1) + '°' : '') + '。不要因为它不常被提起就忽略它——在不经意的时刻，这个相位可能会成为你解决问题的"非主流"路径。','— A ' + giftNameEN + ' aspect between these two planets. Don\'t overlook it just because it\'s not often discussed — in unexpected moments, this aspect might become your unconventional path to solving problems.') + '</p>';
   } else {
     html += '<p>' + _t('specialDay.gift.none') + '</p>';
   }

@@ -58,7 +58,7 @@
   // ══════════════════════════════════════════════════════════════════════════
   add('label.birthdate', '出生日期', 'Birth Date');
   add('label.birthtime', '出生时间', 'Birth Time');
-  add('hint.datePicker', '💡 点击日期框左上角年份可快速切换年份', '💡 Tap the year in the top-left corner to quickly jump years');
+  add('hint.datePicker', '💡 点击日期框左上角年份可快速切换年份', '💡 Tap the year at top-left to jump decades');
   add('hint.birthtime', '💡 记得就填，不记得也没关系，<strong class="time-gold">12:00</strong>就够了。行星照样准，只有上升和宫位是估算的。', '💡 Know it? Enter it. Forgot? No worries — <strong class="time-gold">12:00</strong> works fine. Planets are still spot on; only the ASC and houses are approximate.');
   add('hint.swipeTabs', '← 左右滑动标签栏，可切换查看个人星盘、运势等更多解读 →', '← Swipe the tab bar to view your personal chart, fortune & more →');
   add('hint.scrollLodge', '如模块显示不全，上下滑动页面即可完整加载', 'If items don\'t fully display, scroll up & down to reload');
@@ -83,8 +83,9 @@
   //  PERSON SECTION
   // ══════════════════════════════════════════════════════════════════════════
   add('person.me', '本人', 'You');
-  add('person.partner', '▶ 合盘对方', '▶ Partner');
-  add('person.optional', '（选填，仅合盘需要）', '(optional, synastry only)');
+  add('person.partner', '合盘对方', 'Partner');
+  add('person.optional', '（选填，测感情·测默契·测合作，仅合盘需要）', '(optional — love · friendship · partnership, synastry only)');
+  add('person.cpTagline', '（也可以测测你<span style="font-family:var(--font-heading);font-weight:700;font-size:1.2em;letter-spacing:0.08em;margin:0 1px;">cp</span>有多真，匹配度高说明两人天生一对，匹配度低证明真爱就是偏要强求）', '(Want to test how real your <span style="font-family:var(--font-heading);font-weight:700;font-size:1.2em;letter-spacing:0.08em;margin:0 1px;">CP</span> is? High compatibility = made for each other. Low compatibility = true love fights against all odds.)');
   add('person.expand', '▶ 合盘对方', '▶ Add Partner');
   add('person.collapse', '收起合盘对方', 'Remove Partner');
 
@@ -216,7 +217,7 @@
   add('about.p4', '所以我把它做出来了。然后我想把它分享给每一个还在用别人的尺子量自己的人。', 'So I built it. And now I want to share it with anyone still measuring themselves by someone else\'s ruler.');
   add('about.p5', '很多人一生都在不了解自己的情况下生活。做着自己不喜欢的事，却告诉自己"忍忍就过去了"。对自己说的话，比对讨厌自己的人更过分——但从来没有意识到自己在这么做。因为没有人给过她一面镜子。', 'So many of us go through life without truly knowing ourselves. We do things we don\'t love and tell ourselves to just push through. We say things to ourselves that we\'d never say to someone we dislike — and we never even notice. Because no one ever handed us a mirror.');
   add('about.p6', '星盘不是答案，不是命运，不是绝对。它是你出生那一刻的行星位置——你的底色。告诉你你生来带着什么底色、哪些是你与生俱来的、哪些是需要你来书就的。', 'A birth chart is not an answer, not a fate, not an absolute. It\'s the position of the planets at the exact moment you were born — your foundation. It tells you what you were born with, what\'s always been yours, and what\'s yours to create.');
-  add('about.p7', '知道了，你才可以更好地整装出发。', 'When you truly know yourself, you\'re ready to begin.');
+  add('about.p7', '知道了，你才可以更好地整装出发。', 'When you truly know yourself, you\'re ready to begin again.');
   add('about.closing', '—— LunarVeil', '— LunarVeil');
   add('social.cta', '✦ 加微信解锁深度解读 ✦', '✦ Add WeChat for In-Depth Reading ✦');
   add('social.copyManual', '号：\n请手动复制', 'ID:\nPlease copy manually');
@@ -529,7 +530,6 @@
   add('fortune.available', '今日可抽', 'Available');
   add('rp.available', '今日可查', 'Available');
   add('rp.checked', '今日已查', 'Checked');
-  add('sample.notice', '⚠️ 当前显示为随机示例数据，请修改为你本人的真实出生信息', '⚠️ Showing sample data — please enter your real birth information.');
   add('year.summary', '{year}年主题词：{word1} + {word2}。这是你的"{yearLabel}"。', 'Theme for {year}: {word1} + {word2}. This is your "{yearLabel}".');
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -579,11 +579,11 @@
   // ══════════════════════════════════════════════════════════════════════════
   //  EXTRA UI STRINGS (misc)
   // ══════════════════════════════════════════════════════════════════════════
-  add('misc.year', '年', '');
-  add('misc.month', '月', '');
-  add('misc.day', '日', '');
+  add('misc.year', '年', 'yr');
+  add('misc.month', '月', 'mo');
+  add('misc.day', '日', 'd');
   add('misc.hour', '时', ':');
-  add('misc.minute', '分', '');
+  add('misc.minute', '分', 'm');
   add('misc.degree', '°', '°');
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -621,11 +621,11 @@
   add('specialDay.sr.sunHouse', '太阳落在第{house}宫', 'Sun in the {house}th House');
   add('specialDay.sr.theme', '年度主题', 'Annual Theme');
   // Predictions
-  add('specialDay.pred.saturnComing', '🪐 <strong>土星回归</strong>预计在约<strong>{years}年后</strong>（{age}岁前后，约{date}）到来。土星将回到{sign}，触发你第{house}宫的人生课题——它是一次"人生质检"，逼你交出答卷，也给你打开下一关的钥匙。提前知道，提前准备。', '🪐 <strong>Saturn Return</strong>预计在约<strong>{years} years</strong> (around age {age}, ~{date}). Saturn returns to {sign}, activating your {house}th House — it\'s a "life audit" that demands answers and hands you the key to the next level.');
+  add('specialDay.pred.saturnComing', '🪐 <strong>土星回归</strong>预计在约<strong>{years}年后</strong>（{age}岁前后，约{date}）到来。土星将回到{sign}，触发你第{house}宫的人生课题——它是一次"人生质检"，逼你交出答卷，也给你打开下一关的钥匙。提前知道，提前准备。', '🪐 <strong>Saturn Return</strong> in ~<strong>{years} years</strong> (around age {age}, ~{date}). Saturn returns to {sign}, activating your {house}th House — it\'s a "life audit" that demands answers and hands you the key to the next level.');
   add('specialDay.pred.saturnNow', '🪐 <strong>土星回归正在进行中</strong>——此刻土星正踩在你出生时的土星位置上。这是人生最重要的转折点之一。', '🪐 <strong>Saturn Return in progress</strong> — Saturn is currently crossing your natal Saturn position. One of life\'s most important turning points.');
-  add('specialDay.pred.jupiterComing', '🌟 <strong>木星回归</strong>预计在约<strong>{years}年后</strong>（约{date}）到来。木星将回到{sign}，触发你第{house}宫的扩张领域——那是一轮新大运的起点，该出发的时候别犹豫。', '🌟 <strong>Jupiter Return</strong>预计在约<strong>{years} years</strong> (~{date}). Jupiter returns to {sign}, activating your {house}th House — the start of a new growth cycle. Don\'t hesitate to begin.');
+  add('specialDay.pred.jupiterComing', '🌟 <strong>木星回归</strong>预计在约<strong>{years}年后</strong>（约{date}）到来。木星将回到{sign}，触发你第{house}宫的扩张领域——那是一轮新大运的起点，该出发的时候别犹豫。', '🌟 <strong>Jupiter Return</strong> in ~<strong>{years} years</strong> (~{date}). Jupiter returns to {sign}, activating your {house}th House — the start of a new growth cycle. Don\'t hesitate to begin.');
   add('specialDay.pred.jupiterNow', '🌟 <strong>木星回归正在进行中</strong>——木星正站在你出生时的位置，开启新一轮12年的成长周期。', '🌟 <strong>Jupiter Return in progress</strong> — Jupiter stands at your natal position, opening a new 12-year growth cycle.');
-  add('specialDay.pred.progMoonComing', '🌙 <strong>次限月亮</strong>预计在约<strong>{months}个月后</strong>（约{date}）从{current}换入{next}——届时你的情绪操作系统将全面切换，安全感来源和直觉方向都会改变。', '🌙 <strong>Progressed Moon</strong>预计在约<strong>{months} months</strong> (~{date}) from {current} into {next} — when your emotional OS fully switches, along with your sense of security and intuition.');
+  add('specialDay.pred.progMoonComing', '🌙 <strong>次限月亮</strong>预计在约<strong>{months}个月后</strong>（约{date}）从{current}换入{next}——届时你的情绪操作系统将全面切换，安全感来源和直觉方向都会改变。', '🌙 <strong>Progressed Moon</strong> in ~<strong>{months} months</strong> (~{date}) from {current} into {next} — when your emotional OS fully switches, along with your sense of security and intuition.');
   add('specialDay.pred.progMoonNow', '🌙 <strong>次限月亮正在换座</strong>——就在此刻，你的情绪操作系统正在从{current}迁移到{next}。', '🌙 <strong>Progressed Moon is changing signs</strong> — your emotional OS is migrating from {current} to {next} right now.');
   // Progressed moon text
   add('specialDay.pm.current', '当前次限月亮位于', 'Your progressed Moon is currently in ');
@@ -701,6 +701,36 @@
   /** Get mode name by index (0-2: cardinal,fixed,mutable) */
   window.getModeName = function(i) { return window._ta('modes', i); };
 
+  /** Fill timezone select options with language-appropriate city labels */
+  function fillTimezoneOptions() {
+    var isEn = getCurrentLang() === 'en';
+    var TZ_CITIES = [
+      [-10, '夏威夷', 'Hawaii'], [-8, '洛杉矶', 'Los Angeles'], [-7, '丹佛', 'Denver'],
+      [-6, '墨西哥城', 'Mexico City'], [-5, '纽约', 'New York'], [-3, '巴西', 'Brazil'],
+      [0, '伦敦', 'London'], [1, '巴黎', 'Paris'], [3, '莫斯科', 'Moscow'],
+      [4, '迪拜', 'Dubai'], [5.5, '印度', 'India'], [7, '曼谷', 'Bangkok'],
+      [8, '北京', 'Beijing'], [9, '东京', 'Tokyo'], [10, '悉尼', 'Sydney'],
+      [12, '奥克兰', 'Auckland']
+    ];
+    var ALL_VALUES = [-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,5.5,6,7,8,9,10,11,12];
+    var cityMap = {};
+    for (var i = 0; i < TZ_CITIES.length; i++) {
+      cityMap[TZ_CITIES[i][0]] = isEn ? TZ_CITIES[i][2] : TZ_CITIES[i][1];
+    }
+    var html = '';
+    for (var j = 0; j < ALL_VALUES.length; j++) {
+      var v = ALL_VALUES[j];
+      var sign = v >= 0 ? '+' : '';
+      var label = 'UTC' + sign + v;
+      if (cityMap[v]) label += ' (' + cityMap[v] + ')';
+      html += '<option value="' + v + '">' + label + '</option>';
+    }
+    var sel1 = document.getElementById('p1_tz');
+    var sel2 = document.getElementById('p2_tz');
+    if (sel1) { var oldVal1 = sel1.value; sel1.innerHTML = html; sel1.value = oldVal1 || '8'; }
+    if (sel2) { var oldVal2 = sel2.value; sel2.innerHTML = html; sel2.value = oldVal2 || '8'; }
+  }
+
   /** Set language and apply translations */
   window.setLanguage = function(lang) {
     if (lang !== 'zh' && lang !== 'en') lang = 'zh';
@@ -764,7 +794,29 @@
       } catch(e) { /* silent */ }
     }
 
-    // 7. Refresh badges
+    // 7. Sync city name in address fields with current language
+    var addrFields = ['p1_addr', 'p2_addr'];
+    for (var af = 0; af < addrFields.length; af++) {
+      var addrEl = document.getElementById(addrFields[af]);
+      if (addrEl) {
+        var cn = addrEl.getAttribute('data-city-cn');
+        var en = addrEl.getAttribute('data-city-en');
+        if (cn && en) {
+          var prevVal = addrEl.value;
+          addrEl.value = lang === 'en' ? en : cn;
+          // Also update geo status text
+          var statusEl = document.getElementById(addrFields[af] === 'p1_addr' ? 'p1_geo_status' : 'p2_geo_status');
+          if (statusEl && statusEl.textContent) {
+            statusEl.textContent = statusEl.textContent.replace(prevVal, lang === 'en' ? en : cn);
+          }
+        }
+      }
+    }
+
+    // 8. Fill timezone selects with language-appropriate city labels
+    fillTimezoneOptions();
+
+    // 9. Refresh badges
     try {
       if (typeof updateLodgeBadges === 'function') updateLodgeBadges();
     } catch(e) { /* silent */ }

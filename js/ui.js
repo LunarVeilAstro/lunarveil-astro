@@ -2,6 +2,56 @@
 // Global state: chartData1, chartData2
 // Depends on: ALL other modules (loaded last)
 // ── Error trap: log to console only, not visible to visitors ────────────
+
+// ── Wrapper: openAnswerBook in lodge section needs data.js (lazy) ──────────
+// lodge.js already ran (defer order), so real fns are defined. Override immediately.
+(function() {
+  var _openAB = openAnswerBook;
+  var _openMB = openMagicBall;
+  var _ensureData = function(fn) {
+    if (typeof BOOK_ANSWERS === 'function' && typeof BALL_ANSWERS === 'function') {
+      fn(); return;
+    }
+    loadScript('js/data.js?v=20260712').then(function() { fn(); })
+      .catch(function(e) {
+        console.error('data.js load error:', e);
+        alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.'));
+      });
+  };
+  openAnswerBook = function() { _ensureData(_openAB); };
+  openMagicBall = function() { _ensureData(_openMB); };
+})();
+
+// ── Wrapper: openSingleTarot in lodge section needs tarot.js (lazy) ──────
+// Overwritten by the real function once tarot.js loads
+function openSingleTarot() {
+  if (window._modulesLoaded) return; // Already loaded, real fn handles it
+  // Lazy-load the heavy modules, then delegate to real openSingleTarot
+  loadScript('js/data.js?v=20260712').then(function() {
+    return Promise.all([
+      loadScript('js/reports.js?v=20260712'),
+      loadScript('js/tarot.js?v=20260712')
+    ]);
+  }).then(function() {
+    window._modulesLoaded = true;
+    openSingleTarot(); // Real function now defined (replaced this wrapper)
+  }).catch(function(e) {
+    console.error('Module load error:', e);
+    alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.'));
+  });
+}
+
+// ── Lazy loader for heavy modules ────────────────────────────────────────
+function loadScript(src) {
+  return new Promise(function(resolve, reject) {
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
 window.onerror = function(msg, url, line, col, err) {
   console.error('JS Error line ' + line + ': ' + msg, err || '');
 };
@@ -83,377 +133,389 @@ function renderSocialTeaser(icon, title, sub, actionText, onClick) {
 // ── Local city coordinate DB (avoids Nominatim for known cities) ──────────
 var CITY_DB = [
   // === 直辖市 === UTC+8
-  { k:'北京', lat:39.904, lng:116.407, tz:8 },
-  { k:'上海', lat:31.230, lng:121.474, tz:8 },
-  { k:'天津', lat:39.085, lng:117.200, tz:8 },
-  { k:'重庆', lat:29.432, lng:106.912, tz:8 },
+  { k:'北京', en:'Beijing', lat:39.904, lng:116.407, tz:8 },
+  { k:'上海', en:'Shanghai', lat:31.230, lng:121.474, tz:8 },
+  { k:'天津', en:'Tianjin', lat:39.085, lng:117.200, tz:8 },
+  { k:'重庆', en:'Chongqing', lat:29.432, lng:106.912, tz:8 },
   // === 广东 ===
-  { k:'广州', lat:23.129, lng:113.264, tz:8 },
-  { k:'深圳', lat:22.543, lng:114.058, tz:8 },
-  { k:'东莞', lat:23.021, lng:113.752, tz:8 },
-  { k:'佛山', lat:23.022, lng:113.122, tz:8 },
-  { k:'珠海', lat:22.271, lng:113.577, tz:8 },
-  { k:'惠州', lat:23.112, lng:114.417, tz:8 },
-  { k:'中山', lat:22.516, lng:113.393, tz:8 },
-  { k:'江门', lat:22.579, lng:113.082, tz:8 },
-  { k:'湛江', lat:21.271, lng:110.359, tz:8 },
-  { k:'汕头', lat:23.354, lng:116.682, tz:8 },
-  { k:'茂名', lat:21.663, lng:110.925, tz:8 },
-  { k:'肇庆', lat:23.047, lng:112.465, tz:8 },
-  { k:'梅州', lat:24.288, lng:116.122, tz:8 },
-  { k:'汕尾', lat:22.786, lng:115.375, tz:8 },
-  { k:'河源', lat:23.744, lng:114.701, tz:8 },
-  { k:'清远', lat:23.682, lng:113.056, tz:8 },
-  { k:'韶关', lat:24.801, lng:113.592, tz:8 },
-  { k:'揭阳', lat:23.550, lng:116.373, tz:8 },
-  { k:'潮州', lat:23.657, lng:116.622, tz:8 },
-  { k:'阳江', lat:21.858, lng:111.983, tz:8 },
-  { k:'云浮', lat:22.915, lng:112.045, tz:8 },
+  { k:'广州', en:'Guangzhou', lat:23.129, lng:113.264, tz:8 },
+  { k:'深圳', en:'Shenzhen', lat:22.543, lng:114.058, tz:8 },
+  { k:'东莞', en:'Dongguan', lat:23.021, lng:113.752, tz:8 },
+  { k:'佛山', en:'Foshan', lat:23.022, lng:113.122, tz:8 },
+  { k:'珠海', en:'Zhuhai', lat:22.271, lng:113.577, tz:8 },
+  { k:'惠州', en:'Huizhou', lat:23.112, lng:114.417, tz:8 },
+  { k:'中山', en:'Zhongshan', lat:22.516, lng:113.393, tz:8 },
+  { k:'江门', en:'Jiangmen', lat:22.579, lng:113.082, tz:8 },
+  { k:'湛江', en:'Zhanjiang', lat:21.271, lng:110.359, tz:8 },
+  { k:'汕头', en:'Shantou', lat:23.354, lng:116.682, tz:8 },
+  { k:'茂名', en:'Maoming', lat:21.663, lng:110.925, tz:8 },
+  { k:'肇庆', en:'Zhaoqing', lat:23.047, lng:112.465, tz:8 },
+  { k:'梅州', en:'Meizhou', lat:24.288, lng:116.122, tz:8 },
+  { k:'汕尾', en:'Shanwei', lat:22.786, lng:115.375, tz:8 },
+  { k:'河源', en:'Heyuan', lat:23.744, lng:114.701, tz:8 },
+  { k:'清远', en:'Qingyuan', lat:23.682, lng:113.056, tz:8 },
+  { k:'韶关', en:'Shaoguan', lat:24.801, lng:113.592, tz:8 },
+  { k:'揭阳', en:'Jieyang', lat:23.550, lng:116.373, tz:8 },
+  { k:'潮州', en:'Chaozhou', lat:23.657, lng:116.622, tz:8 },
+  { k:'阳江', en:'Yangjiang', lat:21.858, lng:111.983, tz:8 },
+  { k:'云浮', en:'Yunfu', lat:22.915, lng:112.045, tz:8 },
   // === 浙江 ===
-  { k:'杭州', lat:30.274, lng:120.155, tz:8 },
-  { k:'宁波', lat:29.868, lng:121.544, tz:8 },
-  { k:'温州', lat:27.994, lng:120.699, tz:8 },
-  { k:'绍兴', lat:30.030, lng:120.580, tz:8 },
-  { k:'嘉兴', lat:30.747, lng:120.756, tz:8 },
-  { k:'湖州', lat:30.893, lng:120.088, tz:8 },
-  { k:'金华', lat:29.078, lng:119.647, tz:8 },
-  { k:'台州', lat:28.656, lng:121.421, tz:8 },
-  { k:'衢州', lat:28.936, lng:118.874, tz:8 },
-  { k:'丽水', lat:28.467, lng:119.923, tz:8 },
-  { k:'舟山', lat:29.985, lng:122.207, tz:8 },
+  { k:'杭州', en:'Hangzhou', lat:30.274, lng:120.155, tz:8 },
+  { k:'宁波', en:'Ningbo', lat:29.868, lng:121.544, tz:8 },
+  { k:'温州', en:'Wenzhou', lat:27.994, lng:120.699, tz:8 },
+  { k:'绍兴', en:'Shaoxing', lat:30.030, lng:120.580, tz:8 },
+  { k:'嘉兴', en:'Jiaxing', lat:30.747, lng:120.756, tz:8 },
+  { k:'湖州', en:'Huzhou', lat:30.893, lng:120.088, tz:8 },
+  { k:'金华', en:'Jinhua', lat:29.078, lng:119.647, tz:8 },
+  { k:'台州', en:'Taizhou', lat:28.656, lng:121.421, tz:8 },
+  { k:'衢州', en:'Quzhou', lat:28.936, lng:118.874, tz:8 },
+  { k:'丽水', en:'Lishui', lat:28.467, lng:119.923, tz:8 },
+  { k:'舟山', en:'Zhoushan', lat:29.985, lng:122.207, tz:8 },
   // === 江苏 ===
-  { k:'南京', lat:32.060, lng:118.797, tz:8 },
-  { k:'苏州', lat:31.299, lng:120.585, tz:8 },
-  { k:'无锡', lat:31.491, lng:120.312, tz:8 },
-  { k:'常州', lat:31.811, lng:119.974, tz:8 },
-  { k:'南通', lat:31.979, lng:120.894, tz:8 },
-  { k:'徐州', lat:34.206, lng:117.284, tz:8 },
-  { k:'扬州', lat:32.394, lng:119.413, tz:8 },
-  { k:'镇江', lat:32.190, lng:119.427, tz:8 },
-  { k:'盐城', lat:33.348, lng:120.162, tz:8 },
-  { k:'淮安', lat:33.552, lng:119.113, tz:8 },
-  { k:'连云港', lat:34.597, lng:119.221, tz:8 },
-  { k:'泰州', lat:32.456, lng:119.924, tz:8 },
-  { k:'宿迁', lat:33.962, lng:118.275, tz:8 },
+  { k:'南京', en:'Nanjing', lat:32.060, lng:118.797, tz:8 },
+  { k:'苏州', en:'Suzhou', lat:31.299, lng:120.585, tz:8 },
+  { k:'无锡', en:'Wuxi', lat:31.491, lng:120.312, tz:8 },
+  { k:'常州', en:'Changzhou', lat:31.811, lng:119.974, tz:8 },
+  { k:'南通', en:'Nantong', lat:31.979, lng:120.894, tz:8 },
+  { k:'徐州', en:'Xuzhou', lat:34.206, lng:117.284, tz:8 },
+  { k:'扬州', en:'Yangzhou', lat:32.394, lng:119.413, tz:8 },
+  { k:'镇江', en:'Zhenjiang', lat:32.190, lng:119.427, tz:8 },
+  { k:'盐城', en:'Yancheng', lat:33.348, lng:120.162, tz:8 },
+  { k:'淮安', en:'Huai\'an', lat:33.552, lng:119.113, tz:8 },
+  { k:'连云港', en:'Lianyungang', lat:34.597, lng:119.221, tz:8 },
+  { k:'泰州', en:'Taizhou', lat:32.456, lng:119.924, tz:8 },
+  { k:'宿迁', en:'Suqian', lat:33.962, lng:118.275, tz:8 },
   // === 山东 ===
-  { k:'济南', lat:36.651, lng:116.985, tz:8 },
-  { k:'青岛', lat:36.067, lng:120.383, tz:8 },
-  { k:'烟台', lat:37.539, lng:121.392, tz:8 },
-  { k:'淄博', lat:36.813, lng:118.055, tz:8 },
-  { k:'潍坊', lat:36.707, lng:119.162, tz:8 },
-  { k:'临沂', lat:35.105, lng:118.350, tz:8 },
-  { k:'威海', lat:37.513, lng:122.120, tz:8 },
-  { k:'日照', lat:35.416, lng:119.527, tz:8 },
-  { k:'济宁', lat:35.415, lng:116.587, tz:8 },
-  { k:'泰安', lat:36.200, lng:117.088, tz:8 },
-  { k:'德州', lat:37.436, lng:116.359, tz:8 },
-  { k:'菏泽', lat:35.234, lng:115.481, tz:8 },
-  { k:'聊城', lat:36.456, lng:115.985, tz:8 },
-  { k:'滨州', lat:37.382, lng:117.973, tz:8 },
-  { k:'东营', lat:37.435, lng:118.675, tz:8 },
-  { k:'枣庄', lat:34.811, lng:117.323, tz:8 },
+  { k:'济南', en:'Jinan', lat:36.651, lng:116.985, tz:8 },
+  { k:'青岛', en:'Qingdao', lat:36.067, lng:120.383, tz:8 },
+  { k:'烟台', en:'Yantai', lat:37.539, lng:121.392, tz:8 },
+  { k:'淄博', en:'Zibo', lat:36.813, lng:118.055, tz:8 },
+  { k:'潍坊', en:'Weifang', lat:36.707, lng:119.162, tz:8 },
+  { k:'临沂', en:'Linyi', lat:35.105, lng:118.350, tz:8 },
+  { k:'威海', en:'Weihai', lat:37.513, lng:122.120, tz:8 },
+  { k:'日照', en:'Rizhao', lat:35.416, lng:119.527, tz:8 },
+  { k:'济宁', en:'Jining', lat:35.415, lng:116.587, tz:8 },
+  { k:'泰安', en:'Tai\'an', lat:36.200, lng:117.088, tz:8 },
+  { k:'德州', en:'Dezhou', lat:37.436, lng:116.359, tz:8 },
+  { k:'菏泽', en:'Heze', lat:35.234, lng:115.481, tz:8 },
+  { k:'聊城', en:'Liaocheng', lat:36.456, lng:115.985, tz:8 },
+  { k:'滨州', en:'Binzhou', lat:37.382, lng:117.973, tz:8 },
+  { k:'东营', en:'Dongying', lat:37.435, lng:118.675, tz:8 },
+  { k:'枣庄', en:'Zaozhuang', lat:34.811, lng:117.323, tz:8 },
   // === 四川 ===
-  { k:'成都', lat:30.573, lng:104.067, tz:8 },
-  { k:'绵阳', lat:31.467, lng:104.679, tz:8 },
-  { k:'宜宾', lat:28.751, lng:104.644, tz:8 },
-  { k:'德阳', lat:31.127, lng:104.398, tz:8 },
-  { k:'南充', lat:30.837, lng:106.111, tz:8 },
-  { k:'泸州', lat:28.872, lng:105.443, tz:8 },
-  { k:'达州', lat:31.209, lng:107.468, tz:8 },
-  { k:'乐山', lat:29.552, lng:103.766, tz:8 },
-  { k:'自贡', lat:29.339, lng:104.779, tz:8 },
-  { k:'攀枝花', lat:26.582, lng:101.719, tz:8 },
-  { k:'广元', lat:32.436, lng:105.844, tz:8 },
-  { k:'遂宁', lat:30.533, lng:105.593, tz:8 },
-  { k:'内江', lat:29.580, lng:105.058, tz:8 },
-  { k:'眉山', lat:30.077, lng:103.848, tz:8 },
-  { k:'资阳', lat:30.129, lng:104.627, tz:8 },
-  { k:'巴中', lat:31.859, lng:106.753, tz:8 },
-  { k:'雅安', lat:29.981, lng:103.013, tz:8 },
+  { k:'成都', en:'Chengdu', lat:30.573, lng:104.067, tz:8 },
+  { k:'绵阳', en:'Mianyang', lat:31.467, lng:104.679, tz:8 },
+  { k:'宜宾', en:'Yibin', lat:28.751, lng:104.644, tz:8 },
+  { k:'德阳', en:'Deyang', lat:31.127, lng:104.398, tz:8 },
+  { k:'南充', en:'Nanchong', lat:30.837, lng:106.111, tz:8 },
+  { k:'泸州', en:'Luzhou', lat:28.872, lng:105.443, tz:8 },
+  { k:'达州', en:'Dazhou', lat:31.209, lng:107.468, tz:8 },
+  { k:'乐山', en:'Leshan', lat:29.552, lng:103.766, tz:8 },
+  { k:'自贡', en:'Zigong', lat:29.339, lng:104.779, tz:8 },
+  { k:'攀枝花', en:'Panzhihua', lat:26.582, lng:101.719, tz:8 },
+  { k:'广元', en:'Guangyuan', lat:32.436, lng:105.844, tz:8 },
+  { k:'遂宁', en:'Suining', lat:30.533, lng:105.593, tz:8 },
+  { k:'内江', en:'Neijiang', lat:29.580, lng:105.058, tz:8 },
+  { k:'眉山', en:'Meishan', lat:30.077, lng:103.848, tz:8 },
+  { k:'资阳', en:'Ziyang', lat:30.129, lng:104.627, tz:8 },
+  { k:'巴中', en:'Bazhong', lat:31.859, lng:106.753, tz:8 },
+  { k:'雅安', en:'Ya\'an', lat:29.981, lng:103.013, tz:8 },
   // === 湖北 ===
-  { k:'武汉', lat:30.593, lng:114.305, tz:8 },
-  { k:'襄阳', lat:32.009, lng:112.122, tz:8 },
-  { k:'宜昌', lat:30.691, lng:111.287, tz:8 },
-  { k:'荆州', lat:30.335, lng:112.240, tz:8 },
-  { k:'黄冈', lat:30.454, lng:114.872, tz:8 },
-  { k:'十堰', lat:32.630, lng:110.798, tz:8 },
-  { k:'孝感', lat:30.925, lng:113.927, tz:8 },
-  { k:'荆门', lat:31.035, lng:112.199, tz:8 },
-  { k:'鄂州', lat:30.391, lng:114.895, tz:8 },
-  { k:'黄石', lat:30.200, lng:115.039, tz:8 },
-  { k:'咸宁', lat:29.841, lng:114.322, tz:8 },
-  { k:'随州', lat:31.690, lng:113.383, tz:8 },
-  { k:'恩施', lat:30.283, lng:109.487, tz:8 },
+  { k:'武汉', en:'Wuhan', lat:30.593, lng:114.305, tz:8 },
+  { k:'襄阳', en:'Xiangyang', lat:32.009, lng:112.122, tz:8 },
+  { k:'宜昌', en:'Yichang', lat:30.691, lng:111.287, tz:8 },
+  { k:'荆州', en:'Jingzhou', lat:30.335, lng:112.240, tz:8 },
+  { k:'黄冈', en:'Huanggang', lat:30.454, lng:114.872, tz:8 },
+  { k:'十堰', en:'Shiyan', lat:32.630, lng:110.798, tz:8 },
+  { k:'孝感', en:'Xiaogan', lat:30.925, lng:113.927, tz:8 },
+  { k:'荆门', en:'Jingmen', lat:31.035, lng:112.199, tz:8 },
+  { k:'鄂州', en:'Ezhou', lat:30.391, lng:114.895, tz:8 },
+  { k:'黄石', en:'Huangshi', lat:30.200, lng:115.039, tz:8 },
+  { k:'咸宁', en:'Xianning', lat:29.841, lng:114.322, tz:8 },
+  { k:'随州', en:'Suizhou', lat:31.690, lng:113.383, tz:8 },
+  { k:'恩施', en:'Enshi', lat:30.283, lng:109.487, tz:8 },
   // === 湖南 ===
-  { k:'长沙', lat:28.228, lng:112.939, tz:8 },
-  { k:'岳阳', lat:29.357, lng:113.129, tz:8 },
-  { k:'株洲', lat:27.828, lng:113.134, tz:8 },
-  { k:'湘潭', lat:27.830, lng:112.944, tz:8 },
-  { k:'衡阳', lat:26.893, lng:112.572, tz:8 },
-  { k:'常德', lat:29.032, lng:111.698, tz:8 },
-  { k:'郴州', lat:25.771, lng:113.015, tz:8 },
-  { k:'怀化', lat:27.550, lng:109.959, tz:8 },
-  { k:'邵阳', lat:27.239, lng:111.468, tz:8 },
-  { k:'永州', lat:26.420, lng:111.612, tz:8 },
-  { k:'娄底', lat:27.697, lng:111.996, tz:8 },
-  { k:'益阳', lat:28.554, lng:112.355, tz:8 },
-  { k:'张家界', lat:29.117, lng:110.479, tz:8 },
+  { k:'长沙', en:'Changsha', lat:28.228, lng:112.939, tz:8 },
+  { k:'岳阳', en:'Yueyang', lat:29.357, lng:113.129, tz:8 },
+  { k:'株洲', en:'Zhuzhou', lat:27.828, lng:113.134, tz:8 },
+  { k:'湘潭', en:'Xiangtan', lat:27.830, lng:112.944, tz:8 },
+  { k:'衡阳', en:'Hengyang', lat:26.893, lng:112.572, tz:8 },
+  { k:'常德', en:'Changde', lat:29.032, lng:111.698, tz:8 },
+  { k:'郴州', en:'Chenzhou', lat:25.771, lng:113.015, tz:8 },
+  { k:'怀化', en:'Huaihua', lat:27.550, lng:109.959, tz:8 },
+  { k:'邵阳', en:'Shaoyang', lat:27.239, lng:111.468, tz:8 },
+  { k:'永州', en:'Yongzhou', lat:26.420, lng:111.612, tz:8 },
+  { k:'娄底', en:'Loudi', lat:27.697, lng:111.996, tz:8 },
+  { k:'益阳', en:'Yiyang', lat:28.554, lng:112.355, tz:8 },
+  { k:'张家界', en:'Zhangjiajie', lat:29.117, lng:110.479, tz:8 },
   // === 河南 ===
-  { k:'郑州', lat:34.746, lng:113.625, tz:8 },
-  { k:'洛阳', lat:34.618, lng:112.454, tz:8 },
-  { k:'开封', lat:34.797, lng:114.307, tz:8 },
-  { k:'南阳', lat:32.991, lng:112.528, tz:8 },
-  { k:'许昌', lat:34.036, lng:113.852, tz:8 },
-  { k:'新乡', lat:35.304, lng:113.927, tz:8 },
-  { k:'信阳', lat:32.147, lng:114.091, tz:8 },
-  { k:'安阳', lat:36.098, lng:114.393, tz:8 },
-  { k:'商丘', lat:34.414, lng:115.656, tz:8 },
-  { k:'焦作', lat:35.216, lng:113.242, tz:8 },
-  { k:'平顶山', lat:33.766, lng:113.193, tz:8 },
-  { k:'驻马店', lat:33.012, lng:114.023, tz:8 },
-  { k:'周口', lat:33.636, lng:114.702, tz:8 },
-  { k:'漯河', lat:33.581, lng:114.017, tz:8 },
-  { k:'濮阳', lat:35.762, lng:115.029, tz:8 },
+  { k:'郑州', en:'Zhengzhou', lat:34.746, lng:113.625, tz:8 },
+  { k:'洛阳', en:'Luoyang', lat:34.618, lng:112.454, tz:8 },
+  { k:'开封', en:'Kaifeng', lat:34.797, lng:114.307, tz:8 },
+  { k:'南阳', en:'Nanyang', lat:32.991, lng:112.528, tz:8 },
+  { k:'许昌', en:'Xuchang', lat:34.036, lng:113.852, tz:8 },
+  { k:'新乡', en:'Xinxiang', lat:35.304, lng:113.927, tz:8 },
+  { k:'信阳', en:'Xinyang', lat:32.147, lng:114.091, tz:8 },
+  { k:'安阳', en:'Anyang', lat:36.098, lng:114.393, tz:8 },
+  { k:'商丘', en:'Shangqiu', lat:34.414, lng:115.656, tz:8 },
+  { k:'焦作', en:'Jiaozuo', lat:35.216, lng:113.242, tz:8 },
+  { k:'平顶山', en:'Pingdingshan', lat:33.766, lng:113.193, tz:8 },
+  { k:'驻马店', en:'Zhumadian', lat:33.012, lng:114.023, tz:8 },
+  { k:'周口', en:'Zhoukou', lat:33.636, lng:114.702, tz:8 },
+  { k:'漯河', en:'Luohe', lat:33.581, lng:114.017, tz:8 },
+  { k:'濮阳', en:'Puyang', lat:35.762, lng:115.029, tz:8 },
   // === 河北 ===
-  { k:'石家庄', lat:38.042, lng:114.515, tz:8 },
-  { k:'唐山', lat:39.630, lng:118.180, tz:8 },
-  { k:'保定', lat:38.874, lng:115.465, tz:8 },
-  { k:'邯郸', lat:36.626, lng:114.539, tz:8 },
-  { k:'秦皇岛', lat:39.935, lng:119.600, tz:8 },
-  { k:'廊坊', lat:39.538, lng:116.684, tz:8 },
-  { k:'沧州', lat:38.304, lng:116.839, tz:8 },
-  { k:'邢台', lat:37.071, lng:114.504, tz:8 },
-  { k:'衡水', lat:37.739, lng:115.669, tz:8 },
-  { k:'承德', lat:40.952, lng:117.962, tz:8 },
-  { k:'张家口', lat:40.768, lng:114.886, tz:8 },
+  { k:'石家庄', en:'Shijiazhuang', lat:38.042, lng:114.515, tz:8 },
+  { k:'唐山', en:'Tangshan', lat:39.630, lng:118.180, tz:8 },
+  { k:'保定', en:'Baoding', lat:38.874, lng:115.465, tz:8 },
+  { k:'邯郸', en:'Handan', lat:36.626, lng:114.539, tz:8 },
+  { k:'秦皇岛', en:'Qinhuangdao', lat:39.935, lng:119.600, tz:8 },
+  { k:'廊坊', en:'Langfang', lat:39.538, lng:116.684, tz:8 },
+  { k:'沧州', en:'Cangzhou', lat:38.304, lng:116.839, tz:8 },
+  { k:'邢台', en:'Xingtai', lat:37.071, lng:114.504, tz:8 },
+  { k:'衡水', en:'Hengshui', lat:37.739, lng:115.669, tz:8 },
+  { k:'承德', en:'Chengde', lat:40.952, lng:117.962, tz:8 },
+  { k:'张家口', en:'Zhangjiakou', lat:40.768, lng:114.886, tz:8 },
   // === 山西 ===
-  { k:'太原', lat:37.870, lng:112.550, tz:8 },
-  { k:'大同', lat:40.076, lng:113.300, tz:8 },
-  { k:'运城', lat:35.027, lng:111.007, tz:8 },
-  { k:'临汾', lat:36.088, lng:111.519, tz:8 },
-  { k:'长治', lat:36.196, lng:113.117, tz:8 },
-  { k:'晋城', lat:35.491, lng:112.851, tz:8 },
-  { k:'阳泉', lat:37.857, lng:113.580, tz:8 },
-  { k:'忻州', lat:38.416, lng:112.734, tz:8 },
-  { k:'吕梁', lat:37.519, lng:111.144, tz:8 },
-  { k:'晋中', lat:37.687, lng:112.753, tz:8 },
-  { k:'朔州', lat:39.332, lng:112.433, tz:8 },
+  { k:'太原', en:'Taiyuan', lat:37.870, lng:112.550, tz:8 },
+  { k:'大同', en:'Datong', lat:40.076, lng:113.300, tz:8 },
+  { k:'运城', en:'Yuncheng', lat:35.027, lng:111.007, tz:8 },
+  { k:'临汾', en:'Linfen', lat:36.088, lng:111.519, tz:8 },
+  { k:'长治', en:'Changzhi', lat:36.196, lng:113.117, tz:8 },
+  { k:'晋城', en:'Jincheng', lat:35.491, lng:112.851, tz:8 },
+  { k:'阳泉', en:'Yangquan', lat:37.857, lng:113.580, tz:8 },
+  { k:'忻州', en:'Xinzhou', lat:38.416, lng:112.734, tz:8 },
+  { k:'吕梁', en:'Lvliang', lat:37.519, lng:111.144, tz:8 },
+  { k:'晋中', en:'Jinzhong', lat:37.687, lng:112.753, tz:8 },
+  { k:'朔州', en:'Shuozhou', lat:39.332, lng:112.433, tz:8 },
   // === 陕西 ===
-  { k:'西安', lat:34.341, lng:108.940, tz:8 },
-  { k:'咸阳', lat:34.330, lng:108.710, tz:8 },
-  { k:'宝鸡', lat:34.362, lng:107.238, tz:8 },
-  { k:'延安', lat:36.585, lng:109.490, tz:8 },
-  { k:'榆林', lat:38.285, lng:109.734, tz:8 },
-  { k:'汉中', lat:33.068, lng:107.023, tz:8 },
-  { k:'安康', lat:32.685, lng:109.029, tz:8 },
-  { k:'商洛', lat:33.873, lng:109.941, tz:8 },
-  { k:'渭南', lat:34.500, lng:109.510, tz:8 },
-  { k:'铜川', lat:34.897, lng:108.945, tz:8 },
+  { k:'西安', en:'Xi\'an', lat:34.341, lng:108.940, tz:8 },
+  { k:'咸阳', en:'Xianyang', lat:34.330, lng:108.710, tz:8 },
+  { k:'宝鸡', en:'Baoji', lat:34.362, lng:107.238, tz:8 },
+  { k:'延安', en:'Yan\'an', lat:36.585, lng:109.490, tz:8 },
+  { k:'榆林', en:'Yulin', lat:38.285, lng:109.734, tz:8 },
+  { k:'汉中', en:'Hanzhong', lat:33.068, lng:107.023, tz:8 },
+  { k:'安康', en:'Ankang', lat:32.685, lng:109.029, tz:8 },
+  { k:'商洛', en:'Shangluo', lat:33.873, lng:109.941, tz:8 },
+  { k:'渭南', en:'Weinan', lat:34.500, lng:109.510, tz:8 },
+  { k:'铜川', en:'Tongchuan', lat:34.897, lng:108.945, tz:8 },
   // === 安徽 ===
-  { k:'合肥', lat:31.821, lng:117.229, tz:8 },
-  { k:'芜湖', lat:31.353, lng:118.433, tz:8 },
-  { k:'蚌埠', lat:32.917, lng:117.389, tz:8 },
-  { k:'安庆', lat:30.543, lng:117.064, tz:8 },
-  { k:'马鞍山', lat:31.670, lng:118.506, tz:8 },
-  { k:'滁州', lat:32.301, lng:118.317, tz:8 },
-  { k:'阜阳', lat:32.890, lng:115.814, tz:8 },
-  { k:'宿州', lat:33.647, lng:116.964, tz:8 },
-  { k:'六安', lat:31.735, lng:116.520, tz:8 },
-  { k:'亳州', lat:33.845, lng:115.779, tz:8 },
-  { k:'宣城', lat:30.941, lng:118.758, tz:8 },
-  { k:'淮南', lat:32.626, lng:116.997, tz:8 },
-  { k:'淮北', lat:33.955, lng:116.794, tz:8 },
-  { k:'铜陵', lat:30.945, lng:117.811, tz:8 },
-  { k:'黄山', lat:29.715, lng:118.338, tz:8 },
+  { k:'合肥', en:'Hefei', lat:31.821, lng:117.229, tz:8 },
+  { k:'芜湖', en:'Wuhu', lat:31.353, lng:118.433, tz:8 },
+  { k:'蚌埠', en:'Bengbu', lat:32.917, lng:117.389, tz:8 },
+  { k:'安庆', en:'Anqing', lat:30.543, lng:117.064, tz:8 },
+  { k:'马鞍山', en:'Ma\'anshan', lat:31.670, lng:118.506, tz:8 },
+  { k:'滁州', en:'Chuzhou', lat:32.301, lng:118.317, tz:8 },
+  { k:'阜阳', en:'Fuyang', lat:32.890, lng:115.814, tz:8 },
+  { k:'宿州', en:'Suzhou', lat:33.647, lng:116.964, tz:8 },
+  { k:'六安', en:'Lu\'an', lat:31.735, lng:116.520, tz:8 },
+  { k:'亳州', en:'Bozhou', lat:33.845, lng:115.779, tz:8 },
+  { k:'宣城', en:'Xuancheng', lat:30.941, lng:118.758, tz:8 },
+  { k:'淮南', en:'Huainan', lat:32.626, lng:116.997, tz:8 },
+  { k:'淮北', en:'Huaibei', lat:33.955, lng:116.794, tz:8 },
+  { k:'铜陵', en:'Tongling', lat:30.945, lng:117.811, tz:8 },
+  { k:'黄山', en:'Huangshan', lat:29.715, lng:118.338, tz:8 },
   // === 福建 ===
-  { k:'福州', lat:26.074, lng:119.296, tz:8 },
-  { k:'厦门', lat:24.480, lng:118.089, tz:8 },
-  { k:'泉州', lat:24.874, lng:118.676, tz:8 },
-  { k:'莆田', lat:25.454, lng:119.008, tz:8 },
-  { k:'漳州', lat:24.513, lng:117.647, tz:8 },
-  { k:'龙岩', lat:25.075, lng:117.017, tz:8 },
-  { k:'三明', lat:26.264, lng:117.639, tz:8 },
-  { k:'南平', lat:26.642, lng:118.178, tz:8 },
-  { k:'宁德', lat:26.666, lng:119.548, tz:8 },
+  { k:'福州', en:'Fuzhou', lat:26.074, lng:119.296, tz:8 },
+  { k:'厦门', en:'Xiamen', lat:24.480, lng:118.089, tz:8 },
+  { k:'泉州', en:'Quanzhou', lat:24.874, lng:118.676, tz:8 },
+  { k:'莆田', en:'Putian', lat:25.454, lng:119.008, tz:8 },
+  { k:'漳州', en:'Zhangzhou', lat:24.513, lng:117.647, tz:8 },
+  { k:'龙岩', en:'Longyan', lat:25.075, lng:117.017, tz:8 },
+  { k:'三明', en:'Sanming', lat:26.264, lng:117.639, tz:8 },
+  { k:'南平', en:'Nanping', lat:26.642, lng:118.178, tz:8 },
+  { k:'宁德', en:'Ningde', lat:26.666, lng:119.548, tz:8 },
   // === 江西 ===
-  { k:'南昌', lat:28.682, lng:115.858, tz:8 },
-  { k:'赣州', lat:25.831, lng:114.935, tz:8 },
-  { k:'九江', lat:29.705, lng:116.002, tz:8 },
-  { k:'宜春', lat:27.815, lng:114.417, tz:8 },
-  { k:'吉安', lat:27.114, lng:114.994, tz:8 },
-  { k:'上饶', lat:28.455, lng:117.943, tz:8 },
-  { k:'抚州', lat:27.949, lng:116.358, tz:8 },
-  { k:'景德镇', lat:29.269, lng:117.179, tz:8 },
-  { k:'萍乡', lat:27.623, lng:113.855, tz:8 },
-  { k:'新余', lat:27.818, lng:114.917, tz:8 },
-  { k:'鹰潭', lat:28.260, lng:117.069, tz:8 },
+  { k:'南昌', en:'Nanchang', lat:28.682, lng:115.858, tz:8 },
+  { k:'赣州', en:'Ganzhou', lat:25.831, lng:114.935, tz:8 },
+  { k:'九江', en:'Jiujiang', lat:29.705, lng:116.002, tz:8 },
+  { k:'宜春', en:'Yichun', lat:27.815, lng:114.417, tz:8 },
+  { k:'吉安', en:'Ji\'an', lat:27.114, lng:114.994, tz:8 },
+  { k:'上饶', en:'Shangrao', lat:28.455, lng:117.943, tz:8 },
+  { k:'抚州', en:'Fuzhou', lat:27.949, lng:116.358, tz:8 },
+  { k:'景德镇', en:'Jingdezhen', lat:29.269, lng:117.179, tz:8 },
+  { k:'萍乡', en:'Pingxiang', lat:27.623, lng:113.855, tz:8 },
+  { k:'新余', en:'Xinyu', lat:27.818, lng:114.917, tz:8 },
+  { k:'鹰潭', en:'Yingtan', lat:28.260, lng:117.069, tz:8 },
   // === 辽宁 ===
-  { k:'沈阳', lat:41.806, lng:123.432, tz:8 },
-  { k:'大连', lat:38.914, lng:121.615, tz:8 },
-  { k:'鞍山', lat:41.108, lng:122.994, tz:8 },
-  { k:'抚顺', lat:41.880, lng:123.957, tz:8 },
-  { k:'锦州', lat:41.095, lng:121.127, tz:8 },
-  { k:'营口', lat:40.667, lng:122.235, tz:8 },
-  { k:'丹东', lat:40.000, lng:124.354, tz:8 },
-  { k:'盘锦', lat:41.120, lng:122.071, tz:8 },
-  { k:'葫芦岛', lat:40.711, lng:120.837, tz:8 },
-  { k:'朝阳', lat:41.573, lng:120.449, tz:8 },
-  { k:'辽阳', lat:41.268, lng:123.237, tz:8 },
-  { k:'铁岭', lat:42.286, lng:123.842, tz:8 },
+  { k:'沈阳', en:'Shenyang', lat:41.806, lng:123.432, tz:8 },
+  { k:'大连', en:'Dalian', lat:38.914, lng:121.615, tz:8 },
+  { k:'鞍山', en:'Anshan', lat:41.108, lng:122.994, tz:8 },
+  { k:'抚顺', en:'Fushun', lat:41.880, lng:123.957, tz:8 },
+  { k:'锦州', en:'Jinzhou', lat:41.095, lng:121.127, tz:8 },
+  { k:'营口', en:'Yingkou', lat:40.667, lng:122.235, tz:8 },
+  { k:'丹东', en:'Dandong', lat:40.000, lng:124.354, tz:8 },
+  { k:'盘锦', en:'Panjin', lat:41.120, lng:122.071, tz:8 },
+  { k:'葫芦岛', en:'Huludao', lat:40.711, lng:120.837, tz:8 },
+  { k:'朝阳', en:'Chaoyang', lat:41.573, lng:120.449, tz:8 },
+  { k:'辽阳', en:'Liaoyang', lat:41.268, lng:123.237, tz:8 },
+  { k:'铁岭', en:'Tieling', lat:42.286, lng:123.842, tz:8 },
   // === 吉林 ===
-  { k:'长春', lat:43.817, lng:125.324, tz:8 },
-  { k:'吉林', lat:43.838, lng:126.550, tz:8 },
-  { k:'延吉', lat:42.891, lng:129.509, tz:8 },
-  { k:'四平', lat:43.166, lng:124.350, tz:8 },
-  { k:'通化', lat:41.728, lng:125.940, tz:8 },
-  { k:'松原', lat:45.142, lng:124.825, tz:8 },
+  { k:'长春', en:'Changchun', lat:43.817, lng:125.324, tz:8 },
+  { k:'吉林', en:'Jilin', lat:43.838, lng:126.550, tz:8 },
+  { k:'延吉', en:'Yanji', lat:42.891, lng:129.509, tz:8 },
+  { k:'四平', en:'Siping', lat:43.166, lng:124.350, tz:8 },
+  { k:'通化', en:'Tonghua', lat:41.728, lng:125.940, tz:8 },
+  { k:'松原', en:'Songyuan', lat:45.142, lng:124.825, tz:8 },
   // === 黑龙江 ===
-  { k:'哈尔滨', lat:45.803, lng:126.535, tz:8 },
-  { k:'齐齐哈尔', lat:47.354, lng:123.918, tz:8 },
-  { k:'大庆', lat:46.589, lng:125.103, tz:8 },
-  { k:'牡丹江', lat:44.552, lng:129.633, tz:8 },
-  { k:'佳木斯', lat:46.800, lng:130.327, tz:8 },
+  { k:'哈尔滨', en:'Harbin', lat:45.803, lng:126.535, tz:8 },
+  { k:'齐齐哈尔', en:'Qiqihar', lat:47.354, lng:123.918, tz:8 },
+  { k:'大庆', en:'Daqing', lat:46.589, lng:125.103, tz:8 },
+  { k:'牡丹江', en:'Mudanjiang', lat:44.552, lng:129.633, tz:8 },
+  { k:'佳木斯', en:'Jiamusi', lat:46.800, lng:130.327, tz:8 },
   // === 贵州 ===
-  { k:'贵阳', lat:26.647, lng:106.630, tz:8 },
-  { k:'遵义', lat:27.721, lng:106.927, tz:8 },
-  { k:'毕节', lat:27.299, lng:105.305, tz:8 },
-  { k:'六盘水', lat:26.593, lng:104.830, tz:8 },
-  { k:'安顺', lat:26.253, lng:105.947, tz:8 },
+  { k:'贵阳', en:'Guiyang', lat:26.647, lng:106.630, tz:8 },
+  { k:'遵义', en:'Zunyi', lat:27.721, lng:106.927, tz:8 },
+  { k:'毕节', en:'Bijie', lat:27.299, lng:105.305, tz:8 },
+  { k:'六盘水', en:'Liupanshui', lat:26.593, lng:104.830, tz:8 },
+  { k:'安顺', en:'Anshun', lat:26.253, lng:105.947, tz:8 },
   // === 云南 ===
-  { k:'昆明', lat:25.039, lng:102.718, tz:8 },
-  { k:'大理', lat:25.591, lng:100.230, tz:8 },
-  { k:'丽江', lat:26.872, lng:100.230, tz:8 },
-  { k:'曲靖', lat:25.490, lng:103.798, tz:8 },
-  { k:'玉溪', lat:24.352, lng:102.547, tz:8 },
-  { k:'保山', lat:25.112, lng:99.169, tz:8 },
-  { k:'昭通', lat:27.338, lng:103.717, tz:8 },
+  { k:'昆明', en:'Kunming', lat:25.039, lng:102.718, tz:8 },
+  { k:'大理', en:'Dali', lat:25.591, lng:100.230, tz:8 },
+  { k:'丽江', en:'Lijiang', lat:26.872, lng:100.230, tz:8 },
+  { k:'曲靖', en:'Qujing', lat:25.490, lng:103.798, tz:8 },
+  { k:'玉溪', en:'Yuxi', lat:24.352, lng:102.547, tz:8 },
+  { k:'保山', en:'Baoshan', lat:25.112, lng:99.169, tz:8 },
+  { k:'昭通', en:'Zhaotong', lat:27.338, lng:103.717, tz:8 },
   // === 广西 ===
-  { k:'南宁', lat:22.824, lng:108.367, tz:8 },
-  { k:'桂林', lat:25.274, lng:110.290, tz:8 },
-  { k:'柳州', lat:24.326, lng:109.428, tz:8 },
-  { k:'北海', lat:21.473, lng:109.119, tz:8 },
-  { k:'玉林', lat:22.636, lng:110.181, tz:8 },
-  { k:'梧州', lat:23.477, lng:111.279, tz:8 },
-  { k:'钦州', lat:21.980, lng:108.654, tz:8 },
-  { k:'百色', lat:23.902, lng:106.618, tz:8 },
+  { k:'南宁', en:'Nanning', lat:22.824, lng:108.367, tz:8 },
+  { k:'桂林', en:'Guilin', lat:25.274, lng:110.290, tz:8 },
+  { k:'柳州', en:'Liuzhou', lat:24.326, lng:109.428, tz:8 },
+  { k:'北海', en:'Beihai', lat:21.473, lng:109.119, tz:8 },
+  { k:'玉林', en:'Yulin', lat:22.636, lng:110.181, tz:8 },
+  { k:'梧州', en:'Wuzhou', lat:23.477, lng:111.279, tz:8 },
+  { k:'钦州', en:'Qinzhou', lat:21.980, lng:108.654, tz:8 },
+  { k:'百色', en:'Baise', lat:23.902, lng:106.618, tz:8 },
   // === 甘肃 ===
-  { k:'兰州', lat:36.061, lng:103.834, tz:8 },
-  { k:'天水', lat:34.581, lng:105.725, tz:8 },
-  { k:'酒泉', lat:39.733, lng:98.494, tz:8 },
-  { k:'嘉峪关', lat:39.772, lng:98.290, tz:8 },
+  { k:'兰州', en:'Lanzhou', lat:36.061, lng:103.834, tz:8 },
+  { k:'天水', en:'Tianshui', lat:34.581, lng:105.725, tz:8 },
+  { k:'酒泉', en:'Jiuquan', lat:39.733, lng:98.494, tz:8 },
+  { k:'嘉峪关', en:'Jiayuguan', lat:39.772, lng:98.290, tz:8 },
   // === 内蒙古 ===
-  { k:'呼和浩特', lat:40.842, lng:111.749, tz:8 },
-  { k:'包头', lat:40.658, lng:109.840, tz:8 },
-  { k:'鄂尔多斯', lat:39.608, lng:109.781, tz:8 },
-  { k:'赤峰', lat:42.258, lng:118.889, tz:8 },
+  { k:'呼和浩特', en:'Hohhot', lat:40.842, lng:111.749, tz:8 },
+  { k:'包头', en:'Baotou', lat:40.658, lng:109.840, tz:8 },
+  { k:'鄂尔多斯', en:'Ordos', lat:39.608, lng:109.781, tz:8 },
+  { k:'赤峰', en:'Chifeng', lat:42.258, lng:118.889, tz:8 },
   // === 新疆 ===
-  { k:'乌鲁木齐', lat:43.826, lng:87.617, tz:8 },
-  { k:'克拉玛依', lat:45.580, lng:84.889, tz:8 },
+  { k:'乌鲁木齐', en:'Urumqi', lat:43.826, lng:87.617, tz:8 },
+  { k:'克拉玛依', en:'Karamay', lat:45.580, lng:84.889, tz:8 },
   // === 青海 ===
-  { k:'西宁', lat:36.617, lng:101.778, tz:8 },
+  { k:'西宁', en:'Xining', lat:36.617, lng:101.778, tz:8 },
   // === 宁夏 ===
-  { k:'银川', lat:38.466, lng:106.267, tz:8 },
+  { k:'银川', en:'Yinchuan', lat:38.466, lng:106.267, tz:8 },
   // === 西藏 ===
-  { k:'拉萨', lat:29.651, lng:91.172, tz:8 },
+  { k:'拉萨', en:'Lhasa', lat:29.651, lng:91.172, tz:8 },
   // === 海南 ===
-  { k:'海口', lat:20.044, lng:110.200, tz:8 },
-  { k:'三亚', lat:18.253, lng:109.512, tz:8 },
+  { k:'海口', en:'Haikou', lat:20.044, lng:110.200, tz:8 },
+  { k:'三亚', en:'Sanya', lat:18.253, lng:109.512, tz:8 },
   // === 台湾 ===
-  { k:'台北', lat:25.033, lng:121.565, tz:8 },
-  { k:'高雄', lat:22.617, lng:120.312, tz:8 },
-  { k:'台中', lat:24.148, lng:120.674, tz:8 },
-  { k:'台南', lat:22.999, lng:120.227, tz:8 },
+  { k:'台北', en:'Taipei', lat:25.033, lng:121.565, tz:8 },
+  { k:'高雄', en:'Kaohsiung', lat:22.617, lng:120.312, tz:8 },
+  { k:'台中', en:'Taichung', lat:24.148, lng:120.674, tz:8 },
+  { k:'台南', en:'Tainan', lat:22.999, lng:120.227, tz:8 },
   // === 港澳 ===
-  { k:'香港', lat:22.319, lng:114.169, tz:8 },
-  { k:'澳门', lat:22.199, lng:113.544, tz:8 },
+  { k:'香港', en:'Hong Kong', lat:22.319, lng:114.169, tz:8 },
+  { k:'澳门', en:'Macau', lat:22.199, lng:113.544, tz:8 },
   // === 国际 ===
-  { k:'东京', lat:35.676, lng:139.650, tz:9 },
-  { k:'大阪', lat:34.694, lng:135.502, tz:9 },
-  { k:'首尔', lat:37.566, lng:126.978, tz:9 },
-  { k:'釜山', lat:35.180, lng:129.076, tz:9 },
-  { k:'新加坡', lat:1.352, lng:103.820, tz:8 },
-  { k:'曼谷', lat:13.756, lng:100.502, tz:7 },
-  { k:'清迈', lat:18.788, lng:98.985, tz:7 },
-  { k:'胡志明市', lat:10.823, lng:106.630, tz:7 },
-  { k:'河内', lat:21.028, lng:105.854, tz:7 },
-  { k:'雅加达', lat:-6.209, lng:106.846, tz:7 },
-  { k:'吉隆坡', lat:3.139, lng:101.687, tz:8 },
-  { k:'马尼拉', lat:14.599, lng:120.984, tz:8 },
-  { k:'仰光', lat:16.840, lng:96.174, tz:6.5 },
-  { k:'孟买', lat:19.076, lng:72.877, tz:5.5 },
-  { k:'新德里', lat:28.614, lng:77.209, tz:5.5 },
-  { k:'迪拜', lat:25.204, lng:55.271, tz:4 },
-  { k:'莫斯科', lat:55.756, lng:37.617, tz:3 },
-  { k:'伦敦', lat:51.507, lng:-0.128, tz:0 },
-  { k:'巴黎', lat:48.857, lng:2.352, tz:1 },
-  { k:'柏林', lat:52.520, lng:13.405, tz:1 },
-  { k:'罗马', lat:41.903, lng:12.496, tz:1 },
-  { k:'马德里', lat:40.417, lng:-3.704, tz:1 },
-  { k:'巴塞罗那', lat:41.387, lng:2.170, tz:1 },
-  { k:'阿姆斯特丹', lat:52.368, lng:4.904, tz:1 },
-  { k:'伊斯坦布尔', lat:41.008, lng:28.978, tz:3 },
-  { k:'纽约', lat:40.713, lng:-74.006, tz:-5 },
-  { k:'洛杉矶', lat:34.052, lng:-118.244, tz:-8 },
-  { k:'旧金山', lat:37.775, lng:-122.419, tz:-8 },
-  { k:'芝加哥', lat:41.878, lng:-87.630, tz:-6 },
-  { k:'休斯顿', lat:29.760, lng:-95.370, tz:-6 },
-  { k:'多伦多', lat:43.653, lng:-79.383, tz:-5 },
-  { k:'温哥华', lat:49.282, lng:-123.121, tz:-8 },
-  { k:'悉尼', lat:-33.869, lng:151.209, tz:10 },
-  { k:'墨尔本', lat:-37.814, lng:144.963, tz:10 },
-  { k:'布里斯班', lat:-27.470, lng:153.026, tz:10 },
-  { k:'奥克兰', lat:-36.848, lng:174.763, tz:12 }
+  { k:'东京', en:'Tokyo', lat:35.676, lng:139.650, tz:9 },
+  { k:'大阪', en:'Osaka', lat:34.694, lng:135.502, tz:9 },
+  { k:'首尔', en:'Seoul', lat:37.566, lng:126.978, tz:9 },
+  { k:'釜山', en:'Busan', lat:35.180, lng:129.076, tz:9 },
+  { k:'新加坡', en:'Singapore', lat:1.352, lng:103.820, tz:8 },
+  { k:'曼谷', en:'Bangkok', lat:13.756, lng:100.502, tz:7 },
+  { k:'清迈', en:'Chiang Mai', lat:18.788, lng:98.985, tz:7 },
+  { k:'胡志明市', en:'Ho Chi Minh City', lat:10.823, lng:106.630, tz:7 },
+  { k:'河内', en:'Hanoi', lat:21.028, lng:105.854, tz:7 },
+  { k:'雅加达', en:'Jakarta', lat:-6.209, lng:106.846, tz:7 },
+  { k:'吉隆坡', en:'Kuala Lumpur', lat:3.139, lng:101.687, tz:8 },
+  { k:'马尼拉', en:'Manila', lat:14.599, lng:120.984, tz:8 },
+  { k:'仰光', en:'Yangon', lat:16.840, lng:96.174, tz:6.5 },
+  { k:'孟买', en:'Mumbai', lat:19.076, lng:72.877, tz:5.5 },
+  { k:'新德里', en:'New Delhi', lat:28.614, lng:77.209, tz:5.5 },
+  { k:'迪拜', en:'Dubai', lat:25.204, lng:55.271, tz:4 },
+  { k:'莫斯科', en:'Moscow', lat:55.756, lng:37.617, tz:3 },
+  { k:'伦敦', en:'London', lat:51.507, lng:-0.128, tz:0 },
+  { k:'巴黎', en:'Paris', lat:48.857, lng:2.352, tz:1 },
+  { k:'柏林', en:'Berlin', lat:52.520, lng:13.405, tz:1 },
+  { k:'罗马', en:'Rome', lat:41.903, lng:12.496, tz:1 },
+  { k:'马德里', en:'Madrid', lat:40.417, lng:-3.704, tz:1 },
+  { k:'巴塞罗那', en:'Barcelona', lat:41.387, lng:2.170, tz:1 },
+  { k:'阿姆斯特丹', en:'Amsterdam', lat:52.368, lng:4.904, tz:1 },
+  { k:'伊斯坦布尔', en:'Istanbul', lat:41.008, lng:28.978, tz:3 },
+  { k:'纽约', en:'New York', lat:40.713, lng:-74.006, tz:-5 },
+  { k:'洛杉矶', en:'Los Angeles', lat:34.052, lng:-118.244, tz:-8 },
+  { k:'旧金山', en:'San Francisco', lat:37.775, lng:-122.419, tz:-8 },
+  { k:'芝加哥', en:'Chicago', lat:41.878, lng:-87.630, tz:-6 },
+  { k:'休斯顿', en:'Houston', lat:29.760, lng:-95.370, tz:-6 },
+  { k:'多伦多', en:'Toronto', lat:43.653, lng:-79.383, tz:-5 },
+  { k:'温哥华', en:'Vancouver', lat:49.282, lng:-123.121, tz:-8 },
+  { k:'悉尼', en:'Sydney', lat:-33.869, lng:151.209, tz:10 },
+  { k:'墨尔本', en:'Melbourne', lat:-37.814, lng:144.963, tz:10 },
+  { k:'布里斯班', en:'Brisbane', lat:-27.470, lng:153.026, tz:10 },
+  { k:'奥克兰', en:'Auckland', lat:-36.848, lng:174.763, tz:12 }
 ];
 
 function lookupCity(query) {
   if (!query || query.length < 1) return null;
   var q = query.trim();
-  // Exact match
+  // Exact match (both Chinese and English names)
   for (var i = 0; i < CITY_DB.length; i++) {
-    if (CITY_DB[i].k === q) return CITY_DB[i];
+    if (CITY_DB[i].k === q || CITY_DB[i].en === q) return CITY_DB[i];
   }
   // Contains: query contains city name OR city name contains query
   for (var i = 0; i < CITY_DB.length; i++) {
-    if (q.indexOf(CITY_DB[i].k) !== -1 || CITY_DB[i].k.indexOf(q) !== -1) return CITY_DB[i];
+    var cn = CITY_DB[i].k, en = CITY_DB[i].en;
+    if (q.indexOf(cn) !== -1 || cn.indexOf(q) !== -1) return CITY_DB[i];
+    if (en && (q.toLowerCase().indexOf(en.toLowerCase()) !== -1 || en.toLowerCase().indexOf(q.toLowerCase()) !== -1)) return CITY_DB[i];
   }
   // Prefix (e.g. "北京朝阳区" → "北京")
   for (var i = 0; i < CITY_DB.length; i++) {
-    if (q.length >= CITY_DB[i].k.length && q.indexOf(CITY_DB[i].k) === 0) return CITY_DB[i];
+    var cn2 = CITY_DB[i].k, en2 = CITY_DB[i].en;
+    if (q.length >= cn2.length && q.indexOf(cn2) === 0) return CITY_DB[i];
+    if (en2 && q.length >= en2.length && q.toLowerCase().indexOf(en2.toLowerCase()) === 0) return CITY_DB[i];
   }
   return null;
 }
 
-// Fuzzy match by 2-gram character overlap (for Chinese city names)
+// Fuzzy match: 2-gram overlap for Chinese, case-insensitive substring for English
 function fuzzyMatchCity(query) {
   if (!query || query.length < 2) return null;
   var q = query.trim();
-  // Character set for unigram fallback
+  var qLower = q.toLowerCase();
+
+  // English-mode: try case-insensitive contains/prefix against en field first
+  for (var j = 0; j < CITY_DB.length; j++) {
+    var en = CITY_DB[j].en;
+    if (!en) continue;
+    var enLower = en.toLowerCase();
+    if (qLower.indexOf(enLower) !== -1 || enLower.indexOf(qLower) !== -1) return CITY_DB[j];
+    if (qLower.length >= 3 && enLower.indexOf(qLower) === 0) return CITY_DB[j];
+  }
+
+  // Chinese 2-gram overlap
   var qChars = {};
   for (var ci = 0; ci < q.length; ci++) { qChars[q[ci]] = true; }
-  // Build 2-gram set from query
   var qGrams = {};
   for (var i = 0; i < q.length - 1; i++) {
     qGrams[q.substring(i, i+2)] = true;
   }
   var best = null;
   var bestScore = 0;
-  for (var j = 0; j < CITY_DB.length; j++) {
-    var name = CITY_DB[j].k;
+  for (var j2 = 0; j2 < CITY_DB.length; j2++) {
+    var name = CITY_DB[j2].k;
     if (name.length < 2) continue;
-    // 2-gram overlap
     var hits = 0;
     for (var k = 0; k < name.length - 1; k++) {
       if (qGrams[name.substring(k, k+2)]) hits++;
     }
-    // Also count unigram (single char) overlap as bonus
     var uniHits = 0;
     for (var u = 0; u < name.length; u++) {
       if (qChars[name[u]]) uniHits++;
     }
-    var score = hits * 3 + uniHits; // 2-gram weighted higher
+    var score = hits * 3 + uniHits;
     if (score > bestScore) {
       bestScore = score;
-      best = CITY_DB[j];
+      best = CITY_DB[j2];
     }
   }
   return bestScore >= 1 ? best : null;
@@ -474,7 +536,8 @@ async function geocode(prefix) {
   // 1) Exact local DB lookup
   var local = lookupCity(query);
   if (local) {
-    applyCityResult(prefix, local.lat, local.lng, local.tz, local.k, statusEl);
+    var displayName = (window._lang && window._lang() === 'en') ? (local.en || local.k) : local.k;
+    applyCityResult(prefix, local.lat, local.lng, local.tz, displayName, statusEl);
     return;
   }
 
@@ -532,7 +595,7 @@ async function geocode(prefix) {
       statusEl.className = prevClass;
       return;
     }
-    var errMsg = e.name === 'AbortError' ? _L('查询超时，请检查网络后重试','Request timed out. Please check your network and retry.') : (_L('查询失败','Lookup failed') + '：' + (e.message || ''));
+    var errMsg = e.name === 'AbortError' ? _L('查询超时，请检查网络后重试','Request timed out. Please check your network and retry.') : (_L('查询失败','Lookup failed') + _L('：', ': ') + (e.message || ''));
     statusEl.textContent = '⚠️ ' + errMsg;
     statusEl.className = 'geo-status error';
     document.getElementById(prefix + '_manual').style.display = 'block';
@@ -603,6 +666,7 @@ function getInputValues(prefix) {
   }
 
   if (!dateVal || !timeVal || isNaN(lat) || isNaN(lng)) return null;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) { alert(_L('纬度需在-90到90之间，经度需在-180到180之间','Latitude must be -90~90, longitude -180~180')); return null; }
 
   const [y, m, d] = dateVal.split('-').map(Number);
   const [hh, mm] = timeVal.split(':').map(Number);
@@ -704,7 +768,7 @@ let _birthInput1 = null;
     }, 800);
   }
 
-function calculateAll() {
+async function calculateAll() {
   try {
     const d1 = getInputValues('p1');
     if (!d1) { alert(_t('error.fillInfo')); return; }
@@ -713,6 +777,23 @@ function calculateAll() {
     const overlay = document.getElementById('ritualOverlay');
     overlay.style.display = 'flex';
     _buildProgressRing();
+
+    // Lazy-load heavy modules while ritual animation plays
+    if (!window._modulesLoaded) {
+      try {
+        await loadScript('js/data.js?v=20260712');
+        await Promise.all([
+          loadScript('js/reports.js?v=20260712'),
+          loadScript('js/tarot.js?v=20260712')
+        ]);
+        window._modulesLoaded = true;
+      } catch(e) {
+        overlay.style.display = 'none';
+        alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.'));
+        console.error('Module load error:', e);
+        return;
+      }
+    }
 
     var computed = false;
     function onBothReady() {
@@ -1068,9 +1149,9 @@ function switchTab(idx) {
   if (tabHint) {
     tabHint.style.display = (idx === 2 && chartData2) ? 'block' : 'none';
   }
-  // Re-render on switch to ensure content is fresh
+  // Tarot tab: skip re-render if already has content (preserves card state)
   if (idx === 4) {
-    renderTab4();
+    if (!document.getElementById('tab4').innerHTML.trim()) renderTab4();
   } else if (idx === 8) {
     renderTab8();
   } else if (chartData1) {
@@ -1126,7 +1207,26 @@ function collapseInputCard() {
   if (stag) stag.style.display = 'none';
   var snotice = document.getElementById('sampleNotice');
   if (snotice) snotice.style.display = 'none';
-  card.style.display = 'none';
+  card.style.opacity = '0';
+  card.style.transition = 'opacity 0.3s';
+  setTimeout(function() { card.style.display = 'none'; }, 300);
+}
+
+function showInputCard() {
+  document.getElementById('resultsCard').style.display = 'none';
+  var c = document.getElementById('inputCard');
+  c.style.display = 'block';
+  c.style.maxHeight = 'none';
+  c.style.overflow = '';
+  c.style.border = '';
+  c.style.padding = '';
+  c.style.marginBottom = '';
+  c.style.opacity = '0';
+  c.style.transition = 'opacity 0.35s ease';
+  requestAnimationFrame(function() {
+    c.style.opacity = '1';
+    c.scrollIntoView({behavior: 'smooth'});
+  });
 }
 
 // ── Back to Top visibility ────────────────────────────────────────────────
@@ -1231,7 +1331,7 @@ function buildReportHTML() {
     for (let i = 0; i < tarotState.drawn.length; i++) {
       const card = tarotState.drawn[i];
       const posLabel = posLabelsPdf[i] || '';
-      r += '<p><strong>' + posLabel + '：' + card.name + '</strong>' + (card.isReversed ? '（' + _L('逆位','Reversed') + '）' : '') + '<br>';
+      r += '<p><strong>' + posLabel + _L('：', ': ') + card.name + '</strong>' + (card.isReversed ? _L('（', ' (') + _L('逆位','Reversed') + _L('）', ')') : '') + '<br>';
       r += (card.isReversed ? (card.rev || card.up) : card.up) + '</p>';
     }
   }
@@ -1250,7 +1350,7 @@ function buildReportHTML() {
     const lon = d.positions[p.id];
     const {si, d:dd, m} = degToSign(lon);
     const h = d.houses[p.id] || '?';
-    r += '<tr><td>' + p.name + '</td><td>' + getSignNamePure(si) + ' ' + dd + '°' + String(m).padStart(2,'0') + '′</td><td>' + _L('第','House ') + h + _L('宫','') + '</td><td>' + ELEMENTS[si] + '</td><td>' + MODES[si] + '</td></tr>';
+    r += '<tr><td>' + p.name + '</td><td>' + getSignNamePure(si) + ' ' + dd + '°' + String(m).padStart(2,'0') + '′</td><td>' + _L('第','House ') + h + _L('宫','') + '</td><td>' + _L(ELEMENTS[si], ELEMENTS_EN[ELEMENTS[si]]) + '</td><td>' + _L(MODES[si], MODES_EN[MODES[si]]) + '</td></tr>';
   }
   r += '</table>';
 

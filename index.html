@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<script>var s=localStorage.getItem('lang');if(s&&s.startsWith('en'))document.documentElement.lang='en';</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -220,11 +221,13 @@
         </div>
       </div>
       <div class="person-card" id="p2Card">
-        <h3 style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="toggleP2()">
-          <span id="p2ToggleIcon">▶</span> <span data-i18n="person.partner">合盘对方</span>
-          <span style="font-size:0.6em;color:var(--text-dim);font-weight:normal;" data-i18n="person.optional">（选填，仅合盘需要）</span>
-        </h3>
-        <p style="text-align:left;text-indent:2em;font-style:italic;font-size:0.78em;color:var(--text-dim);margin:4px 0 0 0;">（也可以测测你<span style="font-family:var(--font-heading);font-weight:700;font-size:1.2em;letter-spacing:0.08em;margin:0 1px;">cp</span>有多真，匹配度高说明两人天生一对，匹配度低证明真爱就是偏要强求）</p>
+        <div style="cursor:pointer;text-align:center;" onclick="toggleP2()">
+          <h3 style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2px;">
+            <span id="p2ToggleIcon">▶</span> <span data-i18n="person.partner">合盘对方</span>
+          </h3>
+          <p style="font-size:0.65em;color:var(--text-dim);margin:0;" data-i18n="person.optional">（选填，测感情·测默契·测合作，仅合盘需要）</p>
+        </div>
+        <p style="text-align:left;text-indent:2em;font-style:italic;font-size:0.78em;color:var(--text-dim);margin:4px 0 0 0;" data-i18n-html="person.cpTagline">（也可以测测你<span style="font-family:var(--font-heading);font-weight:700;font-size:1.2em;letter-spacing:0.08em;margin:0 1px;">cp</span>有多真，匹配度高说明两人天生一对，匹配度低证明真爱就是偏要强求）</p>
         <div id="p2Content" style="display:none;">
         <div class="form-row">
           <div class="form-group"><label data-i18n="label.birthdate">出生日期</label><input type="date" id="p2_date"><span class="date-hint" data-i18n="hint.datePicker">💡 点击日期框左上角年份可快速切换年份</span></div>
@@ -280,7 +283,7 @@
   <!-- ── Results ────────────────────────────────────────────────────────── -->
   <div class="card" id="resultsCard" style="display:none">
     <div style="text-align:center;margin-bottom:10px;">
-      <button class="btn btn-secondary" id="btnBackToEdit" onclick="document.getElementById('resultsCard').style.display='none';var c=document.getElementById('inputCard');c.style.display='block';c.style.maxHeight='none';c.style.opacity='1';c.style.overflow='';c.style.transition='';c.style.border='';c.style.padding='';c.style.marginBottom='';c.scrollIntoView({behavior:'smooth'});" style="font-size:0.85em;padding:6px 18px;color:var(--accent);border-color:var(--accent);" data-i18n="btn.backToEdit">↩ 返回修改生日信息</button>
+      <button class="btn btn-secondary" id="btnBackToEdit" onclick="showInputCard()" style="font-size:0.85em;padding:6px 18px;color:var(--accent);border-color:var(--accent);" data-i18n="btn.backToEdit">↩ 返回修改生日信息</button>
     </div>
     <div class="tabs">
       <div class="tab active" onclick="switchTab(0)" data-i18n="tab.natal">本命星盘</div>
@@ -341,17 +344,14 @@
 </div>
 
 <script defer src="js/astronomy.js?v=20260712"></script>
-<script defer src="js/data.js?v=20260712"></script>
-<script defer src="js/reports.js?v=20260712"></script>
-<script defer src="js/tarot.js?v=20260712"></script>
+<!-- Heavy modules (data, reports, tarot) loaded lazily on first 解读星盘 click -->
 <script defer src="js/compass.js?v=20260712"></script>
 <script defer src="js/fortune.js?v=20260712"></script>
 <script defer src="js/dailycard.js?v=20260712"></script>
 <script defer src="js/lodge.js?v=20260712"></script>
 <script defer src="js/ui.js?v=20260712"></script>
-<script defer src="app.js?v=20260712"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
-  onerror="window._emailjsDisabled=true;"
+  onerror="window._emailjsDisabled=true;var b=document.getElementById('btnEmail');if(b){b.textContent='📋 复制报告';b.title='Email服务暂不可用，报告将复制到剪贴板';}"
   onload="try{emailjs.init('Gudf5C47NCkRO4qLp');}catch(e){}"></script>
 <script>
 // ── Random default values ───────────────────────────────────────────────
@@ -371,33 +371,38 @@ try {
 
   // Random city with coords + timezone
   var cities = [
-    { name:'北京', lat:39.904, lng:116.407, tz:8 },
-    { name:'上海', lat:31.230, lng:121.474, tz:8 },
-    { name:'广州', lat:23.129, lng:113.264, tz:8 },
-    { name:'深圳', lat:22.543, lng:114.058, tz:8 },
-    { name:'成都', lat:30.573, lng:104.067, tz:8 },
-    { name:'重庆', lat:29.432, lng:106.912, tz:8 },
-    { name:'武汉', lat:30.593, lng:114.305, tz:8 },
-    { name:'西安', lat:34.341, lng:108.940, tz:8 },
-    { name:'南京', lat:32.060, lng:118.797, tz:8 },
-    { name:'杭州', lat:30.274, lng:120.155, tz:8 },
-    { name:'天津', lat:39.085, lng:117.200, tz:8 },
-    { name:'长沙', lat:28.228, lng:112.939, tz:8 },
-    { name:'苏州', lat:31.299, lng:120.585, tz:8 },
-    { name:'哈尔滨', lat:45.803, lng:126.535, tz:8 },
-    { name:'拉萨', lat:29.651, lng:91.172, tz:8 },
-    { name:'乌鲁木齐', lat:43.826, lng:87.617, tz:8 },
-    { name:'香港', lat:22.319, lng:114.169, tz:8 },
-    { name:'东京', lat:35.676, lng:139.650, tz:9 },
-    { name:'纽约', lat:40.713, lng:-74.006, tz:-5 },
-    { name:'伦敦', lat:51.507, lng:-0.128, tz:0 },
-    { name:'巴黎', lat:48.857, lng:2.352, tz:1 },
-    { name:'悉尼', lat:-33.869, lng:151.209, tz:10 },
-    { name:'首尔', lat:37.566, lng:126.978, tz:9 },
-    { name:'曼谷', lat:13.756, lng:100.502, tz:7 }
+    { name:'北京', en:'Beijing', lat:39.904, lng:116.407, tz:8 },
+    { name:'上海', en:'Shanghai', lat:31.230, lng:121.474, tz:8 },
+    { name:'广州', en:'Guangzhou', lat:23.129, lng:113.264, tz:8 },
+    { name:'深圳', en:'Shenzhen', lat:22.543, lng:114.058, tz:8 },
+    { name:'成都', en:'Chengdu', lat:30.573, lng:104.067, tz:8 },
+    { name:'重庆', en:'Chongqing', lat:29.432, lng:106.912, tz:8 },
+    { name:'武汉', en:'Wuhan', lat:30.593, lng:114.305, tz:8 },
+    { name:'西安', en:'Xi\'an', lat:34.341, lng:108.940, tz:8 },
+    { name:'南京', en:'Nanjing', lat:32.060, lng:118.797, tz:8 },
+    { name:'杭州', en:'Hangzhou', lat:30.274, lng:120.155, tz:8 },
+    { name:'天津', en:'Tianjin', lat:39.085, lng:117.200, tz:8 },
+    { name:'长沙', en:'Changsha', lat:28.228, lng:112.939, tz:8 },
+    { name:'苏州', en:'Suzhou', lat:31.299, lng:120.585, tz:8 },
+    { name:'哈尔滨', en:'Harbin', lat:45.803, lng:126.535, tz:8 },
+    { name:'拉萨', en:'Lhasa', lat:29.651, lng:91.172, tz:8 },
+    { name:'乌鲁木齐', en:'Urumqi', lat:43.826, lng:87.617, tz:8 },
+    { name:'香港', en:'Hong Kong', lat:22.319, lng:114.169, tz:8 },
+    { name:'东京', en:'Tokyo', lat:35.676, lng:139.650, tz:9 },
+    { name:'纽约', en:'New York', lat:40.713, lng:-74.006, tz:-5 },
+    { name:'伦敦', en:'London', lat:51.507, lng:-0.128, tz:0 },
+    { name:'巴黎', en:'Paris', lat:48.857, lng:2.352, tz:1 },
+    { name:'悉尼', en:'Sydney', lat:-33.869, lng:151.209, tz:10 },
+    { name:'首尔', en:'Seoul', lat:37.566, lng:126.978, tz:9 },
+    { name:'曼谷', en:'Bangkok', lat:13.756, lng:100.502, tz:7 }
   ];
   var city = cities[Math.floor(Math.random() * cities.length)];
-  document.getElementById('p1_addr').value = city.name;
+  var isEn = (localStorage.getItem('lang') || '').startsWith('en');
+  var cityDisplay = isEn ? (city.en || city.name) : city.name;
+  var p1Addr = document.getElementById('p1_addr');
+  p1Addr.value = cityDisplay;
+  p1Addr.setAttribute('data-city-cn', city.name);
+  p1Addr.setAttribute('data-city-en', city.en || city.name);
   document.getElementById('p1_lat').value = city.lat;
   document.getElementById('p1_lng').value = city.lng;
   document.getElementById('p1_tz').value = String(city.tz);
@@ -405,7 +410,7 @@ try {
   var ew1 = city.lng >= 0 ? 'E' : 'W';
   var tzSign1 = city.tz >= 0 ? '+' : '';
   var p1Status = document.getElementById('p1_geo_status');
-  if (p1Status) p1Status.textContent = '✅ ' + city.name + ' · ' + Math.abs(city.lat).toFixed(2) + '°' + ns1 + ', ' + Math.abs(city.lng).toFixed(2) + '°' + ew1 + ' · UTC' + tzSign1 + city.tz;
+  if (p1Status) p1Status.textContent = '✅ ' + cityDisplay + ' · ' + Math.abs(city.lat).toFixed(2) + '°' + ns1 + ', ' + Math.abs(city.lng).toFixed(2) + '°' + ew1 + ' · UTC' + tzSign1 + city.tz;
 
   // ── P2 defaults (random, different from P1) ──
   var y2 = 1970 + Math.floor(Math.random() * 36);
@@ -416,7 +421,11 @@ try {
 
   // Pick a different city for P2
   var city2 = cities[Math.floor(Math.random() * cities.length)];
-  document.getElementById('p2_addr').value = city2.name;
+  var city2Display = isEn ? (city2.en || city2.name) : city2.name;
+  var p2Addr = document.getElementById('p2_addr');
+  p2Addr.value = city2Display;
+  p2Addr.setAttribute('data-city-cn', city2.name);
+  p2Addr.setAttribute('data-city-en', city2.en || city2.name);
   document.getElementById('p2_lat').value = city2.lat;
   document.getElementById('p2_lng').value = city2.lng;
   document.getElementById('p2_tz').value = String(city2.tz);
@@ -424,7 +433,7 @@ try {
   var ew2 = city2.lng >= 0 ? 'E' : 'W';
   var tzSign2 = city2.tz >= 0 ? '+' : '';
   var p2Status = document.getElementById('p2_geo_status');
-  if (p2Status) p2Status.textContent = '✅ ' + city2.name + ' · ' + Math.abs(city2.lat).toFixed(2) + '°' + ns2 + ', ' + Math.abs(city2.lng).toFixed(2) + '°' + ew2 + ' · UTC' + tzSign2 + city2.tz;
+  if (p2Status) p2Status.textContent = '✅ ' + city2Display + ' · ' + Math.abs(city2.lat).toFixed(2) + '°' + ns2 + ', ' + Math.abs(city2.lng).toFixed(2) + '°' + ew2 + ' · UTC' + tzSign2 + city2.tz;
 } catch(e) { console.error('Default form init failed:', e); }
 })();
 </script>

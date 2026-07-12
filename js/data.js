@@ -745,6 +745,7 @@ const MINOR_SUITS = [
     "en": "Wands",
     "element": "火",
     "theme": "行动、创造力、热情、事业",
+    "theme_en": "Action, Creativity, Passion, Career",
     "cards": [
       {
         "rank": "王牌",
@@ -949,6 +950,7 @@ const MINOR_SUITS = [
     "en": "Cups",
     "element": "水",
     "theme": "情感、爱情、直觉、关系",
+    "theme_en": "Emotion, Love, Intuition, Relationships",
     "cards": [
       {
         "rank": "王牌",
@@ -1153,6 +1155,7 @@ const MINOR_SUITS = [
     "en": "Swords",
     "element": "风",
     "theme": "思想、沟通、挑战、真理",
+    "theme_en": "Thought, Communication, Challenge, Truth",
     "cards": [
       {
         "rank": "王牌",
@@ -1357,6 +1360,7 @@ const MINOR_SUITS = [
     "en": "Pentacles",
     "element": "土",
     "theme": "财富、工作、健康、物质",
+    "theme_en": "Wealth, Work, Health, Material",
     "cards": [
       {
         "rank": "王牌",

@@ -501,7 +501,7 @@ function detectSpecialDays(birthY, birthM, birthD, birthJd, natalPositions) {
     var pmInfo = getProgressedMoonInfo(birthJd);
     days.push({
       type: 'progMoon', emoji: '🌙', key: 'progMoonStatus',
-      reps: { sign: SIGN_PURE[pmInfo.sign], months: pmInfo.monthsUntil, deg: pmInfo.degreesUntilBoundary + '°' }
+      reps: { sign: getSignNamePure(pmInfo.sign), months: pmInfo.monthsUntil, deg: pmInfo.degreesUntilBoundary + '°' }
     });
   }
   return days;
