@@ -333,7 +333,7 @@ function synthesizeReading(cards, positions, question, questionThemes) {
 }
 
 // ── Tab 4: Tarot ──────────────────────────────────────────────────────────
-let tarotState = { deck:null, drawn:[], spread:'three', question:'', flipped:0 };
+let tarotState = { deck:null, drawn:[], spread:'three', question:'', flipped:0, mode:'single' };
 
 function renderTarotDeck() {
   // Shuffle and get fresh deck
@@ -350,28 +350,68 @@ function drawTarotUI() {
   const tab4 = document.getElementById('tab4');
   let html = '';
 
+  // Mode toggle
+  html += '<div class="tarot-mode-toggle">';
+  html += '<span class="tarot-mode-opt' + (tarotState.mode==='single'?' active':'') + '" onclick="setTarotMode(\'single\')">' + _L('个人塔罗','Personal Tarot') + '</span>';
+  html += '<span class="tarot-mode-opt' + (tarotState.mode==='synastry'?' active':'') + '" onclick="setTarotMode(\'synastry\')">' + _L('合盘塔罗','Synastry Tarot') + '</span>';
+  html += '</div>';
+
+  // Synastry mode — no chartData2 → show guidance
+  if (tarotState.mode === 'synastry' && !(typeof chartData2 !== 'undefined' && chartData2)) {
+    html += '<div class="synastry-hint">';
+    html += '<p>' + _L('🌙 合盘塔罗需要双方星盘数据', '🌙 Synastry Tarot requires both charts') + '</p>';
+    html += '<p style="font-size:0.85em;">' + _L('请先在输入区展开「合盘对方」填写第二个人的出生信息，点击「解读星盘」生成合盘数据后，再使用合盘塔罗。', 'Please expand the "Partner" section, fill in the second person\'s birth info, and click "Read My Chart" to generate synastry data before using Synastry Tarot.') + '</p>';
+    html += '</div>';
+    tab4.innerHTML = html;
+    return;
+  }
+
   // Question area
   html += '<div class="tarot-question-area">';
-  html += `<input type="text" id="tarot_question" placeholder="${isEn ? 'Hold your question in mind, then type it here…' : '默想你的问题，然后在此输入…'}" value="${escHtml(tarotState.question)}" onkeydown="if(event.key==='Enter')drawTarotCards()">`;
+  var qPlaceholder;
+  if (tarotState.mode === 'synastry') {
+    if (tarotState.spread === 'synastry-three') {
+      qPlaceholder = isEn ? 'Meditate on your bond — e.g. "What brought us together? Where is this heading?"' : '默想你们的关系，例：我们因何相遇？这段关系会走向何方？';
+    } else if (tarotState.spread === 'synastry-five') {
+      qPlaceholder = isEn ? 'Reflect on your dynamic — e.g. "What are we to each other? What\'s our core challenge?"' : '默想你们的相处，例：我们各自在关系中的角色？最需要跨越的障碍是什么？';
+    } else {
+      qPlaceholder = isEn ? 'Dive into love\'s truth — e.g. "What does TA truly feel? Will we build a future together?"' : '探寻爱的真相，例：TA对这段感情的真实感受？我们能否走向共同的未来？';
+    }
+  } else {
+    if (tarotState.spread === 'one') {
+      qPlaceholder = isEn ? 'Ask one thing — e.g. "What should I focus on today?" or "A message for my career?"' : '默想一件事，例：今天我需要关注什么？事业上有什么指引？';
+    } else {
+      qPlaceholder = isEn ? 'Past · Present · Future — e.g. "What\'s blocking me? What\'s coming next?"' : '默想你的处境，例：我当下的困境从何而来？未来会如何转折？';
+    }
+  }
+  html += '<input type="text" id="tarot_question" placeholder="' + qPlaceholder + '" value="' + escHtml(tarotState.question) + '" onkeydown="if(event.key===\'Enter\')drawTarotCards()">';
   html += '<button class="geo-btn" onclick="drawTarotCards()" id="tarot_draw_btn">' + _L('🔮 抽牌','🔮 Draw') + '</button>';
   html += '</div>';
 
   // Spread selector
   html += '<div class="spread-selector">';
-  html += `<span class="spread-opt${tarotState.spread==='one'?' active':''}" onclick="setSpread('one')">` + _L('单张牌 · 快速指引','Single Card · Quick Guidance') + `</span>`;
-  html += `<span class="spread-opt${tarotState.spread==='three'?' active':''}" onclick="setSpread('three')">` + _L('三张牌 · 过去现在未来','Three Cards · Past Present Future') + `</span>`;
+  if (tarotState.mode === 'synastry') {
+    html += '<span class="spread-opt' + (tarotState.spread==='synastry-three'?' active':'') + '" onclick="setSpread(\'synastry-three\')">' + _L('时间之箭 · 3张','Arrow of Time · 3') + '</span>';
+    html += '<span class="spread-opt' + (tarotState.spread==='synastry-five'?' active':'') + '" onclick="setSpread(\'synastry-five\')">' + _L('关系十字 · 5张','Relation Cross · 5') + '</span>';
+    html += '<span class="spread-opt' + (tarotState.spread==='synastry-seven'?' active':'') + '" onclick="setSpread(\'synastry-seven\')">' + _L('维纳斯之爱 · 7张','Venus Love · 7') + '</span>';
+  } else {
+    html += '<span class="spread-opt' + (tarotState.spread==='one'?' active':'') + '" onclick="setSpread(\'one\')">' + _L('单张牌 · 快速指引','Single Card · Quick Guidance') + '</span>';
+    html += '<span class="spread-opt' + (tarotState.spread==='three'?' active':'') + '" onclick="setSpread(\'three\')">' + _L('三张牌 · 过去现在未来','Three Cards · Past Present Future') + '</span>';
+  }
   html += '</div>';
 
   // Cards area
   if (tarotState.drawn.length > 0) {
-    const posLabels_ZH = tarotState.spread === 'three'
-      ? ['过去的影响','当下的状态','未来的趋势']
-      : ['宇宙的讯息'];
-    const posLabels_EN = tarotState.spread === 'three'
-      ? ['Past Influence','Present State','Future Trend']
-      : ['Message from the Universe'];
-    const posLabels = isEn ? posLabels_EN : posLabels_ZH;
-    html += '<div class="cards-area">';
+    var posLabels;
+    if (tarotState.mode === 'synastry') {
+      posLabels = getSynastryPositionLabels(tarotState.spread);
+    } else if (tarotState.spread === 'three') {
+      posLabels = isEn ? ['Past Influence','Present State','Future Trend'] : ['过去的影响','当下的状态','未来的趋势'];
+    } else {
+      posLabels = isEn ? ['Message from the Universe'] : ['宇宙的讯息'];
+    }
+    var cardAreaClass = tarotState.mode === 'synastry' ? ('cards-area synastry-cards ' + tarotState.spread) : 'cards-area';
+    html += '<div class="' + cardAreaClass + '">';
     for (let i = 0; i < tarotState.drawn.length; i++) {
       const card = tarotState.drawn[i];
       const isFlipped = i < tarotState.flipped;
@@ -398,23 +438,44 @@ function drawTarotUI() {
 
     // Interpretation
     if (tarotState.flipped >= tarotState.drawn.length) {
-      const themes = analyzeQuestion(tarotState.question || (isEn ? 'General Fortune' : '综合运势'));
+      var isSyn = tarotState.mode === 'synastry';
+      var defaultQ = isSyn ? (isEn ? 'Relationship Guidance' : '关系指引') : (isEn ? 'General Fortune' : '综合运势');
+      var themes = analyzeQuestion(tarotState.question || defaultQ);
       html += '<div class="tarot-interpretation">';
-      html += `<h3>` + _L('✦ 解读：','✦ Reading: ') + (tarotState.question||(isEn ? 'Message from the Universe' : '宇宙给你的信息')) + `</h3>`;
-      for (let i = 0; i < tarotState.drawn.length; i++) {
-        const card = tarotState.drawn[i];
-        const readingLabels_ZH = tarotState.spread==='three'?['❶ 过去','❷ 现在','❸ 未来']:['🎴 指引'];
-        const readingLabels_EN = tarotState.spread==='three'?['❶ Past','❷ Present','❸ Future']:['🎴 Guidance'];
-        const readingLabels = isEn ? readingLabels_EN : readingLabels_ZH;
-        html += '<div class="card-reading">';
-        html += `<h4>${readingLabels[i]}</h4>`;
-        html += `<p>${interpretCard(card, card.isReversed, i, themes)}</p>`;
+
+      if (isSyn) {
+        html += '<h3>' + _L('✦ 关系解读：','✦ Relationship Reading: ') + (tarotState.question||(isEn ? 'Your Bond' : '你们的关系')) + '</h3>';
+        var readingLabels = getReadingLabels(tarotState.spread);
+        for (let i = 0; i < tarotState.drawn.length; i++) {
+          var card = tarotState.drawn[i];
+          html += '<div class="card-reading">';
+          html += '<h4>' + readingLabels[i] + '</h4>';
+          html += '<p>' + interpretSynastryCard(card, card.isReversed, i, themes, tarotState.spread) + '</p>';
+          html += '</div>';
+        }
+        html += '<div class="synthesis">';
+        html += synthesizeSynastryReading(tarotState.drawn, [], tarotState.question, themes, tarotState.spread);
+        html += '</div>';
+      } else {
+        html += '<h3>' + _L('✦ 解读：','✦ Reading: ') + (tarotState.question||(isEn ? 'Message from the Universe' : '宇宙给你的信息')) + '</h3>';
+        for (let i = 0; i < tarotState.drawn.length; i++) {
+          var card = tarotState.drawn[i];
+          var rl_ZH = tarotState.spread==='three'?['❶ 过去','❷ 现在','❸ 未来']:['🎴 指引'];
+          var rl_EN = tarotState.spread==='three'?['❶ Past','❷ Present','❸ Future']:['🎴 Guidance'];
+          var rl = isEn ? rl_EN : rl_ZH;
+          html += '<div class="card-reading">';
+          html += '<h4>' + rl[i] + '</h4>';
+          html += '<p>' + interpretCard(card, card.isReversed, i, themes) + '</p>';
+          html += '</div>';
+        }
+        html += '<div class="synthesis">';
+        html += synthesizeReading(tarotState.drawn, [], tarotState.question || (isEn ? 'Your Fortune' : '你的运势'), themes);
         html += '</div>';
       }
-      // Synthesis
-      html += '<div class="synthesis">';
-      html += synthesizeReading(tarotState.drawn, [], tarotState.question || (isEn ? 'Your Fortune' : '你的运势'), themes);
-      html += '</div>';
+
+      // CTA
+      html += renderTarotCTA(isSyn);
+
       html += '<div style="text-align:center;margin-top:16px;">';
       html += '<button class="btn" onclick="renderTarotDeck()" style="padding:10px 30px;font-size:0.9em;">' + _L('🔄 重新抽牌','🔄 Draw Again') + '</button>';
       html += '</div>';
@@ -442,6 +503,51 @@ function setSpread(type) {
   drawTarotUI();
 }
 
+function setTarotMode(mode) {
+  tarotState.mode = mode;
+  tarotState.drawn = [];
+  tarotState.flipped = 0;
+  tarotState.question = '';
+  tarotState.spread = mode === 'synastry' ? 'synastry-three' : 'three';
+  drawTarotUI();
+}
+
+function getTarotCardCount(spread) {
+  if (spread === 'one') return 1;
+  if (spread === 'three' || spread === 'synastry-three') return 3;
+  if (spread === 'synastry-five') return 5;
+  if (spread === 'synastry-seven') return 7;
+  return 3;
+}
+
+function getSynastryPositionLabels(spread) {
+  var isEn = window._lang && window._lang() === 'en';
+  if (spread === 'synastry-three') {
+    return isEn ? ['Past Connection','Present Bond','Future Direction'] : ['过去的缘分','当下的连接','未来的走向'];
+  }
+  if (spread === 'synastry-five') {
+    return isEn ? ['You','The Other','Status','Challenge','Outlook'] : ['你','对方','关系现状','核心挑战','前景指引'];
+  }
+  if (spread === 'synastry-seven') {
+    return isEn ? ['Your Feelings','Their Feelings','Foundation','Obstacle','Subconscious','Turning Point','Outcome'] : ['你的感受','对方的感受','关系基础','当前障碍','潜意识影响','关键转机','最终结果'];
+  }
+  return [];
+}
+
+function getReadingLabels(spread) {
+  var isEn = window._lang && window._lang() === 'en';
+  if (spread === 'synastry-three') {
+    return isEn ? ['❶ Past Connection','❷ Present Bond','❸ Future Direction'] : ['❶ 过去的缘分','❷ 当下的连接','❸ 未来的走向'];
+  }
+  if (spread === 'synastry-five') {
+    return isEn ? ['❶ You','❷ The Other','❸ Status','❹ Challenge','❺ Outlook'] : ['❶ 你','❷ 对方','❸ 关系现状','❹ 核心挑战','❺ 前景指引'];
+  }
+  if (spread === 'synastry-seven') {
+    return isEn ? ['❶ Your Feelings','❷ Their Feelings','❸ Foundation','❹ Obstacle','❺ Subconscious','❻ Turning Point','❼ Outcome'] : ['❶ 你的感受','❷ 对方的感受','❸ 关系基础','❹ 当前障碍','❺ 潜意识影响','❻ 关键转机','❼ 最终结果'];
+  }
+  return [];
+}
+
 function drawTarotCards() {
   const qInput = document.getElementById('tarot_question');
   const question = qInput ? qInput.value.trim() : '';
@@ -449,7 +555,7 @@ function drawTarotCards() {
 
   // Shuffle fresh each time
   tarotState.deck = shuffle(buildDeck());
-  const count = tarotState.spread === 'three' ? 3 : 1;
+  const count = getTarotCardCount(tarotState.spread);
   tarotState.drawn = [];
   for (let i = 0; i < count; i++) {
     const card = tarotState.deck.pop();
@@ -517,5 +623,286 @@ function revealTarotCard(idx) {
   html += '<button class="share-btn" onclick="openSingleTarot()">' + _t('singletarot.drawAgain') + '</button>';
 
   document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
+}
+
+// ═══ 合盘塔罗 — Relationship Overlay Data ════════════════════════════════════
+var MAJOR_REL_ZH = {
+  '愚者':'在关系中，愚者邀请你放下过去的包袱，带着信任和开放的心跳入这段缘分。不要过度分析，让关系自然展开。',
+  '魔术师':'在关系中，魔术师表明你拥有改善这段关系的一切资源。主动沟通、展现真实的自己，你可以创造想要的互动模式。',
+  '女祭司':'在关系中，女祭司提醒你有些答案不在对话里，而在沉默与直觉中。给彼此空间去感受，不必急于定义这段关系。',
+  '女皇':'在关系中，女皇带来滋养和丰盛的能量。用温柔和接纳去爱对方，关系会在被无条件包容时自然绽放。',
+  '皇帝':'在关系中，皇帝代表稳定和承诺。你需要建立清晰的边界和共同的目标，但同时也要允许柔软进入这段关系。',
+  '教皇':'在关系中，教皇指向更深层的契合——价值观的共鸣和精神的连接。传统的承诺方式（如婚姻）可能在这段关系中有重要意义。',
+  '恋人':'在关系中，恋人是核心牌——代表重要的选择、灵魂的吸引和深度的亲密。但选择意味着取舍，你需要在心动和理性之间找到平衡。',
+  '战车':'在关系中，战车代表克服困难和前进的动力。你们可能面临外部挑战，但共同的意志可以战胜一切。关键是方向一致。',
+  '力量':'在关系中，力量牌不是硬碰硬，而是用温柔驯服恐惧。耐心、理解和持续的信任是你们关系最强大的纽带。',
+  '隐士':'在关系中，隐士提醒你们各自需要独立的精神空间。适度的距离不是疏远，而是让彼此在安静中重新看清对方的价值。',
+  '命运之轮':'在关系中，命运之轮标志着一个转折点——缘分将你们带到此刻。有些关系是命中注定的相遇，顺应这个周期的展开。',
+  '正义':'在关系中，正义牌要求诚实和公平。你需要审视这段关系的给予与接受是否平衡。如果天平倾斜，现在是纠正的时候。',
+  '倒吊人':'在关系中，倒吊人代表需要换个角度看待这段关系。暂时的停顿或牺牲不是终结，而是一种更深的理解正在酝酿。',
+  '死神':'在关系中，死神牌象征一段旧模式的结束和新关系的开始。这不一定意味着分手，而是旧的互动方式必须"死去"，才能迎来真正的亲密。',
+  '节制':'在关系中，节制牌是调和与融合的象征。两个不同的灵魂正在学习如何共舞——不急不躁，找到属于你们的节奏。',
+  '恶魔':'在关系中，恶魔牌揭示可能存在的不健康依恋或控制模式。问问自己：这段关系让你自由吗？还是某种恐惧在捆绑你们？',
+  '高塔':'在关系中，高塔牌预示着突然的冲击或真相的揭晓。虽然过程可能痛苦，但它是为了打破不再真实的幻象，让关系建立在更真实的基础上。',
+  '星星':'在关系中，星星带来希望和治愈。即使经历了困难，你们之间仍然有温柔的星光在指引。信任这段关系的修复力。',
+  '月亮':'在关系中，月亮牌提醒你注意隐藏的情绪和未说出口的感受。关系中可能有模糊不清的地方，不要被表象迷惑——深入的对话能照亮阴影。',
+  '太阳':'在关系中，太阳是最明亮的祝福。真诚的喜悦、孩子的天真和纯粹的快乐充盈着你们的关系。享受这份温暖，它是真实的。',
+  '审判':'在关系中，审判牌召唤你们重新评估这段关系的意义。是时候诚实面对内心的声音：这段关系值得你投入全部的自己吗？',
+  '世界':'在关系中，世界标志着一个完整的循环达成。你们的关系已经走过了完整的旅程——现在是庆祝和收获的时候。这可能意味着关系进入更成熟的阶段，或自然地圆满完结。'
+};
+var MAJOR_REL_EN = {
+  '愚者':'In relationship, The Fool invites you to release past baggage and leap into this connection with trust and an open heart. Don\'t over-analyze — let things unfold naturally.',
+  '魔术师':'In relationship, The Magician shows you have all the tools to improve this connection. Communicate proactively, show your true self, and you can create the dynamic you desire.',
+  '女祭司':'In relationship, The High Priestess reminds you that some answers lie not in words but in silence and intuition. Give each other space to feel — don\'t rush to define things.',
+  '女皇':'In relationship, The Empress brings nurturing, abundant energy. Love with gentleness and acceptance — the relationship will blossom when held unconditionally.',
+  '皇帝':'In relationship, The Emperor represents stability and commitment. Establish clear boundaries and shared goals — but also allow softness into the container you build together.',
+  '教皇':'In relationship, The Hierophant points to deeper resonance — shared values and spiritual connection. Traditional forms of commitment may carry special meaning here.',
+  '恋人':'In relationship, The Lovers is the core card — representing important choice, soul attraction, and deep intimacy. But choice means trade-offs: find balance between passion and reason.',
+  '战车':'In relationship, The Chariot represents overcoming obstacles and forward momentum. You may face external challenges, but shared willpower can conquer anything. The key is aligned direction.',
+  '力量':'In relationship, Strength is not about force — it is taming fear with gentleness. Patience, understanding, and sustained trust are your most powerful bonds.',
+  '隐士':'In relationship, The Hermit reminds you that each person needs independent spiritual space. Healthy distance is not estrangement — it allows you to see each other\'s value anew in quiet.',
+  '命运之轮':'In relationship, Wheel of Fortune marks a turning point — destiny brings you to this moment. Some connections are fated encounters. Flow with this cycle as it unfolds.',
+  '正义':'In relationship, Justice demands honesty and fairness. Examine whether giving and receiving are in balance. If the scales are tilted, now is the time to correct them.',
+  '倒吊人':'In relationship, The Hanged Man suggests seeing the relationship from a different angle. A temporary pause or sacrifice is not an ending — deeper understanding is brewing beneath the surface.',
+  '死神':'In relationship, Death signals the end of an old pattern and the beginning of a new way of relating. This doesn\'t necessarily mean breakup — but old dynamics must "die" for true intimacy to emerge.',
+  '节制':'In relationship, Temperance is the symbol of blending and harmony. Two different souls are learning to dance together — without rushing, find the rhythm that belongs to you both.',
+  '恶魔':'In relationship, The Devil reveals possible unhealthy attachment or control patterns. Ask yourself: does this relationship set you free? Or is some form of fear binding you together?',
+  '高塔':'In relationship, The Tower heralds sudden shock or truth revealed. Though the process may be painful, it serves to break illusions that are no longer real — so the relationship can be rebuilt on honest ground.',
+  '星星':'In relationship, The Star brings hope and healing. Even through difficulty, gentle starlight still guides you. Trust in the relationship\'s capacity for repair.',
+  '月亮':'In relationship, The Moon alerts you to hidden emotions and unspoken feelings. There may be unclear territory between you — don\'t be deceived by surface appearances. Deep dialogue can illuminate the shadows.',
+  '太阳':'In relationship, The Sun is the brightest blessing. Genuine joy, childlike delight, and pure happiness fill your connection. Bask in this warmth — it is real.',
+  '审判':'In relationship, Judgement calls you to re-evaluate the meaning of this bond. It\'s time to honestly face your inner voice: is this relationship worthy of your full self?',
+  '世界':'In relationship, The World marks the completion of a full cycle. Your relationship has journeyed through its complete arc — now is a time of celebration and harvest. This may mean entering a more mature phase, or a natural, graceful completion.'
+};
+
+var ELEM_REL_ZH = {
+  '火':'火元素的能量在关系中表现为激情和行动力。你们之间的热情是宝贵的动力，同时注意不要让冲动压倒倾听。',
+  '水':'水元素在关系中代表情感的深度和直觉。你们之间的情感连接是这段关系最珍贵的资产——信任你的感受。',
+  '风':'风元素在关系中代表沟通和思想。你们需要通过清晰和诚实的对话来建立理解——说出真心话比什么都重要。',
+  '土':'土元素在关系中代表稳定和承诺。你们关系的根基在于彼此的可靠和实际的付出——耐心是最佳的滋养。'
+};
+var ELEM_REL_EN = {
+  '火':'The Fire element manifests in your relationship as passion and drive. The heat between you is a precious engine — just be mindful that impulse doesn\'t override listening.',
+  '水':'The Water element in relationship represents emotional depth and intuition. Your emotional connection is this bond\'s most treasured asset — trust what you feel.',
+  '风':'The Air element in relationship represents communication and ideas. Build understanding through clear, honest dialogue — speaking your true heart matters more than anything.',
+  '土':'The Earth element in relationship represents stability and commitment. Your foundation rests on mutual reliability and tangible effort — patience is the best nourishment.'
+};
+
+var POS_OVERLAY_ZH = {
+  'synastry-three': [
+    '这张牌揭示了你们之间过去的缘分模式——相遇背后可能有更深层的宇宙安排。',
+    '这张牌描绘了你们关系当下的能量状态——此刻的连接质感和互动氛围。',
+    '这张牌预示了关系在目前能量流之下的发展趋势和潜力。'
+  ],
+  'synastry-five': [
+    '这张牌代表你在这段关系中的状态和投射——你在带给这段关系什么能量。',
+    '这张牌代表对方在关系中的感受和立场——TA可能如何看待和体验这段关系。',
+    '这张牌描绘了你们关系的整体现状——当前的能量场和互动模式。',
+    '这张牌指出了关系面临的核心挑战——需要共同面对和转化的关键课题。',
+    '这张牌为关系的发展方向提供高层次的宇宙指引。'
+  ],
+  'synastry-seven': [
+    '这张牌反映你在这段关系中的情感需求和内心真实感受。',
+    '这张牌反映对方在这段关系中可能感受到但未必表达出来的能量。',
+    '这张牌揭示你们关系的基础——是什么根本的力量让你们走到一起。',
+    '这张牌指出当前阻碍关系发展的具体障碍或卡点所在。',
+    '这张牌揭示在潜意识层面影响你们互动模式的深层动力。',
+    '这张牌指出了可以改变关系走向的关键转折点或机会。',
+    '这张牌预示了在当前能量发展趋势下关系可能达成的结果。'
+  ]
+};
+var POS_OVERLAY_EN = {
+  'synastry-three': [
+    'This card reveals the past karmic pattern between you — there may be a deeper cosmic arrangement behind your meeting.',
+    'This card depicts the present energy state of your relationship — the current quality of connection and interaction.',
+    'This card indicates the direction and potential of your relationship under the current energetic flow.'
+  ],
+  'synastry-five': [
+    'This card represents your state and projection in the relationship — what energy you are bringing to the bond.',
+    'This card represents the other person\'s feelings and position — how they may perceive and experience the relationship.',
+    'This card depicts the overall status of your relationship — the current energetic field and interaction pattern.',
+    'This card points to the core challenge facing the relationship — the key lesson to face and transform together.',
+    'This card offers high-level cosmic guidance for the relationship\'s direction.'
+  ],
+  'synastry-seven': [
+    'This card reflects your emotional needs and authentic inner feelings in this relationship.',
+    'This card reflects what the other person may be feeling but not necessarily expressing in this relationship.',
+    'This card reveals the foundation of your relationship — what fundamental force brought you together.',
+    'This card points to the specific obstacle or blockage currently hindering the relationship\'s growth.',
+    'This card reveals the subconscious dynamics influencing your interaction patterns.',
+    'This card indicates the key turning point or opportunity that can shift the relationship\'s direction.',
+    'This card foretells the possible outcome of the relationship under the current energetic trajectory.'
+  ]
+};
+
+// ── Synastry Card Interpretation ────────────────────────────────────────────
+function interpretSynastryCard(card, isReversed, positionIdx, questionThemes, spread) {
+  var isEn = window._lang && window._lang() === 'en';
+  var reading = interpretCard(card, isReversed, positionIdx, questionThemes);
+
+  var posOverlays = isEn ? POS_OVERLAY_EN[spread] : POS_OVERLAY_ZH[spread];
+  var posOverlay = posOverlays && posOverlays[positionIdx] ? posOverlays[positionIdx] : '';
+
+  var relOverlay = '';
+  if (card.type === 'major') {
+    relOverlay = isEn ? (MAJOR_REL_EN[card.name] || '') : (MAJOR_REL_ZH[card.name] || '');
+  } else if (card.element) {
+    relOverlay = isEn ? (ELEM_REL_EN[card.element] || '') : (ELEM_REL_ZH[card.element] || '');
+  }
+
+  if (posOverlay || relOverlay) {
+    reading += '<br><br><span class="syn-rel-label">💞 ' + _L('关系提示','Relationship Insight') + '</span> ';
+    if (posOverlay) reading += posOverlay + ' ';
+    if (relOverlay) reading += relOverlay;
+  }
+
+  return reading;
+}
+
+// ── Compute Synastry Data ────────────────────────────────────────────────────
+function computeSynastryData() {
+  if (typeof chartData1 === 'undefined' || !chartData1) return null;
+  if (typeof chartData2 === 'undefined' || !chartData2) return null;
+
+  var pos1 = chartData1.positions, pos2 = chartData2.positions;
+  var asc1 = chartData1.asc, asc2 = chartData2.asc;
+
+  var crossAspects = [];
+  for (var i = 0; i < PLANETS.length; i++) {
+    for (var j = 0; j < PLANETS.length; j++) {
+      var diff = (Math.abs(pos1[PLANETS[i].id] - pos2[PLANETS[j].id]) + 360) % 360;
+      if (diff > 180) diff = 360 - diff;
+      for (var k = 0; k < ASPECT_DEFS.length; k++) {
+        var ad = ASPECT_DEFS[k];
+        if (Math.abs(diff - ad.angle) <= ad.orb) {
+          crossAspects.push({p1:PLANETS[i].id, p2:PLANETS[j].id, name:ad.name, orb:Math.abs(diff-ad.angle)});
+        }
+      }
+    }
+  }
+
+  var goodScore = 0, hardScore = 0;
+  for (var a = 0; a < crossAspects.length; a++) {
+    var ax = crossAspects[a];
+    if (ax.name === '三合' || ax.name === '六合') goodScore += ax.name==='三合' ? 3 : 2;
+    else if (ax.name === '合') goodScore += 2;
+    else if (ax.name === '刑') hardScore += 2;
+    else if (ax.name === '冲') hardScore += 3;
+  }
+  var total = goodScore + hardScore;
+  var compatPct = total > 0 ? Math.round(goodScore / total * 100) : 50;
+
+  var keyPairs = [['Sun','Moon'],['Sun','Venus'],['Sun','Mars'],['Moon','Venus'],
+                  ['Moon','Mars'],['Venus','Mars'],['Sun','Saturn'],['Moon','Saturn'],['Jupiter','Venus']];
+  var foundAspects = [];
+  for (var kp = 0; kp < keyPairs.length; kp++) {
+    var kp1 = keyPairs[kp][0], kp2 = keyPairs[kp][1];
+    for (var ca = 0; ca < crossAspects.length; ca++) {
+      var cax = crossAspects[ca];
+      if ((cax.p1 === kp1 && cax.p2 === kp2) || (cax.p1 === kp2 && cax.p2 === kp1)) {
+        foundAspects.push(cax);
+        break;
+      }
+    }
+  }
+
+  var e1 = ELEMENTS[degToSign(asc1).si];
+  var e2 = ELEMENTS[degToSign(asc2).si];
+  var isSame = e1 === e2;
+  var isComplement = (e1==='火'&&e2==='风')||(e1==='风'&&e2==='火')||(e1==='土'&&e2==='水')||(e1==='水'&&e2==='土');
+
+  return { crossAspects:crossAspects, compatPct:compatPct, goodScore:goodScore, hardScore:hardScore,
+           foundAspects:foundAspects, e1:e1, e2:e2, isSame:isSame, isComplement:isComplement };
+}
+
+// ── Synastry Synthesis ───────────────────────────────────────────────────────
+function synthesizeSynastryReading(cards, positions, question, questionThemes, spread) {
+  var isEn = window._lang && window._lang() === 'en';
+  var html = '';
+
+  // Part A: Card pattern analysis (reuse existing synthesis)
+  html += synthesizeReading(cards, positions, question || (isEn ? 'Your Relationship' : '你们的关系'), questionThemes);
+
+  // Part B: Synastry data integration
+  var synData = computeSynastryData();
+  if (synData) {
+    html += '<div class="synastry-integration">';
+    html += '<h4>' + _L('✦ 合盘能量解读','✦ Synastry Energy Reading') + '</h4>';
+
+    var scoreText = synData.compatPct >= 75 ? _L('💫 契合度较高','💫 High Compatibility')
+      : synData.compatPct >= 55 ? _L('✨ 契合度中等偏上','✨ Above Average Compatibility')
+      : synData.compatPct >= 40 ? _L('🌗 契合度中等','🌗 Moderate Compatibility')
+      : _L('🌑 契合度充满挑战','🌑 Challenging Compatibility');
+    html += '<p class="synastry-score">' + scoreText + '（' + synData.compatPct + '%）'
+          + ' · ' + _L('和谐','Harmony') + ' ' + synData.goodScore
+          + ' / ' + _L('紧张','Tension') + ' ' + synData.hardScore + '</p>';
+
+    if (synData.foundAspects.length > 0) {
+      html += '<div class="synastry-aspects">';
+      html += '<p><strong>' + _L('关键合盘相位：','Key Synastry Aspects:') + '</strong></p>';
+      for (var fa = 0; fa < synData.foundAspects.length; fa++) {
+        var a = synData.foundAspects[fa];
+        var key = a.p1 + '_' + a.p2;
+        var revKey = a.p2 + '_' + a.p1;
+        var data = SYNASTRY_ASPECTS[key] || SYNASTRY_ASPECTS[revKey];
+        if (data) {
+          var n1 = '', n2 = '';
+          for (var pi = 0; pi < PLANETS.length; pi++) {
+            if (PLANETS[pi].id === a.p1) n1 = PLANETS[pi].name;
+            if (PLANETS[pi].id === a.p2) n2 = PLANETS[pi].name;
+          }
+          var cls = (a.name==='三合'||a.name==='六合'||a.name==='合') ? 'aspect-good' : 'aspect-hard';
+          var text = (a.name==='三合'||a.name==='六合'||a.name==='合') ? data.good : data.hard;
+          html += '<p><span class="' + cls + '">' + n1 + ' ' + _aspectName(a) + ' ' + n2 + '</span> — ' + text + '</p>';
+        }
+      }
+      html += '</div>';
+    }
+
+    var e1en = ELEMENTS_EN[synData.e1] || synData.e1;
+    var e2en = ELEMENTS_EN[synData.e2] || synData.e2;
+    if (synData.isSame) {
+      html += '<p>' + _L(
+        '你们上升同为' + synData.e1 + '象元素，对关系的本能反应和理解方式非常相似。',
+        'Your rising signs share the ' + e1en + ' element — you instinctively understand relationships in similar ways.'
+      ) + '</p>';
+    } else if (synData.isComplement) {
+      html += '<p>' + _L(
+        '你们的上升元素（' + synData.e1 + '与' + synData.e2 + '）天然互补，彼此提供对方欠缺的视角。',
+        'Your rising elements (' + e1en + ' & ' + e2en + ') are naturally complementary — each provides what the other lacks.'
+      ) + '</p>';
+    } else {
+      html += '<p>' + _L(
+        '你们的上升元素（' + synData.e1 + '与' + synData.e2 + '）差异较大，需要更多的理解和磨合，但也因此可能带来深刻的互相成长。',
+        'Your rising elements (' + e1en + ' & ' + e2en + ') are quite different — requiring more understanding and adjustment, but this can also bring profound mutual growth.'
+      ) + '</p>';
+    }
+
+    html += '</div>';
+  }
+
+  return html;
+}
+
+// ── CTA Block ────────────────────────────────────────────────────────────────
+function renderTarotCTA(isSynastry) {
+  var contacts = [
+    {icon:'💬', platform:_L('微信','WeChat'), id:'LunarVeilAstro'},
+    {icon:'🐧', platform:'QQ', id:'3393776733'}
+  ];
+
+  if (isSynastry) {
+    return renderLockedBlock(
+      _L('解锁合盘深度解读','Unlock In-Depth Synastry Reading'),
+      _L('以上为牌面自动解读。每段关系都独一无二——如需结合双方完整星盘+塔罗的精细化深度分析，请联系占星师一对一咨询。','The above is an automated card interpretation. Every relationship is unique — for a personalized deep analysis combining both birth charts with tarot, contact our astrologer for a one-on-one consultation.'),
+      contacts
+    );
+  } else {
+    return renderLockedBlock(
+      _L('解锁个人深度解读','Unlock In-Depth Tarot Reading'),
+      _L('以上为牌面自动解读。每个人的星盘都是独一无二的宇宙地图——如需结合你的完整星盘+塔罗的精细化深度分析，请联系占星师一对一咨询。','The above is an automated card interpretation. Every birth chart is a unique cosmic map — for a personalized deep analysis combining your full chart with tarot, contact our astrologer for a one-on-one consultation.'),
+      contacts
+    );
+  }
 }
 

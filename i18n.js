@@ -59,7 +59,7 @@
   add('label.birthdate', '出生日期', 'Birth Date');
   add('label.birthtime', '出生时间', 'Birth Time');
   add('hint.datePicker', '💡 点击日期框左上角年份可快速切换年份', '💡 Tap the year in the top-left corner to quickly jump years');
-  add('hint.birthtime', '记得就填，不记得也没关系，<strong class="time-gold">12:00</strong>就够了。行星照样准，只有上升和宫位是估算的。', 'Know it? Enter it. Forgot? No worries — <strong class="time-gold">12:00</strong> works fine. Planets are still spot on; only the ASC and houses are approximate.');
+  add('hint.birthtime', '💡 记得就填，不记得也没关系，<strong class="time-gold">12:00</strong>就够了。行星照样准，只有上升和宫位是估算的。', '💡 Know it? Enter it. Forgot? No worries — <strong class="time-gold">12:00</strong> works fine. Planets are still spot on; only the ASC and houses are approximate.');
   add('hint.swipeTabs', '← 左右滑动标签栏，可切换查看个人星盘、运势等更多解读 →', '← Swipe the tab bar to view your personal chart, fortune & more →');
   add('hint.scrollLodge', '如模块显示不全，上下滑动页面即可完整加载', 'If items don\'t fully display, scroll up & down to reload');
   add('label.timezone', '时区 (UTC)', 'Timezone (UTC)');
@@ -68,6 +68,7 @@
   add('label.email', '电子邮箱（可选，用于接收PDF报告）', 'Email (optional, for PDF report)');
   add('label.latitude', '纬度', 'Latitude');
   add('label.longitude', '经度', 'Longitude');
+  add('label.manualCoords', '📍 手动输入经纬度 ▼', '📍 Enter coords manually ▼');
 
   // ══════════════════════════════════════════════════════════════════════════
   //  FORM PLACEHOLDERS
@@ -160,6 +161,21 @@
   add('tarot.cardHint', '这张牌是今天给你的指引。记住：牌面不是预言，是你内心的回声。', 'This card is your guidance for today. Remember: the card is not a prophecy — it is the echo of your own heart.');
   add('tarot.interpretation', '✦ 解读：', '✦ Reading: ');
   add('tarot.defaultQuestion', '宇宙给你的信息', 'Message from the Universe');
+
+  // ── TAROT MODE TOGGLE ──
+  add('tarot.mode.personal', '个人塔罗', 'Personal Tarot');
+  add('tarot.mode.synastry', '合盘塔罗', 'Synastry Tarot');
+
+  // ── TAROT SYNASTRY SPREADS ──
+  add('tarot.spread.synastryThree', '时间之箭 · 过去现在未来', 'Arrow of Time · PPF');
+  add('tarot.spread.synastryFive', '关系十字', 'Relationship Cross');
+  add('tarot.spread.synastrySeven', '维纳斯之爱', 'Venus Love Spread');
+
+  // ── TAROT CTA ──
+  add('tarot.cta.singleTitle', '解锁个人深度解读', 'Unlock In-Depth Tarot Reading');
+  add('tarot.cta.singleDesc', '以上为牌面自动解读。每个人的星盘都是独一无二的宇宙地图——如需结合你的完整星盘+塔罗的精细化深度分析，请联系占星师一对一咨询。', 'The above is an automated card interpretation. Every birth chart is a unique cosmic map — for a personalized deep analysis combining your full chart with tarot, contact our astrologer for a one-on-one consultation.');
+  add('tarot.cta.synastryTitle', '解锁合盘深度解读', 'Unlock In-Depth Synastry Reading');
+  add('tarot.cta.synastryDesc', '以上为牌面自动解读。每段关系都独一无二——如需结合双方完整星盘+塔罗的精细化深度分析，请联系占星师一对一咨询。', 'The above is an automated card interpretation. Every relationship is unique — for a personalized deep analysis combining both birth charts with tarot, contact our astrologer for a one-on-one consultation.');
 
   // ══════════════════════════════════════════════════════════════════════════
   //  ERROR / VALIDATION MESSAGES

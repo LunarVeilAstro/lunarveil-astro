@@ -172,6 +172,12 @@ header .subtitle {
 .geo-status.success { color: #6a9a6a; }
 .geo-status.error { color: #c87070; }
 .geo-status.loading { color: var(--gold-dim); }
+.manual-toggle {
+  display: inline-block; font-size: 0.72em; color: var(--text-dim);
+  cursor: pointer; margin-top: 2px; user-select: none;
+  transition: color 0.2s;
+}
+.manual-toggle:hover { color: var(--accent); }
 
 .date-hint {
   display: block; font-size: 0.7em; color: #6a6a80; margin-top: 3px; letter-spacing: 0.03em;
@@ -306,6 +312,21 @@ header .subtitle {
   margin: 12px 0; letter-spacing: 0.08em;
 }
 
+/* ── Tarot Mode Toggle ──────────────────────────────────────────────────── */
+.tarot-mode-toggle {
+  display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;
+}
+.tarot-mode-opt {
+  padding: 8px 28px; border-radius: 20px; cursor: pointer;
+  font-size: 0.9em; letter-spacing: 0.06em;
+  border: 1px solid var(--border); color: var(--text-dim);
+  background: transparent; transition: all 0.3s; font-family: inherit;
+}
+.tarot-mode-opt.active, .tarot-mode-opt:hover {
+  border-color: var(--gold); color: var(--accent);
+  background: rgba(201,169,110,0.1);
+}
+
 /* ── Tarot ──────────────────────────────────────────────────────────────── */
 .tarot-question-area {
   display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end;
@@ -438,6 +459,53 @@ header .subtitle {
   margin-left: 6px;
 }
 
+/* ── Synastry Tarot ─────────────────────────────────────────────────────── */
+.synastry-cards {
+  --card-w: 150px; --card-h: 270px;
+}
+.synastry-cards.synastry-five {
+  --card-w: 120px; --card-h: 210px;
+}
+.synastry-cards.synastry-seven {
+  --card-w: 100px; --card-h: 180px;
+}
+.synastry-cards .tarot-card {
+  width: var(--card-w); height: var(--card-h);
+}
+
+.syn-rel-label {
+  color: var(--gold); font-weight: bold;
+}
+
+.synastry-hint {
+  text-align: center; padding: 30px 16px; color: var(--text-dim);
+  line-height: 1.9; font-size: 0.92em;
+}
+
+.synastry-integration {
+  margin-top: 20px; padding: 18px; border-radius: 10px;
+  background: rgba(100,80,140,0.06); border: 1px solid rgba(180,140,200,0.12);
+}
+.synastry-integration h4 {
+  color: var(--accent); font-size: 0.95em; margin: 0 0 12px;
+  letter-spacing: 0.06em;
+}
+.synastry-score {
+  text-align: center; color: var(--gold); font-weight: bold;
+  font-size: 0.95em; margin-bottom: 12px;
+}
+.synastry-aspects {
+  margin: 10px 0; padding: 10px 14px;
+  background: rgba(0,0,0,0.15); border-radius: 8px;
+}
+.synastry-aspects p {
+  color: var(--text); line-height: 1.7; font-size: 0.88em; margin: 4px 0;
+}
+
+.tarot-interpretation .locked-block {
+  margin: 16px 0 6px;
+}
+
 @media (max-width: 600px) {
   .tarot-card { width: 120px; height: 230px; }
   .card-front { padding: 8px 6px; }
@@ -447,6 +515,13 @@ header .subtitle {
   .tarot-interpretation { padding: 14px; }
   .tarot-interpretation .card-reading p { font-size: 0.85em; text-indent: 1.5em; }
   .tarot-interpretation .card-reading h4 { font-size: 0.9em; }
+  /* synastry */
+  .synastry-cards.synastry-five { --card-w: 100px; --card-h: 190px; }
+  .synastry-cards.synastry-seven { --card-w: 80px; --card-h: 160px; }
+  .tarot-mode-opt { padding: 6px 18px; font-size: 0.82em; }
+  .synastry-integration { padding: 12px; }
+  .synastry-aspects { padding: 8px 10px; }
+  .synastry-aspects p { font-size: 0.82em; }
 }
 /* ── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
@@ -1953,6 +2028,10 @@ header .subtitle {
   .tarot-card { width: 80px; height: 170px; }
   .cards-area { gap: 4px; }
   .card-front .card-title { font-size: 0.66em; }
+  /* synastry */
+  .synastry-cards.synastry-five { --card-w: 65px; --card-h: 140px; }
+  .synastry-cards.synastry-seven { --card-w: 55px; --card-h: 120px; }
+  .tarot-mode-opt { padding: 5px 14px; font-size: 0.76em; }
   .card-front .card-keywords { font-size: 0.56em; line-height: 1.25; }
   .tarot-pick-card { width: 44px; height: 66px; }
 

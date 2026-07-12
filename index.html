@@ -191,10 +191,11 @@
           <div class="form-group" style="flex:3">
             <label data-i18n="label.birthplace">出生地点 (城市/地址)</label>
             <div class="geo-row">
-              <div class="form-group" style="margin-bottom:0"><input type="text" id="p1_addr" data-i18n-placeholder="placeholder.birthplace" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p1')"></div>
+              <div class="form-group" style="margin-bottom:0"><input type="text" id="p1_addr" data-i18n-placeholder="placeholder.birthplace" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p1')" onblur="geocode('p1')"></div>
               <div class="form-group" style="margin-bottom:0"><button class="geo-btn" onclick="geocode('p1')" data-i18n="btn.geocode">🔍 定位</button></div>
             </div>
             <div class="geo-status" id="p1_geo_status">✅ 宁夏银川 · 38.47°N, 106.27°E · UTC+8</div>
+            <span class="manual-toggle" onclick="toggleManual('p1')" data-i18n="label.manualCoords">📍 手动输入经纬度 ▼</span>
           </div>
         </div>
         <div class="form-row" style="margin-top:10px;">
@@ -247,10 +248,11 @@
           <div class="form-group" style="flex:3">
             <label data-i18n="label.birthplace">出生地点 (城市/地址)</label>
             <div class="geo-row">
-              <div class="form-group" style="margin-bottom:0"><input type="text" id="p2_addr" data-i18n-placeholder="placeholder.birthplace" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p2')"></div>
+              <div class="form-group" style="margin-bottom:0"><input type="text" id="p2_addr" data-i18n-placeholder="placeholder.birthplace" placeholder="如：北京、上海、纽约..." onkeydown="if(event.key==='Enter')geocode('p2')" onblur="geocode('p2')"></div>
               <div class="form-group" style="margin-bottom:0"><button class="geo-btn" onclick="geocode('p2')">🔍 定位</button></div>
             </div>
             <div class="geo-status" id="p2_geo_status"></div>
+            <span class="manual-toggle" onclick="toggleManual('p2')" data-i18n="label.manualCoords">📍 手动输入经纬度 ▼</span>
           </div>
         </div>
         <input type="hidden" id="p2_lat" value="">
@@ -398,6 +400,30 @@ try {
   document.getElementById('p1_lat').value = city.lat;
   document.getElementById('p1_lng').value = city.lng;
   document.getElementById('p1_tz').value = String(city.tz);
+  var ns1 = city.lat >= 0 ? 'N' : 'S';
+  var ew1 = city.lng >= 0 ? 'E' : 'W';
+  var tzSign1 = city.tz >= 0 ? '+' : '';
+  var p1Status = document.getElementById('p1_geo_status');
+  if (p1Status) p1Status.textContent = '✅ ' + city.name + ' · ' + Math.abs(city.lat).toFixed(2) + '°' + ns1 + ', ' + Math.abs(city.lng).toFixed(2) + '°' + ew1 + ' · UTC' + tzSign1 + city.tz;
+
+  // ── P2 defaults (random, different from P1) ──
+  var y2 = 1970 + Math.floor(Math.random() * 36);
+  var m2 = 1 + Math.floor(Math.random() * 12);
+  var maxD2 = new Date(y2, m2, 0).getDate();
+  var d2 = 1 + Math.floor(Math.random() * maxD2);
+  document.getElementById('p2_date').value = y2 + '-' + String(m2).padStart(2,'0') + '-' + String(d2).padStart(2,'0');
+
+  // Pick a different city for P2
+  var city2 = cities[Math.floor(Math.random() * cities.length)];
+  document.getElementById('p2_addr').value = city2.name;
+  document.getElementById('p2_lat').value = city2.lat;
+  document.getElementById('p2_lng').value = city2.lng;
+  document.getElementById('p2_tz').value = String(city2.tz);
+  var ns2 = city2.lat >= 0 ? 'N' : 'S';
+  var ew2 = city2.lng >= 0 ? 'E' : 'W';
+  var tzSign2 = city2.tz >= 0 ? '+' : '';
+  var p2Status = document.getElementById('p2_geo_status');
+  if (p2Status) p2Status.textContent = '✅ ' + city2.name + ' · ' + Math.abs(city2.lat).toFixed(2) + '°' + ns2 + ', ' + Math.abs(city2.lng).toFixed(2) + '°' + ew2 + ' · UTC' + tzSign2 + city2.tz;
 } catch(e) { console.error('Default form init failed:', e); }
 })();
 </script>
