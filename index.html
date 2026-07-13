@@ -349,7 +349,7 @@
 <script defer src="js/fortune.js?v=20260712"></script>
 <script defer src="js/dailycard.js?v=20260712"></script>
 <script defer src="js/lodge.js?v=20260712"></script>
-<script defer src="js/ui.js?v=20260712"></script>
+<script defer src="js/ui.js?v=20260713"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
   onerror="window._emailjsDisabled=true;var b=document.getElementById('btnEmail');if(b){b.textContent='📋 复制报告';b.title='Email服务暂不可用，报告将复制到剪贴板';}"
   onload="try{emailjs.init('Gudf5C47NCkRO4qLp');}catch(e){}"></script>
@@ -412,28 +412,32 @@ try {
   var p1Status = document.getElementById('p1_geo_status');
   if (p1Status) p1Status.textContent = '✅ ' + cityDisplay + ' · ' + Math.abs(city.lat).toFixed(2) + '°' + ns1 + ', ' + Math.abs(city.lng).toFixed(2) + '°' + ew1 + ' · UTC' + tzSign1 + city.tz;
 
-  // ── P2 defaults (random, different from P1) ──
-  var y2 = 1970 + Math.floor(Math.random() * 36);
-  var m2 = 1 + Math.floor(Math.random() * 12);
-  var maxD2 = new Date(y2, m2, 0).getDate();
-  var d2 = 1 + Math.floor(Math.random() * maxD2);
-  document.getElementById('p2_date').value = y2 + '-' + String(m2).padStart(2,'0') + '-' + String(d2).padStart(2,'0');
+  // P2（合盘对方）默认空白：仅当用户展开对方卡片时才随机填充（由 toggleP2 调用）。
+  // 未展开 → 只测本人；展开 → 有随机数据可直接体验合盘。
+  window._fillPartnerRandom = function() {
+    var p2DateEl = document.getElementById('p2_date');
+    if (!p2DateEl || p2DateEl.value) return;  // 已有数据则不覆盖用户输入
+    var y2 = 1970 + Math.floor(Math.random() * 36);
+    var m2 = 1 + Math.floor(Math.random() * 12);
+    var maxD2 = new Date(y2, m2, 0).getDate();
+    var d2 = 1 + Math.floor(Math.random() * maxD2);
+    p2DateEl.value = y2 + '-' + String(m2).padStart(2,'0') + '-' + String(d2).padStart(2,'0');
 
-  // Pick a different city for P2
-  var city2 = cities[Math.floor(Math.random() * cities.length)];
-  var city2Display = isEn ? (city2.en || city2.name) : city2.name;
-  var p2Addr = document.getElementById('p2_addr');
-  p2Addr.value = city2Display;
-  p2Addr.setAttribute('data-city-cn', city2.name);
-  p2Addr.setAttribute('data-city-en', city2.en || city2.name);
-  document.getElementById('p2_lat').value = city2.lat;
-  document.getElementById('p2_lng').value = city2.lng;
-  document.getElementById('p2_tz').value = String(city2.tz);
-  var ns2 = city2.lat >= 0 ? 'N' : 'S';
-  var ew2 = city2.lng >= 0 ? 'E' : 'W';
-  var tzSign2 = city2.tz >= 0 ? '+' : '';
-  var p2Status = document.getElementById('p2_geo_status');
-  if (p2Status) p2Status.textContent = '✅ ' + city2Display + ' · ' + Math.abs(city2.lat).toFixed(2) + '°' + ns2 + ', ' + Math.abs(city2.lng).toFixed(2) + '°' + ew2 + ' · UTC' + tzSign2 + city2.tz;
+    var city2 = cities[Math.floor(Math.random() * cities.length)];
+    var city2Display = isEn ? (city2.en || city2.name) : city2.name;
+    var p2Addr = document.getElementById('p2_addr');
+    p2Addr.value = city2Display;
+    p2Addr.setAttribute('data-city-cn', city2.name);
+    p2Addr.setAttribute('data-city-en', city2.en || city2.name);
+    document.getElementById('p2_lat').value = city2.lat;
+    document.getElementById('p2_lng').value = city2.lng;
+    document.getElementById('p2_tz').value = String(city2.tz);
+    var ns2 = city2.lat >= 0 ? 'N' : 'S';
+    var ew2 = city2.lng >= 0 ? 'E' : 'W';
+    var tzSign2 = city2.tz >= 0 ? '+' : '';
+    var p2Status = document.getElementById('p2_geo_status');
+    if (p2Status) p2Status.textContent = '✅ ' + city2Display + ' · ' + Math.abs(city2.lat).toFixed(2) + '°' + ns2 + ', ' + Math.abs(city2.lng).toFixed(2) + '°' + ew2 + ' · UTC' + tzSign2 + city2.tz;
+  };
 } catch(e) { console.error('Default form init failed:', e); }
 })();
 </script>

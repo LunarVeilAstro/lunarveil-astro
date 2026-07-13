@@ -626,6 +626,7 @@ function toggleP2() {
   if (content.style.display === 'none') {
     content.style.display = 'block';
     icon.textContent = '▼';
+    if (window._fillPartnerRandom) window._fillPartnerRandom();  // 展开时随机填充对方数据
   } else {
     content.style.display = 'none';
     icon.textContent = '▶';
@@ -843,14 +844,19 @@ async function calculateAll() {
       try {
         chartData1 = computeChart(d1);
         _birthInput1 = d1;
-        // Auto-geocode p2 if address filled but coordinates missing
-        var p2AddrEl = document.getElementById('p2_addr');
-        var p2LatRaw = parseFloat(document.getElementById('p2_lat').value);
-        var p2LngRaw = parseFloat(document.getElementById('p2_lng').value);
-        if (p2AddrEl && p2AddrEl.value.trim() && (isNaN(p2LatRaw) || isNaN(p2LngRaw))) {
-          await geocode('p2');
+        // 合盘对方为选填项：仅当用户主动展开对方卡片时才读取，
+        // 避免浏览器自动填充等把空表当成已填、误跳到合盘缘分。
+        var p2Open = document.getElementById('p2Content').style.display !== 'none';
+        if (p2Open) {
+          // Auto-geocode p2 if address filled but coordinates missing
+          var p2AddrEl = document.getElementById('p2_addr');
+          var p2LatRaw = parseFloat(document.getElementById('p2_lat').value);
+          var p2LngRaw = parseFloat(document.getElementById('p2_lng').value);
+          if (p2AddrEl && p2AddrEl.value.trim() && (isNaN(p2LatRaw) || isNaN(p2LngRaw))) {
+            await geocode('p2');
+          }
         }
-        var d2 = getInputValues('p2');
+        var d2 = p2Open ? getInputValues('p2') : null;
         chartData2 = d2 ? computeChart(d2) : null;
         computed = true;
         onBothReady();
