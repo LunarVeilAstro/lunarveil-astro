@@ -155,9 +155,7 @@ function updateLodgeBadges() {
   const rb = document.getElementById('rpBadge');
   if (fb) {
     const drawn = localStorage.getItem('fortune_date'+personKey()) === today && localStorage.getItem('fortune_slip'+personKey());
-    const extra = parseInt(localStorage.getItem('fortune_extra_'+today+personKey()) || '0');
-    if (drawn && extra <= 0) { fb.textContent = _t('fortune.drawnToday'); fb.classList.add('used'); }
-    else if (extra > 0) { fb.textContent = _t('fortune.remaining', {count: extra+1}); fb.classList.remove('used'); }
+    if (drawn) { fb.textContent = _t('fortune.drawnToday'); fb.classList.add('used'); }
     else { fb.textContent = _t('fortune.available'); fb.classList.remove('used'); }
   }
   if (rb) {
@@ -191,9 +189,8 @@ function drawFortuneSlip() {
 function openDailyFortune() {
   const today = todayKey();
   const lastDate = localStorage.getItem('fortune_date'+personKey());
-  let extra = parseInt(localStorage.getItem('fortune_extra_'+today+personKey()) || '0');
 
-  if (lastDate === today && localStorage.getItem('fortune_slip'+personKey()) && extra <= 0) {
+  if (lastDate === today && localStorage.getItem('fortune_slip'+personKey())) {
     let slipIdx = parseInt(localStorage.getItem('fortune_slip'+personKey()));
     if (isNaN(slipIdx)) { localStorage.removeItem('fortune_slip'+personKey()); openDailyFortune(); return; }
     let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
@@ -206,12 +203,6 @@ function openDailyFortune() {
     html += renderShareButton('fortune');
     showGameModal(html);
     return;
-  }
-
-  if (extra > 0) {
-    extra--;
-    if (extra <= 0) localStorage.removeItem('fortune_extra_'+today+personKey());
-    else localStorage.setItem('fortune_extra_'+today+personKey(), extra);
   }
 
   let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
@@ -262,7 +253,7 @@ function openDailyRP() {
     let html = '<h3>' + _t('lodge.dailyRP') + '</h3>';;
     html += '<p style="color:var(--text-dim);font-size:0.85em;">'+_L('你今天已经查过啦','You\'ve already checked today')+'</p>';
     html += renderRPResult(score, personalized);
-    html += renderShareButton('fortune');
+    html += renderShareButton('rp');
     html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日专属解读','Daily Personal Reading')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一专属解读','Add <strong style="color:#d4b870;">LunarVeilAstro</strong> on WeChat for a personal reading')+'</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">'+_L('复制微信号','Copy WeChat ID')+'</span></div>';
     showGameModal(html);
     return;
@@ -282,7 +273,7 @@ function openDailyRP() {
 
   let html = '<h3>' + _t('lodge.dailyRP') + '</h3>';;
   html += renderRPResult(score, personalized);
-  html += renderShareButton('fortune');
+  html += renderShareButton('rp');
   html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日专属解读','Daily Personal Reading')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一专属解读','Add <strong style="color:#d4b870;">LunarVeilAstro</strong> on WeChat for a personal reading')+'</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">'+_L('复制微信号','Copy WeChat ID')+'</span></div>';
   showGameModal(html);
 }
@@ -320,38 +311,36 @@ function renderRPResult(score, personalized) {
   return r;
 }
 
-// ── 分享得次数 ───────────────────────────────────────────────────────
+// ── 分享后再玩一次 ───────────────────────────────────────────────────
 function shareForExtra(gameType) {
   var shareUrl = 'https://lunarveilastro.github.io/lunarveil-astro/';
 
-  // Grant extra immediately so UI never blocks
-  grantExtra(gameType);
-  showCopyMessage();
-
-  // Try Web Share API first
+  // 触发分享 / 复制链接（不阻塞 UI）
   if (navigator.share && window.isSecureContext) {
     navigator.share({
       title: _t('share.title'),
       text: _t('share.text'),
       url: shareUrl
     }).catch(function() {});
-    return;
+  } else {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).catch(function() {});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = shareUrl;
+        ta.style.cssText = 'position:fixed;left:-9999px;';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+    } catch(e) {}
   }
 
-  // Clipboard in background — don't block UI
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(shareUrl).catch(function() {});
-    } else {
-      var ta = document.createElement('textarea');
-      ta.value = shareUrl;
-      ta.style.cssText = 'position:fixed;left:-9999px;';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); } catch(e) {}
-      document.body.removeChild(ta);
-    }
-  } catch(e) {}
+  // 任何分享动作都解锁再玩一次：清当日记录并立即重新开始（无次数限制、不显示剩余次数）
+  replayGame(gameType);
+  showCopyMessage();
 }
 
 function showCopyMessage() {
@@ -366,17 +355,28 @@ function showCopyMessage() {
   modal.appendChild(msg);
 }
 
-function grantExtra(gameType) {
-  const today = todayKey();
-  if (gameType === 'fortune') {
-    const cur = parseInt(localStorage.getItem('fortune_extra_'+today+personKey()) || '0');
-    localStorage.setItem('fortune_extra_'+today+personKey(), cur + 1);
+function replayGame(gameType) {
+  const pk = personKey();
+  if (gameType === 'rp') {
+    localStorage.removeItem('rp_date'+pk);
+    localStorage.removeItem('rp_score'+pk);
+    localStorage.removeItem('rp_personalized'+pk);
+    updateLodgeBadges();
+    openDailyRP();          // 立即重新测一次人品
+  } else {
+    localStorage.removeItem('fortune_date'+pk);
+    localStorage.removeItem('fortune_slip'+pk);
+    localStorage.removeItem('fortune_annotation'+pk);
+    updateLodgeBadges();
+    openDailyFortune();     // 回到抽签界面，可再抽一次
   }
-  updateLodgeBadges();
 }
 
 function renderShareButton(gameType) {
-  return '<button class="share-btn" onclick="event.stopPropagation();shareForExtra(\'' + gameType + '\')">📤 '+_L('分享得次数','Share for Extra Draw')+'</button>';
+  var label = gameType === 'rp'
+    ? _L('分享后再测一次','Share to Check Again')
+    : _L('分享后再抽一次','Share to Draw Again');
+  return '<button class="share-btn" onclick="event.stopPropagation();shareForExtra(\'' + gameType + '\')">📤 '+label+'</button>';
 }
 
 // Initialize badges on load
