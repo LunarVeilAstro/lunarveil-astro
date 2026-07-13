@@ -103,6 +103,9 @@
   // ══════════════════════════════════════════════════════════════════════════
   add('sample.notice', '⚠️ 当前显示为随机示例数据，请修改为你本人的真实出生信息', '⚠️ Showing sample data. Please enter your real birth information.');
   add('sample.tag', '示例数据', 'SAMPLE');
+  add('remembered.notice', '🌙 已记住你上次填写的出生信息，可直接解读；换人算盘请修改。信息只存在本设备浏览器，不会上传服务器。', '🌙 Your last birth info is remembered on this device — read it directly, or edit for someone else. Stored only in this browser, never uploaded.');
+  add('remembered.clear', '清除记录', 'Clear');
+  add('btn.random', '🎲 随机', '🎲 Random');
   add('summary.clickToEdit', '点击展开修改', 'Click to edit');
   add('summary.title', '📡 输入出生信息', '📡 Enter Birth Information');
 
@@ -132,7 +135,6 @@
   add('lodge.badge.drawn', '今日已抽', 'Drawn Today');
   add('lodge.badge.extra', '还可抽', 'More');
   add('lodge.badge.rpAvailable', '今日可查', 'Available');
-  add('lodge.badge.rpChecked', '今日已查', 'Checked Today');
   add('lodge.chartHint', '✨ 福运方位、每日一签、今日人品会结合你的星盘给出专属结果<br>先算星盘，解读更准', '✨ Fortune Direction, Daily Fortune & Daily RP sync with your birth chart<br>— get your chart calculated first for personalized results');
   add('lodge.chartHintLinked', '✨ 已关联你的星盘<br>以下福运方位、每日一签、今日人品将基于你的本命盘给出专属解读', '✨ Linked to your birth chart<br>— Fortune Direction, Daily Fortune & Daily RP are now personalized to you');
 
@@ -313,7 +315,6 @@
   // ══════════════════════════════════════════════════════════════════════════
   //  GAME MODALS — Daily Fortune Slip
   // ══════════════════════════════════════════════════════════════════════════
-  add('fortune.alreadyDrawn', '今天的签文你已经抽过了', 'You\'ve already drawn your fortune today');
   add('fortune.drawHint', '点击签筒摇签', 'Click the fortune cylinder to draw');
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -525,8 +526,6 @@
   add('geo.line', '✅ {city} · {lat}°{ns}, {lng}°{ew} · UTC{tz}', '✅ {city} · {lat}°{ns}, {lng}°{ew} · UTC{tz}');
   add('compass.remaining', '今日剩余 {count} 次', '{count} left today');
   add('compass.usedUp', '今日已用完', 'Used up today');
-  add('fortune.remaining', '还可抽{count}次', '{count} more');
-  add('fortune.drawnToday', '今日已抽', 'Drawn today');
   add('fortune.available', '今日可抽', 'Available');
   add('rp.available', '今日可查', 'Available');
   add('rp.checked', '今日已查', 'Checked');

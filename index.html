@@ -45,8 +45,8 @@
   gtag('js', new Date());
   gtag('config', 'G-7M6096TY6B');
 </script>
-<link rel="stylesheet" href="styles.css?v=20260712">
-<script defer src="i18n.js"></script>
+<link rel="stylesheet" href="styles.css?v=20260715">
+<script defer src="i18n.js?v=20260715"></script>
 </head>
 <body>
 <!-- Loading Ritual Overlay -->
@@ -166,9 +166,10 @@
   <div class="card" id="inputCard">
     <h2 data-i18n="summary.title">📡 输入出生信息</h2>
     <div class="sample-notice" id="sampleNotice" data-i18n="sample.notice">⚠️ 当前显示为随机示例数据，请修改为你本人的真实出生信息</div>
+    <div class="remembered-notice" id="rememberedNotice" style="display:none;"><span data-i18n="remembered.notice">🌙 已记住你上次填写的出生信息，可直接解读；换人算盘请修改。信息只存在本设备浏览器，不会上传服务器。</span><button type="button" class="remembered-clear" onclick="clearMyChart()" data-i18n="remembered.clear">清除记录</button></div>
     <div class="person-section">
       <div class="person-card">
-        <h3 data-i18n="person.me">本人</h3>
+        <h3 style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;"><span data-i18n="person.me">本人</span><button type="button" class="rand-btn" onclick="_fillSelfRandom()" data-i18n="btn.random" title="随机填一组示例数据">🎲 随机</button></h3>
         <div class="form-row">
           <div class="form-group"><label data-i18n="label.birthdate">出生日期</label><input type="date" id="p1_date"><span class="date-hint" data-i18n="hint.datePicker">💡 点击日期框左上角年份可快速切换年份</span></div>
           <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p1_time" step="60" value="12:00"><span class="date-hint" data-i18n-html="hint.birthtime">记得就填，不记得也没关系，<strong class="time-gold">12:00</strong>就够了。行星照样准，只有上升和宫位是估算的。</span></div>
@@ -229,6 +230,7 @@
         </div>
         <p style="text-align:left;text-indent:2em;font-style:italic;font-size:0.78em;color:var(--text-dim);margin:4px 0 0 0;" data-i18n-html="person.cpTagline">（也可以测测你<span style="font-family:var(--font-heading);font-weight:700;font-size:1.2em;letter-spacing:0.08em;margin:0 1px;">cp</span>有多真，匹配度高说明两人天生一对，匹配度低证明真爱就是偏要强求）</p>
         <div id="p2Content" style="display:none;">
+        <div style="text-align:right;margin-bottom:6px;"><button type="button" class="rand-btn" onclick="_fillPartnerRandom(true)" data-i18n="btn.random" title="随机填一组示例数据">🎲 随机</button></div>
         <div class="form-row">
           <div class="form-group"><label data-i18n="label.birthdate">出生日期</label><input type="date" id="p2_date"><span class="date-hint" data-i18n="hint.datePicker">💡 点击日期框左上角年份可快速切换年份</span></div>
           <div class="form-group"><label data-i18n="label.birthtime">出生时间</label><input type="time" id="p2_time" step="60" value="12:00"><span class="date-hint" data-i18n-html="hint.birthtime">记得就填，不记得也没关系，<strong class="time-gold">12:00</strong>就够了。行星照样准，只有上升和宫位是估算的。</span></div>
@@ -346,30 +348,19 @@
 <script defer src="js/astronomy.js?v=20260712"></script>
 <!-- Heavy modules (data, reports, tarot) loaded lazily on first 解读星盘 click -->
 <script defer src="js/compass.js?v=20260712"></script>
-<script defer src="js/fortune.js?v=20260713"></script>
+<script defer src="js/fortune.js?v=20260715"></script>
 <script defer src="js/dailycard.js?v=20260712"></script>
 <script defer src="js/lodge.js?v=20260712"></script>
-<script defer src="js/ui.js?v=20260714"></script>
+<script defer src="js/ui.js?v=20260715"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
   onerror="window._emailjsDisabled=true;var b=document.getElementById('btnEmail');if(b){b.textContent='📋 复制报告';b.title='Email服务暂不可用，报告将复制到剪贴板';}"
   onload="try{emailjs.init('Gudf5C47NCkRO4qLp');}catch(e){}"></script>
 <script>
-// ── Random default values ───────────────────────────────────────────────
+// ── Birth-info init: restore remembered chart, else random sample ────────
 (function() {
 try {
-  // Random date between 1970-2005
-  var y = 1970 + Math.floor(Math.random() * 36);
-  var m = 1 + Math.floor(Math.random() * 12);
-  var maxD = new Date(y, m, 0).getDate();
-  var d = 1 + Math.floor(Math.random() * maxD);
-  var mm = String(m).padStart(2,'0');
-  var dd = String(d).padStart(2,'0');
-  document.getElementById('p1_date').value = y + '-' + mm + '-' + dd;
-
-  // Default to noon — accurate planet positions, ASC/houses approximate
-  document.getElementById('p1_time').value = '12:00';
-
-  // Random city with coords + timezone
+  var MYCHART_KEY = 'lva_mychart_v1';
+  // City list with coords + timezone
   var cities = [
     { name:'北京', en:'Beijing', lat:39.904, lng:116.407, tz:8 },
     { name:'上海', en:'Shanghai', lat:31.230, lng:121.474, tz:8 },
@@ -396,49 +387,94 @@ try {
     { name:'首尔', en:'Seoul', lat:37.566, lng:126.978, tz:9 },
     { name:'曼谷', en:'Bangkok', lat:13.756, lng:100.502, tz:7 }
   ];
-  var city = cities[Math.floor(Math.random() * cities.length)];
-  var isEn = (localStorage.getItem('lang') || '').startsWith('en');
-  var cityDisplay = isEn ? (city.en || city.name) : city.name;
-  var p1Addr = document.getElementById('p1_addr');
-  p1Addr.value = cityDisplay;
-  p1Addr.setAttribute('data-city-cn', city.name);
-  p1Addr.setAttribute('data-city-en', city.en || city.name);
-  document.getElementById('p1_lat').value = city.lat;
-  document.getElementById('p1_lng').value = city.lng;
-  document.getElementById('p1_tz').value = String(city.tz);
-  var ns1 = city.lat >= 0 ? 'N' : 'S';
-  var ew1 = city.lng >= 0 ? 'E' : 'W';
-  var tzSign1 = city.tz >= 0 ? '+' : '';
-  var p1Status = document.getElementById('p1_geo_status');
-  if (p1Status) p1Status.textContent = '✅ ' + cityDisplay + ' · ' + Math.abs(city.lat).toFixed(2) + '°' + ns1 + ', ' + Math.abs(city.lng).toFixed(2) + '°' + ew1 + ' · UTC' + tzSign1 + city.tz;
 
-  // P2（合盘对方）默认空白：仅当用户展开对方卡片时才随机填充（由 toggleP2 调用）。
-  // 未展开 → 只测本人；展开 → 有随机数据可直接体验合盘。
-  window._fillPartnerRandom = function() {
-    var p2DateEl = document.getElementById('p2_date');
-    if (!p2DateEl || p2DateEl.value) return;  // 已有数据则不覆盖用户输入
-    var y2 = 1970 + Math.floor(Math.random() * 36);
-    var m2 = 1 + Math.floor(Math.random() * 12);
-    var maxD2 = new Date(y2, m2, 0).getDate();
-    var d2 = 1 + Math.floor(Math.random() * maxD2);
-    p2DateEl.value = y2 + '-' + String(m2).padStart(2,'0') + '-' + String(d2).padStart(2,'0');
+  function isEnLang() { return (localStorage.getItem('lang') || '').startsWith('en'); }
+  function pickCity() { return cities[Math.floor(Math.random() * cities.length)]; }
+  function randDate() {
+    var y = 1970 + Math.floor(Math.random() * 36);
+    var m = 1 + Math.floor(Math.random() * 12);
+    var maxD = new Date(y, m, 0).getDate();
+    var d = 1 + Math.floor(Math.random() * maxD);
+    return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+  }
+  function applyCity(prefix, city) {
+    var disp = isEnLang() ? (city.en || city.name) : city.name;
+    var addr = document.getElementById(prefix + '_addr');
+    if (addr) {
+      addr.value = disp;
+      addr.setAttribute('data-city-cn', city.name);
+      addr.setAttribute('data-city-en', city.en || city.name);
+    }
+    var latEl = document.getElementById(prefix + '_lat'); if (latEl) latEl.value = city.lat;
+    var lngEl = document.getElementById(prefix + '_lng'); if (lngEl) lngEl.value = city.lng;
+    var tzEl = document.getElementById(prefix + '_tz'); if (tzEl) tzEl.value = String(city.tz);
+    var lm = document.getElementById(prefix + '_lat_m'); if (lm) lm.value = '';  // 清掉手动经纬度，用随机城市坐标
+    var gm = document.getElementById(prefix + '_lng_m'); if (gm) gm.value = '';
+    var ns = city.lat >= 0 ? 'N' : 'S', ew = city.lng >= 0 ? 'E' : 'W', tzSign = city.tz >= 0 ? '+' : '';
+    var status = document.getElementById(prefix + '_geo_status');
+    if (status) status.textContent = '✅ ' + disp + ' · ' + Math.abs(city.lat).toFixed(2) + '°' + ns + ', ' + Math.abs(city.lng).toFixed(2) + '°' + ew + ' · UTC' + tzSign + city.tz;
+  }
 
-    var city2 = cities[Math.floor(Math.random() * cities.length)];
-    var city2Display = isEn ? (city2.en || city2.name) : city2.name;
-    var p2Addr = document.getElementById('p2_addr');
-    p2Addr.value = city2Display;
-    p2Addr.setAttribute('data-city-cn', city2.name);
-    p2Addr.setAttribute('data-city-en', city2.en || city2.name);
-    document.getElementById('p2_lat').value = city2.lat;
-    document.getElementById('p2_lng').value = city2.lng;
-    document.getElementById('p2_tz').value = String(city2.tz);
-    var ns2 = city2.lat >= 0 ? 'N' : 'S';
-    var ew2 = city2.lng >= 0 ? 'E' : 'W';
-    var tzSign2 = city2.tz >= 0 ? '+' : '';
-    var p2Status = document.getElementById('p2_geo_status');
-    if (p2Status) p2Status.textContent = '✅ ' + city2Display + ' · ' + Math.abs(city2.lat).toFixed(2) + '°' + ns2 + ', ' + Math.abs(city2.lng).toFixed(2) + '°' + ew2 + ' · UTC' + tzSign2 + city2.tz;
+  // 本人：随机填一组示例（也是「🎲 随机」按钮的处理函数）
+  window._fillSelfRandom = function() {
+    var dateEl = document.getElementById('p1_date'); if (dateEl) dateEl.value = randDate();
+    var timeEl = document.getElementById('p1_time'); if (timeEl) timeEl.value = '12:00';
+    applyCity('p1', pickCity());
+    // 点随机 = 换示例，切回「随机示例」提示
+    var sn = document.getElementById('sampleNotice'); if (sn) sn.style.display = '';
+    var rn = document.getElementById('rememberedNotice'); if (rn) rn.style.display = 'none';
   };
-} catch(e) { console.error('Default form init failed:', e); }
+
+  // 合盘对方：未展开时空白；展开自动填充（force 省略，不覆盖用户输入）；「🎲 随机」按钮传 force=true 强制换一组
+  window._fillPartnerRandom = function(force) {
+    var p2DateEl = document.getElementById('p2_date');
+    if (!p2DateEl) return;
+    if (!force && p2DateEl.value) return;
+    p2DateEl.value = randDate();
+    applyCity('p2', pickCity());
+  };
+
+  function restoreSelf(s) {
+    function set(id, val) { var el = document.getElementById(id); if (el && val != null) el.value = val; }
+    set('p1_date', s.date);
+    set('p1_time', s.time || '12:00');
+    set('p1_tz', s.tz);
+    var addr = document.getElementById('p1_addr');
+    if (addr) {
+      addr.value = s.addr || '';
+      if (s.cityCn) addr.setAttribute('data-city-cn', s.cityCn);
+      if (s.cityEn) addr.setAttribute('data-city-en', s.cityEn);
+    }
+    set('p1_lat', s.lat);
+    set('p1_lng', s.lng);
+    set('p1_lat_m', s.latM);
+    set('p1_lng_m', s.lngM);
+    set('p1_job', s.job);
+    set('p1_email', s.email);
+    var status = document.getElementById('p1_geo_status');
+    if (status && s.geoStatus) status.textContent = s.geoStatus;
+  }
+
+  // 加载时：有存档就回填本人信息，没有才随机示例
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem(MYCHART_KEY) || 'null'); } catch(e) {}
+  if (saved && saved.date) {
+    restoreSelf(saved);
+    var sn = document.getElementById('sampleNotice'); if (sn) sn.style.display = 'none';
+    var rn = document.getElementById('rememberedNotice'); if (rn) rn.style.display = '';
+  } else {
+    window._fillSelfRandom();
+  }
+
+  // 标记用户是否真的改过本人信息（回填/随机都是程序赋值，不触发 input，不算改动）
+  window._p1Edited = false;
+  var editIds = ['p1_date','p1_time','p1_tz','p1_addr','p1_lat_m','p1_lng_m','p1_job','p1_email'];
+  function _markP1Edited() { window._p1Edited = true; }
+  for (var ei = 0; ei < editIds.length; ei++) {
+    var eel = document.getElementById(editIds[ei]);
+    if (eel) { eel.addEventListener('input', _markP1Edited); eel.addEventListener('change', _markP1Edited); }
+  }
+} catch(e) { console.error('Birth-info init failed:', e); }
 })();
 </script>
 

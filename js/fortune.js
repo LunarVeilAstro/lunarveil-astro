@@ -150,18 +150,16 @@ function generateFortuneAnnotation() {
 
 // ── Badge update ──────────────────────────────────────────────────────
 function updateLodgeBadges() {
-  const today = todayKey();
   const fb = document.getElementById('fortuneBadge');
   const rb = document.getElementById('rpBadge');
+  // 每日一签 / 今日人品 均无每日限制，徽章永远显示「可玩」、不置灰
   if (fb) {
-    const drawn = localStorage.getItem('fortune_date'+personKey()) === today && localStorage.getItem('fortune_slip'+personKey());
-    if (drawn) { fb.textContent = _t('fortune.drawnToday'); fb.classList.add('used'); }
-    else { fb.textContent = _t('fortune.available'); fb.classList.remove('used'); }
+    fb.textContent = _t('fortune.available');
+    fb.classList.remove('used');
   }
   if (rb) {
-    const checked = localStorage.getItem('rp_date'+personKey()) === today;
-    if (checked) { rb.textContent = _t('lodge.badge.rpChecked'); rb.classList.add('used'); }
-    else { rb.textContent = _t('lodge.badge.rpAvailable'); rb.classList.remove('used'); }
+    rb.textContent = _t('lodge.badge.rpAvailable');
+    rb.classList.remove('used');
   }
 }
 
@@ -173,6 +171,11 @@ function showGameModal(html) {
 function closeGameModal() {
   document.getElementById('gameOverlay').classList.remove('show');
   updateLodgeBadges();
+}
+// 弹窗是否仍打开——动画途中被关闭时用于中止后续出签/渲染
+function _gameModalShown() {
+  var ov = document.getElementById('gameOverlay');
+  return !!(ov && ov.classList.contains('show'));
 }
 
 // ── 每日一签 ─────────────────────────────────────────────────────────
@@ -187,43 +190,47 @@ function drawFortuneSlip() {
 }
 
 function openDailyFortune() {
-  const today = todayKey();
-  const lastDate = localStorage.getItem('fortune_date'+personKey());
-
-  if (lastDate === today && localStorage.getItem('fortune_slip'+personKey())) {
-    let slipIdx = parseInt(localStorage.getItem('fortune_slip'+personKey()));
-    if (isNaN(slipIdx)) { localStorage.removeItem('fortune_slip'+personKey()); openDailyFortune(); return; }
-    let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
-    html += '<p style="color:var(--text-dim);font-size:0.85em;">' + _t('fortune.alreadyDrawn') + '</p>';
-    html += renderFortuneResult(slipIdx);
-    if (chartData1) {
-      const annotation = localStorage.getItem('fortune_annotation'+personKey());
-      if (annotation) html += annotation;
-    }
-    html += renderShareButton('fortune');
-    showGameModal(html);
-    return;
-  }
-
+  // 每次打开都出签筒、摇一摇都是新签（无每日限制）。
+  // 签筒无需 data.js，立即渲染（默认静止）；data.js 后台预载，供点击摇签时用。
+  if (typeof FORTUNE_SLIPS_ZH === 'undefined') loadScript(DATA_JS).catch(function(){});
+  _fortuneShaking = false;
   let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
-  html += '<div class="fortune-tube" id="fortuneTube" onclick="revealFortune()"></div>';
+  html += '<div class="fortune-tube" id="fortuneTube" onclick="shakeFortune()"></div>';
   html += '<p style="color:var(--text-dim);font-size:0.82em;">' + _t('fortune.drawHint') + '</p>';
   showGameModal(html);
 }
 
+var _fortuneShaking = false;
+// 点击签筒：先摇 3 下（CSS 动画），摇完再抽签出结果
+function shakeFortune() {
+  if (_fortuneShaking) return;
+  // 抽签需要 data.js，没载完先载再来
+  if (typeof FORTUNE_SLIPS_ZH === 'undefined') {
+    loadScript(DATA_JS).then(shakeFortune).catch(function(e){ console.error('data.js load error:', e); alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.')); });
+    return;
+  }
+  _fortuneShaking = true;
+  var tube = document.getElementById('fortuneTube');
+  if (!tube) { revealFortune(); return; }
+  tube.classList.add('shaking');
+  var done = false;
+  var finish = function() { if (done) return; done = true; if (!_gameModalShown()) { _fortuneShaking = false; return; } revealFortune(); };
+  tube.addEventListener('animationend', finish, { once: true });
+  setTimeout(finish, 1100);   // 兜底：animationend 未触发也出签（3 下约 0.9s）
+}
+
 function revealFortune() {
+  // 快速点击时 data.js 可能还没载完——载完再抽（签筒继续显示、动画照旧）
+  if (typeof FORTUNE_SLIPS_ZH === 'undefined') {
+    loadScript(DATA_JS).then(revealFortune).catch(function(e){ console.error('data.js load error:', e); alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.')); });
+    return;
+  }
   const slipIdx = drawFortuneSlip();
-  localStorage.setItem('fortune_date'+personKey(), todayKey());
-  localStorage.setItem('fortune_slip'+personKey(), String(slipIdx));
 
   let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
   html += renderFortuneResult(slipIdx);
   if (chartData1) {
-    const annotation = generateFortuneAnnotation();
-    localStorage.setItem('fortune_annotation'+personKey(), annotation);
-    html += annotation;
-  } else {
-    localStorage.removeItem('fortune_annotation'+personKey());
+    html += generateFortuneAnnotation();
   }
   html += renderShareButton('fortune');
   html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">📕</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日运势推送','Daily Fortune Updates')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('关注小红书 <strong style="color:#d4b870;">LunarVeilAstro</strong> 全平台同名','Follow <strong style="color:#d4b870;">LunarVeilAstro</strong> on Xiaohongshu')+'</div></div><a href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;text-decoration:none;font-weight:bold;white-space:nowrap;">'+_L('去关注 →','Follow →')+'</a></div>';
@@ -244,41 +251,59 @@ function renderFortuneResult(slipIdx) {
 
 // ── 今日人品 ─────────────────────────────────────────────────────────
 function openDailyRP() {
-  const today = todayKey();
-  const lastDate = localStorage.getItem('rp_date'+personKey());
-
-  if (lastDate === today) {
-    const score = parseInt(localStorage.getItem('rp_score'+personKey()) || '50');
-    const personalized = localStorage.getItem('rp_personalized'+personKey()) === 'true' && chartData1;
-    let html = '<h3>' + _t('lodge.dailyRP') + '</h3>';;
-    html += '<p style="color:var(--text-dim);font-size:0.85em;">'+_L('你今天已经查过啦','You\'ve already checked today')+'</p>';
-    html += renderRPResult(score, personalized);
-    html += renderShareButton('rp');
-    html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日专属解读','Daily Personal Reading')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一专属解读','Add <strong style="color:#d4b870;">LunarVeilAstro</strong> on WeChat for a personal reading')+'</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">'+_L('复制微信号','Copy WeChat ID')+'</span></div>';
-    showGameModal(html);
-    return;
-  }
-
-  let score, personalized = false;
-  if (chartData1) {
-    score = computeTransitWeightedRP();
-    personalized = true;
-    localStorage.setItem('rp_personalized'+personKey(), 'true');
-  } else {
-    score = Math.floor(Math.random() * 101);
-    localStorage.setItem('rp_personalized'+personKey(), 'false');
-  }
-  localStorage.setItem('rp_date'+personKey(), today);
-  localStorage.setItem('rp_score'+personKey(), score);
-
-  let html = '<h3>' + _t('lodge.dailyRP') + '</h3>';;
-  html += renderRPResult(score, personalized);
-  html += renderShareButton('rp');
-  html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日专属解读','Daily Personal Reading')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一专属解读','Add <strong style="color:#d4b870;">LunarVeilAstro</strong> on WeChat for a personal reading')+'</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">'+_L('复制微信号','Copy WeChat ID')+'</span></div>';
+  // 点击轮盘再开始测：先展示缓慢自转的命运之轮（中心✦）+ 提示，点一下才计算新分数。
+  // 轮盘无需 data.js，立即渲染；data.js 后台预载，供点击揭晓时用。
+  if (typeof RP_TIERS === 'undefined') loadScript(DATA_JS).catch(function(){});
+  _rpRevealing = false;
+  let html = '<h3>' + _t('lodge.dailyRP') + '</h3>';
+  html += '<div class="rp-reveal rp-idle" id="rpReveal" onclick="revealRP()">';
+  html += '<div class="rp-wheel" id="rpWheel"></div>';
+  html += '<div class="rp-score-circle">';
+  html += '<div class="rp-score-num" id="rpScoreNum">✦</div>';
+  html += '<div class="rp-score-label">' + _t('rp.title') + '</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '<p class="rp-hint" id="rpHint" style="color:var(--text-dim);font-size:0.82em;margin-top:2px;">'+_L('点击轮盘，测今日人品','Tap the wheel to reveal today\'s luck')+'</p>';
+  html += '<div id="rpRest"></div>';
   showGameModal(html);
 }
 
-function renderRPResult(score, personalized) {
+var _rpRevealing = false;
+function revealRP() {
+  if (_rpRevealing) return;
+  // 揭晓需要 data.js（评语/幸运物）；没载完先载再来（轮盘继续自转）
+  if (typeof RP_TIERS === 'undefined') {
+    loadScript(DATA_JS).then(revealRP).catch(function(e){ console.error('data.js load error:', e); alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.')); });
+    return;
+  }
+  _rpRevealing = true;
+
+  var reveal = document.getElementById('rpReveal');
+  if (reveal) { reveal.classList.remove('rp-idle'); reveal.onclick = null; reveal.style.cursor = 'default'; }
+  var hint = document.getElementById('rpHint');
+  if (hint) hint.style.display = 'none';
+
+  // 每次点击都测一个全新分数
+  var score, personalized = false;
+  if (chartData1) {
+    score = computeTransitWeightedRP();
+    personalized = true;
+  } else {
+    score = Math.floor(Math.random() * 101);
+  }
+
+  animateRPReveal(score, function() {
+    var rest = document.getElementById('rpRest');
+    if (rest) rest.innerHTML = renderRPRest(score, personalized) + renderShareButton('rp') + _rpWeChatCard();
+    _rpRevealing = false;
+  });
+}
+
+function _rpWeChatCard() {
+  return '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">💬</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日专属解读','Daily Personal Reading')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('加微信 <strong style="color:#d4b870;">LunarVeilAstro</strong> 一对一专属解读','Add <strong style="color:#d4b870;">LunarVeilAstro</strong> on WeChat for a personal reading')+'</div></div><span onclick="copySocial(\'微信\',\'LunarVeilAstro\')" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;font-weight:bold;white-space:nowrap;">'+_L('复制微信号','Copy WeChat ID')+'</span></div>';
+}
+
+function renderRPRest(score, personalized) {
   const tier = RP_TIERS().find(t => score >= t.min);
   const rpLabelIdx = RP_TIERS().indexOf(tier);
   let color, dir, num;
@@ -293,11 +318,7 @@ function renderRPResult(score, personalized) {
     num = Math.floor(Math.abs(score * 17) % 100);
   }
 
-  let r = '<div class="rp-score-circle">';
-  r += '<div class="rp-score-num">' + score + '</div>';
-  r += '<div class="rp-score-label">' + _t('rp.title') + '</div>';
-  r += '</div>';
-  r += '<div class="rp-comment">' + tier.emoji + ' ' + _ta('rp.tiers', rpLabelIdx) + '</div>';
+  let r = '<div class="rp-comment">' + tier.emoji + ' ' + _ta('rp.tiers', rpLabelIdx) + '</div>';
   if (personalized && chartData1) {
     const sunSign = getNatalSunSign();
     r += '<div style="background:rgba(201,169,110,0.1);border:1px solid var(--gold);border-radius:8px;padding:4px 10px;margin:8px 0;display:inline-block;font-size:0.78em;color:var(--accent);">' + _t('rp.basedOnChart') + ' ' + sunSign + _t('rp.chartBased') + '</div>';
@@ -311,12 +332,43 @@ function renderRPResult(score, personalized) {
   return r;
 }
 
+// 命运之轮：金环旋转定格 + 分数 0→终值滚动，定格时圆圈爆一下光晕，完成后回调 onDone
+function animateRPReveal(score, onDone) {
+  var numEl = document.getElementById('rpScoreNum');
+  if (!numEl) { if (onDone) onDone(); return; }
+  var target = parseInt(score, 10) || 0;
+  var wheel = document.getElementById('rpWheel');
+  if (wheel) { void wheel.offsetWidth; wheel.classList.add('spin'); }
+  var dur = 1500, start = null;
+  var ease = function(t) { return 1 - Math.pow(1 - t, 3); };  // easeOutCubic
+  numEl.textContent = '0';
+  function step(ts) {
+    if (!_gameModalShown()) return;   // 弹窗已关闭则停止（重开 openDailyRP 会复位 _rpRevealing）
+    if (start === null) start = ts;
+    var t = Math.min(1, (ts - start) / dur);
+    numEl.textContent = String(Math.round(ease(t) * target));
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      numEl.textContent = String(target);
+      var circle = (numEl.closest && numEl.closest('.rp-score-circle')) || document.querySelector('.rp-score-circle');
+      if (circle) circle.classList.add('pop');
+      if (onDone) onDone();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
 // ── 分享后再玩一次 ───────────────────────────────────────────────────
 function shareForExtra(gameType) {
   var shareUrl = 'https://lunarveilastro.github.io/lunarveil-astro/';
 
   // 触发分享 / 复制链接（不阻塞 UI）
-  if (navigator.share && window.isSecureContext) {
+  // 仅在移动端/触屏用原生分享；电脑端直接静默复制链接，避免弹出系统分享框、取消后卡顿
+  var preferNativeShare = navigator.share && window.isSecureContext &&
+    (/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(navigator.userAgent) ||
+     (window.matchMedia && window.matchMedia('(pointer: coarse)').matches));
+  if (preferNativeShare) {
     navigator.share({
       title: _t('share.title'),
       text: _t('share.text'),
@@ -356,20 +408,9 @@ function showCopyMessage() {
 }
 
 function replayGame(gameType) {
-  const pk = personKey();
-  if (gameType === 'rp') {
-    localStorage.removeItem('rp_date'+pk);
-    localStorage.removeItem('rp_score'+pk);
-    localStorage.removeItem('rp_personalized'+pk);
-    updateLodgeBadges();
-    openDailyRP();          // 立即重新测一次人品
-  } else {
-    localStorage.removeItem('fortune_date'+pk);
-    localStorage.removeItem('fortune_slip'+pk);
-    localStorage.removeItem('fortune_annotation'+pk);
-    updateLodgeBadges();
-    openDailyFortune();     // 回到抽签界面，可再抽一次
-  }
+  updateLodgeBadges();
+  if (gameType === 'rp') openDailyRP();        // 回到命运之轮，可再测
+  else openDailyFortune();                     // 回到签筒，可再抽
 }
 
 function renderShareButton(gameType) {

@@ -3,18 +3,20 @@
 // Depends on: ALL other modules (loaded last)
 // ── Error trap: log to console only, not visible to visitors ────────────
 
-// ── Wrapper: lodge games (answer book / magic ball / daily fortune / RP) need data.js (lazy) ──
-// lodge.js & fortune.js already ran (defer order), so real fns are defined. Override immediately.
+// data.js 懒加载地址（版本号集中此处，data.js 更新时只改这一行）
+var DATA_JS = 'js/data.js?v=20260712';
+
+// ── Wrapper: lodge games (answer book / magic ball) need data.js (lazy) ──
+// lodge.js already ran (defer order), so real fns are defined. Override immediately.
+// 注意：每日一签(openDailyFortune)、今日人品(openDailyRP) 不在此列——签筒/轮盘无需 data.js，自己即时渲染+后台预载。
 (function() {
   var _openAB = openAnswerBook;
   var _openMB = openMagicBall;
-  var _openDF = openDailyFortune;
-  var _openRP = openDailyRP;
   var _ensureData = function(fn) {
     if (typeof BOOK_ANSWERS === 'function' && typeof BALL_ANSWERS === 'function' && typeof FORTUNE_SLIPS_ZH !== 'undefined') {
       fn(); return;
     }
-    loadScript('js/data.js?v=20260712').then(function() { fn(); })
+    loadScript(DATA_JS).then(function() { fn(); })
       .catch(function(e) {
         console.error('data.js load error:', e);
         alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.'));
@@ -22,8 +24,6 @@
   };
   openAnswerBook = function() { _ensureData(_openAB); };
   openMagicBall = function() { _ensureData(_openMB); };
-  openDailyFortune = function() { _ensureData(_openDF); };
-  openDailyRP = function() { _ensureData(_openRP); };
 })();
 
 // ── Wrapper: openSingleTarot in lodge section needs tarot.js (lazy) ──────
@@ -31,9 +31,9 @@
 function openSingleTarot() {
   if (window._modulesLoaded) return; // Already loaded, real fn handles it
   // Lazy-load the heavy modules, then delegate to real openSingleTarot
-  loadScript('js/data.js?v=20260712').then(function() {
+  loadScript(DATA_JS).then(function() {
     return Promise.all([
-      loadScript('js/reports.js?v=20260712'),
+      loadScript('js/reports.js?v=20260715'),
       loadScript('js/tarot.js?v=20260712')
     ]);
   }).then(function() {
@@ -681,6 +681,35 @@ function getInputValues(prefix) {
   return { y, m, d, utcH, lat, lng };
 }
 
+// ── 记忆本人星盘：只存本机浏览器，不上传 ────────────────────────────
+var MYCHART_KEY = 'lva_mychart_v1';
+
+function _saveMyChart() {
+  // 只在用户真正改过本人信息时才记忆；纯看随机示例不留痕迹
+  if (!window._p1Edited) return;
+  try {
+    function v(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+    var addr = document.getElementById('p1_addr');
+    var status = document.getElementById('p1_geo_status');
+    var data = {
+      date: v('p1_date'), time: v('p1_time'), tz: v('p1_tz'),
+      addr: addr ? addr.value : '',
+      cityCn: addr ? (addr.getAttribute('data-city-cn') || '') : '',
+      cityEn: addr ? (addr.getAttribute('data-city-en') || '') : '',
+      geoStatus: status ? status.textContent : '',
+      lat: v('p1_lat'), lng: v('p1_lng'),
+      latM: v('p1_lat_m'), lngM: v('p1_lng_m'),
+      job: v('p1_job'), email: v('p1_email')
+    };
+    localStorage.setItem(MYCHART_KEY, JSON.stringify(data));
+  } catch (e) { /* localStorage 不可用则静默跳过 */ }
+}
+
+function clearMyChart() {
+  try { localStorage.removeItem(MYCHART_KEY); } catch (e) {}
+  location.reload();
+}
+
 
 let chartData1 = null;
 let chartData2 = null;
@@ -777,6 +806,7 @@ async function calculateAll() {
   try {
     const d1 = getInputValues('p1');
     if (!d1) { alert(_t('error.fillInfo')); return; }
+    _saveMyChart();   // 记住本人星盘，下次打开免重填（仅存本机）
 
     // Show overlay and build progress ring
     const overlay = document.getElementById('ritualOverlay');
@@ -786,9 +816,9 @@ async function calculateAll() {
     // Lazy-load heavy modules while ritual animation plays
     if (!window._modulesLoaded) {
       try {
-        await loadScript('js/data.js?v=20260712');
+        await loadScript(DATA_JS);
         await Promise.all([
-          loadScript('js/reports.js?v=20260712'),
+          loadScript('js/reports.js?v=20260715'),
           loadScript('js/tarot.js?v=20260712')
         ]);
         window._modulesLoaded = true;

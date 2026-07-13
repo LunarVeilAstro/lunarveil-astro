@@ -2890,7 +2890,7 @@ function generateSpecialDayReading(chartData, birthInput, specialDays) {
         var transName = isEn ? t.transPlanet : (PLANETS.find(function(p){return p.id===t.transPlanet;})||{name:t.transPlanet}).name;
         var natalName = isEn ? t.natalPlanet : (PLANETS.find(function(p){return p.id===t.natalPlanet;})||{name:t.natalPlanet}).name;
         html += '<div class="sr-timeline-item"><span class="tl-date">' + t.date + '</span> ';
-        html += '<span class="tl-event">' + transName + ' ' + (isEn ? t.angleNameEn : t.angleName) + ' ' + natalName + '</span>';
+        html += '<span class="tl-event"><span class="tl-planet">' + transName + '</span> ' + (isEn ? t.angleNameEn : t.angleName) + ' <span class="tl-planet">' + natalName + '</span></span>';
         var td = getTransitDescription(t);
         if (td) html += '<div class="tl-desc">' + td + '</div>';
         html += '</div>';
