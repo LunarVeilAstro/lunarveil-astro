@@ -3,13 +3,15 @@
 // Depends on: ALL other modules (loaded last)
 // ── Error trap: log to console only, not visible to visitors ────────────
 
-// ── Wrapper: openAnswerBook in lodge section needs data.js (lazy) ──────────
-// lodge.js already ran (defer order), so real fns are defined. Override immediately.
+// ── Wrapper: lodge games (answer book / magic ball / daily fortune / RP) need data.js (lazy) ──
+// lodge.js & fortune.js already ran (defer order), so real fns are defined. Override immediately.
 (function() {
   var _openAB = openAnswerBook;
   var _openMB = openMagicBall;
+  var _openDF = openDailyFortune;
+  var _openRP = openDailyRP;
   var _ensureData = function(fn) {
-    if (typeof BOOK_ANSWERS === 'function' && typeof BALL_ANSWERS === 'function') {
+    if (typeof BOOK_ANSWERS === 'function' && typeof BALL_ANSWERS === 'function' && typeof FORTUNE_SLIPS_ZH !== 'undefined') {
       fn(); return;
     }
     loadScript('js/data.js?v=20260712').then(function() { fn(); })
@@ -20,6 +22,8 @@
   };
   openAnswerBook = function() { _ensureData(_openAB); };
   openMagicBall = function() { _ensureData(_openMB); };
+  openDailyFortune = function() { _ensureData(_openDF); };
+  openDailyRP = function() { _ensureData(_openRP); };
 })();
 
 // ── Wrapper: openSingleTarot in lodge section needs tarot.js (lazy) ──────
