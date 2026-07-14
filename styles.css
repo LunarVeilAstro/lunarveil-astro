@@ -2127,3 +2127,23 @@ header .subtitle {
   .tl-date { min-width: 70px; font-size: 0.9em; }
   .sr-highlight { font-size: 0.78em !important; padding: 8px 10px; }
 }
+
+/* ── SkyNow: Live Sky Wheel ──────────────────────────────────────────── */
+#skyNowCard { text-align: center; }
+.skynow-intro { color: var(--text-dim); font-size: 0.9em; margin-bottom: 4px; }
+.skynow-date { color: var(--accent); font-size: 0.88em; letter-spacing: 0.08em; margin: 0 0 12px; }
+#skyMiniWrap { cursor: pointer; display: inline-block; outline: none; }
+#skyMiniWrap:focus-visible { box-shadow: 0 0 0 2px var(--gold-dim); border-radius: 50%; }
+#skyMiniCanvas { width: min(320px, 80vw); height: auto; display: block; margin: 0 auto; }
+.skynow-hint { color: var(--text-dim); font-size: 0.8em; letter-spacing: 0.1em; margin-top: 10px; transition: color 0.3s; }
+#skyMiniWrap:hover .skynow-hint { color: var(--gold); }
+#skyFullCanvas { width: min(560px, 88vw); height: auto; display: block; margin: 0 auto 16px; }
+.skynow-cols { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; text-align: left; margin-bottom: 16px; }
+.skynow-cols h3 { color: var(--gold); font-size: 0.95em; font-weight: normal; letter-spacing: 0.1em; margin: 0 0 8px; }
+#skyPlanetTable { border-collapse: collapse; font-size: 0.88em; }
+#skyPlanetTable td { padding: 3px 8px; border-bottom: 1px solid rgba(122,95,180,0.15); }
+#skyPlanetTable td.skyg { color: var(--gold); font-size: 1.05em; }
+#skyPlanetTable td.skydeg { color: #b8a8d8; text-align: right; }
+#skyPlanetTable td.skyretro { color: #d4906a; font-size: 0.85em; }
+#skyAspectList { font-size: 0.85em; line-height: 2.1; color: #b8aecb; }
+.skyorb { color: var(--text-dim); font-size: 0.85em; }

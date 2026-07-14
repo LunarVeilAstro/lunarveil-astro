@@ -41,6 +41,17 @@
   add('tab.about', '关于', 'About');
 
   // ══════════════════════════════════════════════════════════════════════════
+  //  SKYNOW — Live Sky Wheel
+  // ══════════════════════════════════════════════════════════════════════════
+  add('skynow.title', '🌌 实 时 天 象', '🌌 Live Sky Now');
+  add('skynow.intro', '十颗行星此刻走到了哪里 · 每分钟自动更新', 'Where the ten planets are right now · updates every minute');
+  add('skynow.expandHint', '✦ 点击展开完整天象 ✦', '✦ Tap to expand full sky chart ✦');
+  add('skynow.planets', '行星位置', 'Planetary Positions');
+  add('skynow.aspects', '主要相位', 'Major Aspects');
+  add('skynow.collapse', '收起天象盘 ↑', 'Collapse ↑');
+  add('skynow.noAspects', '当前无紧密相位', 'No tight aspects right now');
+
+  // ══════════════════════════════════════════════════════════════════════════
   //  BUTTONS
   // ══════════════════════════════════════════════════════════════════════════
   add('btn.calculate', '✦  解 读 星 盘  ✦', '✦  Read My Chart  ✦');
@@ -795,6 +806,9 @@
         }
       } catch(e) { /* silent */ }
     }
+
+    // 6b. Re-render live sky wheel (planet/sign names are drawn on canvas)
+    if (typeof renderSkyNow === 'function') { try { renderSkyNow(); } catch(e) { /* silent */ } }
 
     // 7. Sync city name in address fields with current language
     var addrFields = ['p1_addr', 'p2_addr'];

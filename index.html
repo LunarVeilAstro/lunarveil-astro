@@ -48,8 +48,8 @@
   gtag('js', new Date());
   gtag('config', 'G-7M6096TY6B');
 </script>
-<link rel="stylesheet" href="styles.css?v=20260715">
-<script defer src="i18n.js?v=20260715"></script>
+<link rel="stylesheet" href="styles.css?v=20260718">
+<script defer src="i18n.js?v=20260718"></script>
 </head>
 <body>
 <!-- Loading Ritual Overlay -->
@@ -104,6 +104,33 @@
 
   <!-- ═══ 今日星象速览 ═══════════════════════════════════════════════════════════ -->
   <div class="card" id="dailyCard"></div>
+
+  <!-- ═══ 实时天象盘 ═══════════════════════════════════════════════════════════ -->
+  <div class="card" id="skyNowCard">
+    <h2 data-i18n="skynow.title">🌌 实 时 天 象</h2>
+    <p class="skynow-intro" data-i18n="skynow.intro">十颗行星此刻走到了哪里 · 每分钟自动更新</p>
+    <p class="skynow-date" id="skyNowDate"></p>
+    <div id="skyMiniWrap" role="button" tabindex="0" onclick="toggleSkyFull()">
+      <canvas id="skyMiniCanvas" width="320" height="320"></canvas>
+      <p class="skynow-hint" data-i18n="skynow.expandHint">✦ 点击展开完整天象 ✦</p>
+    </div>
+    <div id="skyFullWrap" style="display:none;">
+      <canvas id="skyFullCanvas" width="560" height="560"></canvas>
+      <div class="skynow-cols">
+        <div>
+          <h3 data-i18n="skynow.planets">行星位置</h3>
+          <table id="skyPlanetTable"></table>
+        </div>
+        <div>
+          <h3 data-i18n="skynow.aspects">主要相位</h3>
+          <div id="skyAspectList"></div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn btn-secondary" onclick="toggleSkyFull()" style="font-size:0.85em;padding:6px 20px;" data-i18n="skynow.collapse">收起天象盘 ↑</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══ 灵性驿站 ═══════════════════════════════════════════════════════════ -->
   <div class="card" id="lodgeCard">
@@ -358,6 +385,7 @@
 <script defer src="js/fortune.js?v=20260715"></script>
 <script defer src="js/dailycard.js?v=20260712"></script>
 <script defer src="js/lodge.js?v=20260712"></script>
+<script defer src="js/skynow.js?v=20260718"></script>
 <script defer src="js/ui.js?v=20260717"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
   onerror="window._emailjsDisabled=true;var b=document.getElementById('btnEmail');if(b){b.textContent='📋 复制报告';b.title='Email服务暂不可用，报告将复制到剪贴板';}"
