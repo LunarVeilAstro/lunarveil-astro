@@ -461,14 +461,15 @@ var CITY_DB = [
 
 // ── Offline county-level DB (~3100 China 县/区/县级市, tz +8), lazy-merged ──
 // Sourced from Aliyun DataV centers (GCJ-02; sub-km offset, negligible for houses/ascendant).
-// Lets 冷门小城 resolve fully offline — no Nominatim, which is unreachable in mainland China.
+// Loaded via <script> injection (works on file:// too — fetch() is blocked for local files),
+// so 冷门小城 resolve fully offline — no Nominatim, which is unreachable in mainland China.
 var _cityDbLoaded = false, _cityDbPromise = null;
 function ensureCityDb() {
   if (_cityDbLoaded) return Promise.resolve();
   if (_cityDbPromise) return _cityDbPromise;
-  _cityDbPromise = fetch('js/city_db.json?v=20260716')
-    .then(function(r){ return r.ok ? r.json() : []; })
-    .then(function(arr){
+  _cityDbPromise = loadScript('js/city_db.js?v=20260717')
+    .then(function(){
+      var arr = window.CHINA_COUNTY_DB;
       if (Array.isArray(arr)) { for (var i = 0; i < arr.length; i++) CITY_DB.push(arr[i]); }
       _cityDbLoaded = true;
     })
