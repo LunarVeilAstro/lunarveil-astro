@@ -459,6 +459,25 @@ var CITY_DB = [
   { k:'奥克兰', en:'Auckland', lat:-36.848, lng:174.763, tz:12 }
 ];
 
+// ── Offline county-level DB (~3100 China 县/区/县级市, tz +8), lazy-merged ──
+// Sourced from Aliyun DataV centers (GCJ-02; sub-km offset, negligible for houses/ascendant).
+// Lets 冷门小城 resolve fully offline — no Nominatim, which is unreachable in mainland China.
+var _cityDbLoaded = false, _cityDbPromise = null;
+function ensureCityDb() {
+  if (_cityDbLoaded) return Promise.resolve();
+  if (_cityDbPromise) return _cityDbPromise;
+  _cityDbPromise = fetch('js/city_db.json?v=20260716')
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(arr){
+      if (Array.isArray(arr)) { for (var i = 0; i < arr.length; i++) CITY_DB.push(arr[i]); }
+      _cityDbLoaded = true;
+    })
+    .catch(function(){ _cityDbLoaded = true; });  // fail-open: keep base DB working
+  return _cityDbPromise;
+}
+// Warm it in the background so the first 定位 click is instant.
+try { setTimeout(function(){ ensureCityDb(); }, 1500); } catch (e) {}
+
 function lookupCity(query) {
   if (!query || query.length < 1) return null;
   var q = query.trim();
@@ -505,6 +524,7 @@ function fuzzyMatchCity(query) {
   }
   var best = null;
   var bestScore = 0;
+  var bestHits = 0;
   for (var j2 = 0; j2 < CITY_DB.length; j2++) {
     var name = CITY_DB[j2].k;
     if (name.length < 2) continue;
@@ -519,13 +539,16 @@ function fuzzyMatchCity(query) {
     var score = hits * 3 + uniHits;
     if (score > bestScore) {
       bestScore = score;
+      bestHits = hits;
       best = CITY_DB[j2];
     }
   }
-  return bestScore >= 1 ? best : null;
+  // Require at least one shared 2-gram (adjacent pair). A single shared character
+  // is too weak (e.g. 西宁→西安) and would preempt the correct lookup — reject it.
+  return bestHits >= 1 ? best : null;
 }
 
-// ── Geocoding (local DB → fuzzy → Nominatim fallback) ─────────────────────
+// ── Geocoding: offline DB (exact→fuzzy, tz+8) → CJK miss = manual → Latin = Nominatim ──
 async function geocode(prefix) {
   const addrInput = document.getElementById(prefix + '_addr');
   const statusEl = document.getElementById(prefix + '_geo_status');
@@ -536,6 +559,9 @@ async function geocode(prefix) {
   var prevClass = statusEl.className;
   statusEl.textContent = _t('geo.loading');
   statusEl.className = 'geo-status loading';
+
+  // Make sure the offline county DB is merged first — domestic names resolve with no network.
+  try { await ensureCityDb(); } catch (e) {}
 
   // 1) Exact local DB lookup
   var local = lookupCity(query);
@@ -558,7 +584,18 @@ async function geocode(prefix) {
     return;
   }
 
-  // 3) Nominatim fallback (international cities not in DB)
+  // 3) Chinese place not in the offline DB → do NOT call Nominatim (unreachable in
+  //    mainland China; it would just hang and time out). Guide to a broader name or manual coords.
+  var hasCJK = /[一-鿿]/.test(query);
+  if (hasCJK) {
+    statusEl.innerHTML = '⚠️ ' + _L('没找到「', 'Couldn\'t find "') + escHtml(query) + _L('」。可改填上一级的市/县名，或点下方「手动输入经纬度」直接填坐标。', '". Try the parent city/county name, or use "Enter coordinates manually" below.');
+    statusEl.className = 'geo-status error';
+    var mBox = document.getElementById(prefix + '_manual');
+    if (mBox) mBox.style.display = 'block';
+    return;
+  }
+
+  // 4) Latin / overseas query → Nominatim (reachable outside the GFW, best global coverage)
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(function() { ctrl.abort(); }, 8000);
