@@ -223,7 +223,7 @@
   add('about.p6', '星盘不是答案，不是命运，不是绝对。它是你出生那一刻的行星位置——你的底色。告诉你你生来带着什么底色、哪些是你与生俱来的、哪些是需要你来书就的。', 'A birth chart is not an answer, not a fate, not an absolute. It\'s the position of the planets at the exact moment you were born — your foundation. It tells you what you were born with, what\'s always been yours, and what\'s yours to create.');
   add('about.p7', '知道了，你才可以更好地整装出发。', 'When you truly know yourself, you\'re ready to begin again.');
   add('about.closing', '—— LunarVeil', '— LunarVeil');
-  add('social.cta', '✦ 加微信解锁深度解读 ✦', '✦ Add WeChat for In-Depth Reading ✦');
+  add('social.cta', '✦ 加微信或发邮件，解锁深度解读 ✦', '✦ Add WeChat or email us for In-Depth Reading ✦');
   add('social.copyManual', '号：\n请手动复制', 'ID:\nPlease copy manually');
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -737,6 +737,7 @@
     if (lang !== 'zh' && lang !== 'en') lang = 'zh';
     localStorage.setItem('lang', lang);
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+    setMetaOg('locale', lang === 'en' ? 'en_US' : 'zh_CN');
     applyTranslations();
   };
 

@@ -476,8 +476,13 @@ function ensureCityDb() {
     .catch(function(){ _cityDbLoaded = true; });  // fail-open: keep base DB working
   return _cityDbPromise;
 }
-// Warm it in the background so the first 定位 click is instant.
-try { setTimeout(function(){ ensureCityDb(); }, 1500); } catch (e) {}
+// Warm city DB in background after initial paint, without competing for first-load bandwidth.
+// Uses requestIdleCallback when available (yields to the event loop), falls back to 4s delay.
+try {
+  var _warm = function(){ ensureCityDb(); };
+  if (window.requestIdleCallback) { requestIdleCallback(_warm, { timeout: 4000 }); }
+  else { setTimeout(_warm, 4000); }
+} catch (e) {}
 
 function lookupCity(query) {
   if (!query || query.length < 1) return null;
