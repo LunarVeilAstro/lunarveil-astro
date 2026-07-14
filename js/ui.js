@@ -1642,3 +1642,11 @@ function wrapLine(line, maxLen) {
   return result;
 }
 
+function mailContact() {
+  var user = 'lunarveilastro';
+  var domain = 'outlook.com';
+  var addr = user + '@' + domain;
+  var subject = encodeURIComponent(_L('占星咨询', 'Astrology Consultation'));
+  window.location.href = 'mailto:' + addr + '?subject=' + subject;
+}
+

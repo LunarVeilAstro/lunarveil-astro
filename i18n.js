@@ -207,6 +207,8 @@
   add('social.douyin', '抖音', 'Douyin');
   add('social.copy', '点击复制', 'Copy');
   add('social.follow', '点击关注', 'Follow');
+  add('social.email', '邮箱', 'Email');
+  add('social.emailHint', '点击发邮件', 'Click to email');
   add('social.copied', '✓ 已复制', '✓ Copied');
 
   // ══════════════════════════════════════════════════════════════════════════
