@@ -137,6 +137,8 @@
   add('lodge.zodiacMatchDesc', '测测你和TA的星座缘分', 'Check your zodiac compatibility');
   add('lodge.dailyFortune', '每日一签', 'Daily Fortune');
   add('lodge.dailyFortuneDesc', '摇一支签，已算星盘者得专属解读', 'Draw a slip — chart users get personalized reading');
+  add('lodge.templeFortune', '寺庙求签', 'Temple Oracle');
+  add('lodge.templeFortuneDesc', '观音·关帝·吕祖，三套传统灵签', 'Guanyin · Guandi · Lüzu — 3 traditional oracles');
   add('lodge.dailyRP', '今日人品', 'Daily RP');
   add('lodge.dailyRPDesc', '已算星盘者基于本命盘专属计算', 'Personalized luck score based on your chart');
   add('lodge.badge.available', '今日可探', 'Available Today');

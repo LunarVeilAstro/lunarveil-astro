@@ -29,6 +29,7 @@
   var WEEK_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
   var expanded = false;
+  var skyLoaded = false;
 
   function calcBody(id, T){
     if (id === 'Sun') return calcSun(T);
@@ -256,6 +257,27 @@
   window.renderSkyNow = renderSkyNow;
   window.toggleSkyFull = toggleSkyFull;
 
+  function toggleSkySection(){
+    var content = document.getElementById('skyNowContent');
+    var arrow = document.getElementById('skyNowArrow');
+    if (!content) return;
+    if (!skyLoaded){
+      skyLoaded = true;
+      content.style.display = '';
+      if (arrow) arrow.textContent = '▾';
+      requestAnimationFrame(function(){
+        renderSkyNow();
+        setInterval(renderSkyNow, 60000);
+      });
+    } else {
+      var hidden = content.style.display === 'none';
+      content.style.display = hidden ? '' : 'none';
+      if (arrow) arrow.textContent = hidden ? '▾' : '▸';
+    }
+  }
+
+  window.toggleSkySection = toggleSkySection;
+
   function init(){
     var wrap = document.getElementById('skyMiniWrap');
     if (wrap){
@@ -263,12 +285,10 @@
         if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleSkyFull(); }
       });
     }
-    renderSkyNow();
-    setInterval(renderSkyNow, 60000);
     var resizeTimer;
     window.addEventListener('resize', function(){
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(renderSkyNow, 200);
+      if (skyLoaded) resizeTimer = setTimeout(renderSkyNow, 200);
     });
   }
   if (document.readyState === 'loading'){

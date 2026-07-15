@@ -1592,6 +1592,150 @@ header .subtitle {
   75% { transform: rotate(8deg); }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Temple Fortune — 寺庙求签
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── System selection grid ── */
+.temple-system-grid { display:flex; flex-direction:column; gap:10px; margin:10px 0 6px; }
+.temple-system-card {
+  background:linear-gradient(135deg, rgba(30,13,26,0.85), rgba(42,20,50,0.7));
+  border:1px solid rgba(200,160,100,0.18); border-radius:12px;
+  padding:14px 16px; cursor:pointer; transition:all 0.3s;
+  display:flex; align-items:center; gap:14px;
+}
+.temple-system-card:hover {
+  border-color:rgba(200,160,100,0.45); transform:translateX(4px);
+  box-shadow:0 4px 20px rgba(160,60,90,0.12);
+}
+.temple-system-icon { font-size:2em; width:48px; text-align:center; flex-shrink:0; }
+.temple-system-name { color:#d4b870; font-size:1em; font-weight:bold; letter-spacing:0.06em; }
+.temple-system-desc { color:var(--text-dim); font-size:0.73em; margin-top:2px; }
+
+/* ── Temple tube — ornate 签筒 design ── */
+.temple-tube {
+  width:80px; height:224px; margin:0 auto 18px;
+  background:
+    /* subtle wood grain */
+    repeating-linear-gradient(0deg,
+      transparent 0px, transparent 5px,
+      rgba(255,255,255,0.012) 5px, rgba(255,255,255,0.012) 6px
+    ),
+    repeating-linear-gradient(0deg,
+      transparent 0px, transparent 13px,
+      rgba(0,0,0,0.06) 13px, rgba(0,0,0,0.06) 14px
+    ),
+    /* main body gradient — deep purple wood tone */
+    linear-gradient(180deg, #1e0a1a 0%, #3a1540 12%, #2e1230 50%, #3a1540 88%, #1e0a1a 100%);
+  border:2px solid #c9a96e; border-radius:14px;
+  position:relative; overflow:hidden; cursor:pointer;
+  box-shadow:
+    0 0 40px rgba(160,60,90,0.12),
+    0 0 80px rgba(200,160,60,0.05),
+    inset 0 0 25px rgba(200,160,80,0.04),
+    /* bottom rim rings */
+    0 6px 0 -2px #1e0a1a,
+    0 6px 0 0 rgba(200,160,100,0.7),
+    0 10px 0 -2px #1e0a1a,
+    0 10px 0 0 rgba(180,140,90,0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.temple-tube:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 50px rgba(160,60,90,0.18),
+    0 0 90px rgba(200,160,60,0.07),
+    inset 0 0 25px rgba(200,160,80,0.04),
+    0 6px 0 -2px #1e0a1a,
+    0 6px 0 0 rgba(200,160,100,0.7),
+    0 10px 0 -2px #1e0a1a,
+    0 10px 0 0 rgba(180,140,90,0.35);
+}
+.temple-tube.shaking { animation:tubeShake 0.3s ease-in-out 3; }
+.temple-tube::before {
+  /* ornate top rim — metallic gold band */
+  content:''; position:absolute; top:0; left:-2px; right:-2px; height:9px;
+  background:linear-gradient(180deg, #f0d878 0%, #d4b048 30%, #a08030 55%, #c9a040 75%, #e8c860 100%);
+  border-radius:14px 14px 0 0; z-index:2;
+  box-shadow:0 2px 6px rgba(0,0,0,0.35);
+}
+.temple-tube::after {
+  /* 3 fortune sticks at staggered heights */
+  content:''; position:absolute; top:15px; left:50%; transform:translateX(-50%);
+  width:4px; height:115px;
+  background:linear-gradient(180deg, #f0d878 0%, #c9a96e 50%, #8a7040 90%);
+  border-radius:2px;
+  box-shadow:
+    -16px 4px 0 0 rgba(220,175,105,0.65),
+     16px -3px 0 0 rgba(210,165,95,0.6);
+}
+
+/* ── Slip card — purplish-red gradient base + gold accents ── */
+.temple-slip-card {
+  background:linear-gradient(170deg, #1e0d1a 0%, #2a1530 18%, #25102a 40%, #2a1435 60%, #20102a 80%, #1c0d22 100%);
+  border:1px solid rgba(200,100,140,0.20); border-radius:12px;
+  padding:22px 16px 16px; margin:10px 0; position:relative; overflow:hidden;
+  text-align:left; box-shadow:0 4px 30px rgba(160,60,90,0.15);
+}
+.temple-slip-glow {
+  position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 5%, rgba(200,80,120,0.10) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 90%, rgba(160,60,100,0.05) 0%, transparent 40%);
+}
+.temple-slip-content { position:relative; z-index:1; }
+
+.ts-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px; }
+.ts-brand { color:#d4b870; font-size:10px; font-weight:bold; letter-spacing:0.1em; white-space:nowrap; }
+.ts-num { color:rgba(200,170,130,0.5); font-size:10px; letter-spacing:0.06em; white-space:nowrap; }
+
+.ts-level { text-align:center; margin:10px 0 4px; }
+.ts-level-badge { display:inline-block; font-size:24px; font-weight:900; letter-spacing:0.18em; padding:4px 20px; border:1px solid rgba(200,160,60,0.4); border-radius:8px; color:#e8c860; background:rgba(200,160,60,0.07); white-space:nowrap; }
+.ts-level-good { color:#e0b878; background:rgba(200,160,100,0.06); border-color:rgba(200,160,100,0.3); }
+.ts-level-common { color:#b0a0b8; background:rgba(180,140,160,0.05); border-color:rgba(180,140,160,0.22); }
+
+.ts-title { text-align:center; color:#c0a878; font-size:13px; margin:2px 0; letter-spacing:0.08em; }
+
+.ts-poem-block { text-align:center; margin:12px 0; padding:12px 8px; background:rgba(180,80,120,0.04); border-top:1px solid rgba(200,100,140,0.13); border-bottom:1px solid rgba(200,100,140,0.13); }
+.ts-poem-text { color:#e8d8c8; font-size:15px; line-height:2; letter-spacing:0.06em; font-weight:bold; }
+.ts-vernacular { color:#a098b8; font-size:10.5px; line-height:1.65; margin-top:7px; text-align:left; text-indent:2em; }
+
+.ts-interp-section { margin-top:10px; }
+.ts-interp-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 10px; margin-top:3px; }
+.ts-interp-item { display:flex; gap:4px; font-size:10px; line-height:1.5; }
+.ts-interp-label { color:#c0a878; white-space:nowrap; min-width:24px; flex-shrink:0; }
+.ts-interp-text { color:#a098b8; }
+
+.ts-dos-donts { margin-top:8px; font-size:10px; }
+.ts-dos { color:#8ab88a; margin-bottom:1px; }
+.ts-donts { color:#c09090; margin-bottom:4px; }
+
+.ts-lucky-bar { display:flex; gap:10px; flex-wrap:wrap; color:rgba(200,170,130,0.5); font-size:9px; }
+.ts-footer { margin-top:10px; text-align:center; color:rgba(180,140,160,0.2); font-size:8.5px; letter-spacing:0.06em; }
+
+/* ── iOS image preview overlay ── */
+.ios-preview-overlay {
+  position:absolute; inset:0; z-index:10;
+  background:rgba(10,5,14,0.92);
+  display:flex; align-items:center; justify-content:center;
+  border-radius:16px;
+}
+.ios-preview-box { width:90%; max-width:400px; text-align:center; position:relative; }
+.ios-preview-close {
+  position:absolute; top:-8px; right:-4px;
+  background:rgba(180,140,90,0.2); border:1px solid var(--gold-dim); color:var(--text-dim);
+  width:28px; height:28px; border-radius:50%; font-size:14px; cursor:pointer; z-index:2;
+}
+.ios-preview-img { width:100%; border-radius:8px; box-shadow:0 0 40px rgba(180,140,90,0.25); display:block; }
+.ios-preview-hint {
+  color:var(--gold); font-size:0.82em; letter-spacing:0.06em;
+  margin-top:12px; animation:iosHintPulse 2s ease-in-out infinite;
+}
+@keyframes iosHintPulse {
+  0%,100%{opacity:0.6;} 50%{opacity:1;}
+}
+
+@media(max-width:480px) { .ts-interp-grid { grid-template-columns:1fr; } }
+
 /* RP display */
 .rp-score-circle {
   width: 120px; height: 120px; border-radius: 50%;
@@ -2130,6 +2274,9 @@ header .subtitle {
 
 /* ── SkyNow: Live Sky Wheel ──────────────────────────────────────────── */
 #skyNowCard { text-align: center; }
+.skynow-toggle { cursor: pointer; user-select: none; transition: color 0.3s; }
+.skynow-toggle:hover { color: var(--gold); }
+.skynow-arrow { font-size: 0.7em; vertical-align: middle; display: inline-block; transition: transform 0.3s; }
 .skynow-intro { color: var(--text-dim); font-size: 0.9em; margin-bottom: 4px; }
 .skynow-date { color: var(--accent); font-size: 0.88em; letter-spacing: 0.08em; margin: 0 0 12px; }
 #skyMiniWrap { cursor: pointer; display: inline-block; outline: none; }

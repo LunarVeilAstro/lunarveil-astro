@@ -105,33 +105,6 @@
   <!-- ═══ 今日星象速览 ═══════════════════════════════════════════════════════════ -->
   <div class="card" id="dailyCard"></div>
 
-  <!-- ═══ 实时天象盘 ═══════════════════════════════════════════════════════════ -->
-  <div class="card" id="skyNowCard">
-    <h2 data-i18n="skynow.title">🌌 实 时 天 象</h2>
-    <p class="skynow-intro" data-i18n="skynow.intro">十颗行星此刻走到了哪里 · 每分钟自动更新</p>
-    <p class="skynow-date" id="skyNowDate"></p>
-    <div id="skyMiniWrap" role="button" tabindex="0" onclick="toggleSkyFull()">
-      <canvas id="skyMiniCanvas" width="320" height="320"></canvas>
-      <p class="skynow-hint" data-i18n="skynow.expandHint">✦ 点击展开完整天象 ✦</p>
-    </div>
-    <div id="skyFullWrap" style="display:none;">
-      <canvas id="skyFullCanvas" width="560" height="560"></canvas>
-      <div class="skynow-cols">
-        <div>
-          <h3 data-i18n="skynow.planets">行星位置</h3>
-          <table id="skyPlanetTable"></table>
-        </div>
-        <div>
-          <h3 data-i18n="skynow.aspects">主要相位</h3>
-          <div id="skyAspectList"></div>
-        </div>
-      </div>
-      <div style="text-align:center;">
-        <button class="btn btn-secondary" onclick="toggleSkyFull()" style="font-size:0.85em;padding:6px 20px;" data-i18n="skynow.collapse">收起天象盘 ↑</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ═══ 灵性驿站 ═══════════════════════════════════════════════════════════ -->
   <div class="card" id="lodgeCard">
     <h2 data-i18n="lodge.title">🔮 灵 性 驿 站</h2>
@@ -171,11 +144,11 @@
         <div class="lodge-desc" data-i18n="lodge.zodiacMatchDesc">测测你和TA的星座缘分</div>
       </div>
       <!-- Row 2: 每日一签 + 今日人品 (centered) -->
-      <div class="lodge-item lodge-daily" onclick="openDailyFortune()">
+      <div class="lodge-item lodge-daily" onclick="openTempleFortune()">
         <div class="lodge-icon">🏮</div>
         <div class="lodge-name" data-i18n="lodge.dailyFortune">每日一签</div>
         <div class="lodge-desc" data-i18n="lodge.dailyFortuneDesc">摇一支签，已算星盘者得专属解读</div>
-        <div class="lodge-badge" id="fortuneBadge" data-i18n="lodge.badge.available.short">今日可抽</div>
+        <div class="lodge-badge" id="templeFortuneBadge">今日可求</div>
       </div>
       <div class="lodge-item lodge-daily" onclick="openDailyRP()">
         <div class="lodge-icon">🎲</div>
@@ -340,6 +313,36 @@
     <div class="tab-content" id="tab7"></div>
     <div class="tab-content" id="tab8"></div>
   </div>
+
+  <!-- ═══ 实时天象盘 ═══════════════════════════════════════════════════════════ -->
+  <div class="card" id="skyNowCard">
+    <h2 class="skynow-toggle" onclick="toggleSkySection()" data-i18n="skynow.title">🌌 实 时 天 象 <span class="skynow-arrow" id="skyNowArrow">▸</span></h2>
+    <p class="skynow-intro" data-i18n="skynow.intro">十颗行星此刻走到了哪里 · 每分钟自动更新</p>
+    <div id="skyNowContent" style="display:none;">
+      <p class="skynow-date" id="skyNowDate"></p>
+      <div id="skyMiniWrap" role="button" tabindex="0" onclick="toggleSkyFull()">
+        <canvas id="skyMiniCanvas" width="320" height="320"></canvas>
+        <p class="skynow-hint" data-i18n="skynow.expandHint">✦ 点击展开完整天象 ✦</p>
+      </div>
+      <div id="skyFullWrap" style="display:none;">
+        <canvas id="skyFullCanvas" width="560" height="560"></canvas>
+        <div class="skynow-cols">
+          <div>
+            <h3 data-i18n="skynow.planets">行星位置</h3>
+            <table id="skyPlanetTable"></table>
+          </div>
+          <div>
+            <h3 data-i18n="skynow.aspects">主要相位</h3>
+            <div id="skyAspectList"></div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <button class="btn btn-secondary" onclick="toggleSkyFull()" style="font-size:0.85em;padding:6px 20px;" data-i18n="skynow.collapse">收起天象盘 ↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <p style="text-align:center;color:#5a5a70;font-size:0.78em;margin-top:20px;letter-spacing:0.04em;line-height:2;" id="footerDisclaimer">
     <span data-i18n="footer.disclaimer1">星辰不为任何人改写轨迹，星盘也从不替你掌舵。</span><br>
     <span data-i18n="footer.disclaimer2">它只是一面古老的镜子，映照你来时路上未曾看清的光与影。</span><br>
@@ -383,6 +386,7 @@
 <!-- Heavy modules (data, reports, tarot) loaded lazily on first 解读星盘 click -->
 <script defer src="js/compass.js?v=20260712"></script>
 <script defer src="js/fortune.js?v=20260715"></script>
+<script defer src="js/html-to-image.js?v=20260718"></script>
 <script defer src="js/dailycard.js?v=20260712"></script>
 <script defer src="js/lodge.js?v=20260712"></script>
 <script defer src="js/skynow.js?v=20260718"></script>

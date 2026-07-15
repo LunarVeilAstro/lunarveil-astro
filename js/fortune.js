@@ -409,8 +409,9 @@ function showCopyMessage() {
 
 function replayGame(gameType) {
   updateLodgeBadges();
-  if (gameType === 'rp') openDailyRP();        // 回到命运之轮，可再测
-  else openDailyFortune();                     // 回到签筒，可再抽
+  if (gameType === 'rp') openDailyRP();
+  else if (gameType === 'temple') openTempleFortune();
+  else openTempleFortune();
 }
 
 function renderShareButton(gameType) {
@@ -418,6 +419,182 @@ function renderShareButton(gameType) {
     ? _L('分享后再测一次','Share to Check Again')
     : _L('分享后再抽一次','Share to Draw Again');
   return '<button class="share-btn" onclick="event.stopPropagation();shareForExtra(\'' + gameType + '\')">📤 '+label+'</button>';
+}
+
+// ── 寺庙求签 ───────────────────────────────────────────────────────────
+var _templeSystemId = 'guanyin';
+var _templeShaking = false;
+
+function openTempleFortune() {
+  if (typeof TEMPLE_SLIPS_GUANYIN_ZH === 'undefined') {
+    loadScript(DATA_JS).catch(function(){});
+  }
+  var html = '<h3>' + _t('lodge.templeFortune') + '</h3>';
+  html += '<p style="color:var(--text-dim);font-size:0.82em;margin-bottom:14px;">' + _L('选择一套灵签系统，心中默念所求之事，然后摇签','Choose an oracle, hold your question in mind, then draw.') + '</p>';
+  html += '<div class="temple-system-grid">';
+  var systems = [
+    {id:'guanyin',icon:'☸️',name:_L('观音灵签','Guanyin Oracle'),desc:_L('慈悲指引 · 姻缘 家庭 健康 求心安','Compassionate — love, family, health, peace of mind')},
+    {id:'guandi',icon:'⚔️',name:_L('关帝灵签','Guandi Oracle'),desc:_L('刚毅决断 · 事业 财运 重大决策','Heroic — career, wealth, major decisions')},
+    {id:'lvzu',icon:'☯️',name:_L('吕祖灵签','Lüzu Oracle'),desc:_L('玄妙哲理 · 学业 修行 人生方向','Taoist wisdom — study, self-cultivation, life direction')}
+  ];
+  for (var i=0; i<systems.length; i++) {
+    var s = systems[i];
+    html += '<div class="temple-system-card" onclick="startTempleDraw(\'' + s.id + '\')">';
+    html += '<div class="temple-system-icon">' + s.icon + '</div>';
+    html += '<div><div class="temple-system-name">' + s.name + '</div>';
+    html += '<div class="temple-system-desc">' + s.desc + '</div></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  showGameModal(html);
+}
+
+function startTempleDraw(systemId) {
+  if (typeof TEMPLE_SLIPS_GUANYIN_ZH === 'undefined') {
+    loadScript(DATA_JS).then(function(){ startTempleDraw(systemId); }).catch(function(e){ console.error(e); });
+    return;
+  }
+  var systemNames = {guanyin:_L('观音灵签','Guanyin Oracle'),guandi:_L('关帝灵签','Guandi Oracle'),lvzu:_L('吕祖灵签','Lüzu Oracle')};
+  _templeSystemId = systemId;
+  _templeShaking = false;
+  var html = '<h3>' + systemNames[systemId] + '</h3>';
+  html += '<p style="color:var(--text-dim);font-size:0.82em;margin-bottom:14px;">' + _L('心中默念所求之事，点击签筒求签','Hold your question in mind, then click the cylinder to draw.') + '</p>';
+  html += '<div class="temple-tube" id="templeTube" onclick="shakeTempleTube()"></div>';
+  html += '<p style="color:var(--text-dim);font-size:0.78em;">' + _L('点击签筒摇签','Click the cylinder to draw') + '</p>';
+  showGameModal(html);
+}
+
+function shakeTempleTube() {
+  if (_templeShaking) return;
+  if (typeof TEMPLE_SLIPS_GUANYIN_ZH === 'undefined') {
+    loadScript(DATA_JS).then(shakeTempleTube).catch(function(e){ console.error(e); });
+    return;
+  }
+  _templeShaking = true;
+  var tube = document.getElementById('templeTube');
+  if (!tube) { revealTempleSlip(); return; }
+  tube.classList.add('shaking');
+  var done = false;
+  var finish = function() { if (done) return; done = true; if (!_gameModalShown()) { _templeShaking = false; return; } revealTempleSlip(); };
+  tube.addEventListener('animationend', finish, {once:true});
+  setTimeout(finish, 1100);
+}
+
+function drawTempleSlip(systemId) {
+  var pool;
+  if (systemId === 'guanyin') pool = TEMPLE_SLIPS_GUANYIN();
+  else if (systemId === 'guandi') pool = TEMPLE_SLIPS_GUANDI();
+  else pool = TEMPLE_SLIPS_LVZU();
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function revealTempleSlip() {
+  var slip = drawTempleSlip(_templeSystemId);
+  var systemNames = {guanyin:_L('观音灵签','Guanyin Oracle'),guandi:_L('关帝灵签','Guandi Oracle'),lvzu:_L('吕祖灵签','Lüzu Oracle')};
+  var html = '<h3>' + systemNames[_templeSystemId] + '</h3>';
+  html += renderTempleSlipResult(slip);
+  if (chartData1) { html += generateFortuneAnnotation(); }
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">';
+  html += renderShareButton('temple');
+  html += '<button class="share-btn" onclick="event.stopPropagation();downloadTempleCard()" style="background:rgba(200,160,100,0.15);border:1px solid rgba(200,160,100,0.4);">📥 '+_L('下载分享卡片','Download Share Card')+'</button>';
+  html += '</div>';
+  html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">📕</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日运势推送','Daily Fortune Updates')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('关注小红书 <strong style="color:#d4b870;">LunarVeilAstro</strong> 全平台同名','Follow <strong style="color:#d4b870;">LunarVeilAstro</strong> on Xiaohongshu')+'</div></div><a href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;text-decoration:none;font-weight:bold;white-space:nowrap;">'+_L('去关注 →','Follow →')+'</a></div>';
+  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
+  _templeShaking = false;
+}
+
+function renderTempleSlipResult(slip) {
+  var r = '<div class="temple-slip-card">';
+  r += '<div class="temple-slip-glow"></div>';
+  r += '<div class="temple-slip-content">';
+
+  // 顶部：品牌 + 签号
+  r += '<div class="ts-top">';
+  r += '<span class="ts-brand">LunarVeilAstro</span>';
+  r += '<span class="ts-num">' + _L('第','#') + slip.id + _L('签','') + '</span>';
+  r += '</div>';
+
+  // 等第徽章
+  var levelClass = 'ts-level-common';
+  if (slip.level === '上上签' || slip.level === 'Supreme') levelClass = '';
+  else if (slip.level === '上签' || slip.level === 'Excellent' || slip.level === '上吉') levelClass = 'ts-level-good';
+  r += '<div class="ts-level"><span class="ts-level-badge ' + levelClass + '">' + slip.level + '</span></div>';
+
+  // 签题
+  r += '<div class="ts-title">' + slip.title + '</div>';
+
+  // 签诗 + 白话
+  r += '<div class="ts-poem-block">';
+  r += '<div class="ts-poem-text">' + slip.poem.replace(/\n/g,'<br>') + '</div>';
+  r += '<div class="ts-vernacular">' + slip.vernacular + '</div>';
+  r += '</div>';
+
+  // 7项解签
+  r += '<div class="ts-interp-section"><div class="ts-interp-grid">';
+  var cats = [
+    {key:'career',label:_L('事业','Career')},{key:'love',label:_L('姻缘','Love')},
+    {key:'wealth',label:_L('财运','Wealth')},{key:'health',label:_L('健康','Health')},
+    {key:'study',label:_L('学业','Study')},{key:'family',label:_L('家宅','Family')},
+    {key:'overall',label:_L('整体','Overall')}
+  ];
+  for (var i=0; i<cats.length; i++) {
+    r += '<div class="ts-interp-item">';
+    r += '<span class="ts-interp-label">' + cats[i].label + '</span>';
+    r += '<span class="ts-interp-text">' + (slip.interpretation[cats[i].key] || '') + '</span>';
+    r += '</div>';
+  }
+  r += '</div></div>';
+
+  // 宜忌
+  r += '<div class="ts-dos-donts">';
+  r += '<div class="ts-dos">' + slip.dos + '</div>';
+  r += '<div class="ts-donts">' + slip.donts + '</div>';
+  r += '</div>';
+
+  // 幸运指引
+  r += '<div class="ts-lucky-bar">';
+  r += _L('幸运色','Lucky Color') + '：' + slip.luckyColor + '　';
+  r += _L('幸运数','Lucky Num') + '：' + slip.luckyNum + '　';
+  r += _L('方位','Direction') + '：' + slip.luckyDir;
+  r += '</div>';
+
+  // 底部
+  r += '<div class="ts-footer">LunarVeilAstro · ' + _L('宇宙回声','Cosmic Echo') + '</div>';
+
+  r += '</div></div>';
+  return r;
+}
+
+function downloadTempleCard() {
+  var node = document.querySelector('.temple-slip-card');
+  if (!node) return;
+  if (typeof htmlToImage === 'undefined') { alert(_L('加载中，请稍后再试','Loading, please try again.')); return; }
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  htmlToImage.toPng(node, {pixelRatio:2, backgroundColor:null})
+    .then(function(dataUrl) {
+      if (isIOS) {
+        showIOSImagePreview(dataUrl);
+      } else {
+        var a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = 'LunarVeilAstro_求签_' + new Date().toISOString().slice(0,10) + '.png';
+        a.click();
+      }
+    })
+    .catch(function(e) { console.error(e); alert(_L('下载失败，请重试','Download failed, please retry.')); });
+}
+
+function showIOSImagePreview(dataUrl) {
+  var overlay = document.createElement('div');
+  overlay.className = 'ios-preview-overlay';
+  overlay.innerHTML =
+    '<div class="ios-preview-box">' +
+    '<button class="ios-preview-close" onclick="this.closest(\'.ios-preview-overlay\').remove()">✕</button>' +
+    '<img src="' + dataUrl + '" alt="' + _L('求签卡片','Temple Slip') + '" class="ios-preview-img" />' +
+    '<p class="ios-preview-hint">' + _L('长按上方图片 → 保存到相册','Long press the image → Save to Photos') + '</p>' +
+    '</div>';
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.getElementById('gameModal').appendChild(overlay);
 }
 
 // Initialize badges on load
