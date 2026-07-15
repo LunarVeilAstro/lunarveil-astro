@@ -535,10 +535,11 @@ function renderTempleSlipResult(slip) {
   if (shiyueIdx >= 0) {
     var mainLines = poemLines.slice(0, shiyueIdx).filter(function(l){ return l.trim() !== ''; });
     var verseLines = poemLines.slice(shiyueIdx + 1).filter(function(l){ return l.trim() !== ''; });
+    r += '<div class="ts-poem-label">' + poemLines[shiyueIdx].trim() + '</div>';
     r += '<div class="ts-poem-cols">';
     r += '<div class="ts-poem-col">' + mainLines.join('<br>') + '</div>';
     r += '<div class="ts-poem-sep">│</div>';
-    r += '<div class="ts-poem-col"><span class="ts-poem-label">' + poemLines[shiyueIdx].trim() + '</span><br>' + verseLines.join('<br>') + '</div>';
+    r += '<div class="ts-poem-col">' + verseLines.join('<br>') + '</div>';
     r += '</div>';
   } else {
     // 3-6行且无空行 → 左右分栏
