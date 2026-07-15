@@ -1709,7 +1709,7 @@ header .subtitle {
 .ts-interp-label { color:#c0a878; white-space:nowrap; min-width:24px; flex-shrink:0; }
 .ts-interp-text { color:#a098b8; }
 .ts-interp-overall { grid-column:2; }
-.ts-interp-dosdonts { grid-column:1; grid-row:4; }
+.ts-interp-dosdonts { grid-column:1; grid-row:4; display:block; }
 .ts-dos { color:#8ab88a; font-size:10px; margin-bottom:2px; }
 .ts-donts { color:#c09090; font-size:10px; }
 
