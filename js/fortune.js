@@ -433,7 +433,7 @@ function openTempleFortune() {
   html += '<p style="color:var(--text-dim);font-size:0.82em;margin-bottom:14px;">' + _L('选择一套灵签系统，心中默念所求之事，然后摇签','Choose an oracle, hold your question in mind, then draw.') + '</p>';
   html += '<div class="temple-system-grid">';
   var systems = [
-    {id:'guanyin',icon:'☸️',name:_L('观音灵签','Guanyin Oracle'),desc:_L('慈悲指引 · 姻缘 家庭 健康 求心安','Compassionate — love, family, health, peace of mind')},
+    {id:'guanyin',icon:'🪷',name:_L('观音灵签','Guanyin Oracle'),desc:_L('慈悲指引 · 姻缘 家庭 健康 求心安','Compassionate — love, family, health, peace of mind')},
     {id:'guandi',icon:'⚔️',name:_L('关帝灵签','Guandi Oracle'),desc:_L('刚毅决断 · 事业 财运 重大决策','Heroic — career, wealth, major decisions')},
     {id:'lvzu',icon:'☯️',name:_L('吕祖灵签','Lüzu Oracle'),desc:_L('玄妙哲理 · 学业 修行 人生方向','Taoist wisdom — study, self-cultivation, life direction')}
   ];
