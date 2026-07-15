@@ -1697,6 +1697,10 @@ header .subtitle {
 
 .ts-poem-block { text-align:center; margin:12px 0; padding:12px 8px; background:rgba(180,80,120,0.04); border-top:1px solid rgba(200,100,140,0.13); border-bottom:1px solid rgba(200,100,140,0.13); }
 .ts-poem-text { color:#e8d8c8; font-size:15px; line-height:2; letter-spacing:0.06em; font-weight:bold; }
+/* 4-line poem: left 2 lines | right 2 lines */
+.ts-poem-cols { display:flex; align-items:center; justify-content:center; gap:10px; }
+.ts-poem-col { color:#e8d8c8; font-size:15px; line-height:2; letter-spacing:0.06em; font-weight:bold; text-align:left; }
+.ts-poem-sep { color:rgba(200,160,100,0.4); font-size:18px; }
 .ts-vernacular { color:#a098b8; font-size:10.5px; line-height:1.65; margin-top:7px; text-align:left; text-indent:2em; }
 
 .ts-interp-section { margin-top:10px; }
@@ -1704,6 +1708,7 @@ header .subtitle {
 .ts-interp-item { display:flex; gap:4px; font-size:10px; line-height:1.5; }
 .ts-interp-label { color:#c0a878; white-space:nowrap; min-width:24px; flex-shrink:0; }
 .ts-interp-text { color:#a098b8; }
+.ts-interp-overall { grid-column:2; }
 
 .ts-dos-donts { margin-top:8px; font-size:10px; }
 .ts-dos { color:#8ab88a; margin-bottom:1px; }

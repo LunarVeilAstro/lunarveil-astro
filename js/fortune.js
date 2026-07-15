@@ -528,7 +528,16 @@ function renderTempleSlipResult(slip) {
 
   // 签诗 + 白话
   r += '<div class="ts-poem-block">';
-  r += '<div class="ts-poem-text">' + slip.poem.replace(/\n/g,'<br>') + '</div>';
+  var poemLines = slip.poem.split('\n');
+  if (poemLines.length === 4) {
+    r += '<div class="ts-poem-cols">';
+    r += '<div class="ts-poem-col">' + poemLines[0] + '<br>' + poemLines[1] + '</div>';
+    r += '<div class="ts-poem-sep">│</div>';
+    r += '<div class="ts-poem-col">' + poemLines[2] + '<br>' + poemLines[3] + '</div>';
+    r += '</div>';
+  } else {
+    r += '<div class="ts-poem-text">' + slip.poem.replace(/\n/g,'<br>') + '</div>';
+  }
   r += '<div class="ts-vernacular">' + slip.vernacular + '</div>';
   r += '</div>';
 
@@ -545,9 +554,7 @@ function renderTempleSlipResult(slip) {
     r += '<span class="ts-interp-text">' + (slip.interpretation[cats[i].key] || '') + '</span>';
     r += '</div>';
   }
-  // 整体占右列
-  r += '<div class="ts-interp-item"></div>';
-  r += '<div class="ts-interp-item">';
+  r += '<div class="ts-interp-item ts-interp-overall">';
   r += '<span class="ts-interp-label">' + _L('整体','Overall') + '</span>';
   r += '<span class="ts-interp-text">' + (slip.interpretation['overall'] || '') + '</span>';
   r += '</div>';
