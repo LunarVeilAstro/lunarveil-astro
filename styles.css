@@ -1739,7 +1739,21 @@ header .subtitle {
   0%,100%{opacity:0.6;} 50%{opacity:1;}
 }
 
-@media(max-width:480px) { .ts-interp-grid { grid-template-columns:1fr; } }
+@media(max-width:480px) {
+  .ts-interp-grid { grid-template-columns:1fr; }
+  .ts-interp-overall { grid-column:1; }
+  .ts-interp-dosdonts { grid-column:1; grid-row:auto; }
+  .ts-poem-cols { flex-direction:column; gap:6px; }
+  .ts-poem-sep { display:none; }
+  .ts-poem-col { text-align:center; }
+}
+
+/* ── Card reveal animation ── */
+@keyframes templeCardReveal {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.temple-slip-card { animation:templeCardReveal 0.55s ease-out; }
 
 /* RP display */
 .rp-score-circle {
