@@ -522,6 +522,7 @@ function renderTempleSlipResult(slip) {
   var levelClass = 'ts-level-common';
   if (slip.level === '上上签' || slip.level === 'Supreme') levelClass = '';
   else if (slip.level === '上签' || slip.level === 'Excellent' || slip.level === '上吉') levelClass = 'ts-level-good';
+  else if (slip.level === '下签' || slip.level === 'Challenging' || slip.level === '下下签' || slip.level === 'Difficult') levelClass = 'ts-level-warn';
   r += '<div class="ts-level"><span class="ts-level-badge ' + levelClass + '">' + slip.level + '</span></div>';
 
   // 签题
@@ -537,7 +538,7 @@ function renderTempleSlipResult(slip) {
     var mainLines = poemLines.slice(0, shiyueIdx).filter(function(l){ return l.trim() !== ''; });
     var verseLines = poemLines.slice(shiyueIdx + 1).filter(function(l){ return l.trim() !== ''; });
     r += '<div class="ts-poem-cols">';
-    r += '<div class="ts-poem-col"><span class="ts-poem-label">签文：</span><br>' + mainLines.join('<br>') + '</div>';
+    r += '<div class="ts-poem-col"><span class="ts-poem-label">' + _L('签文：','Verse') + '</span><br>' + mainLines.join('<br>') + '</div>';
     r += '<div class="ts-poem-sep">│</div>';
     r += '<div class="ts-poem-col"><span class="ts-poem-label">' + poemLines[shiyueIdx].trim() + '</span><br>' + verseLines.join('<br>') + '</div>';
     r += '</div>';

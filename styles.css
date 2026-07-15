@@ -1692,6 +1692,7 @@ header .subtitle {
 .ts-level-badge { display:inline-block; font-size:24px; font-weight:900; letter-spacing:0.18em; padding:4px 20px; border:1px solid rgba(200,160,60,0.4); border-radius:8px; color:#e8c860; background:rgba(200,160,60,0.07); white-space:nowrap; }
 .ts-level-good { color:#e0b878; background:rgba(200,160,100,0.06); border-color:rgba(200,160,100,0.3); }
 .ts-level-common { color:#b0a0b8; background:rgba(180,140,160,0.05); border-color:rgba(180,140,160,0.22); }
+.ts-level-warn { color:#c08070; background:rgba(200,120,100,0.06); border-color:rgba(200,140,120,0.25); }
 
 .ts-title { text-align:center; color:#c0a878; font-size:13px; margin:2px 0; letter-spacing:0.08em; }
 
