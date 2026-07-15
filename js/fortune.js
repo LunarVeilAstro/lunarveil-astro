@@ -424,6 +424,46 @@ function renderShareButton(gameType) {
 // ── 寺庙求签 ───────────────────────────────────────────────────────────
 var _templeSystemId = 'guanyin';
 var _templeShaking = false;
+var TEMPLE_HISTORY_KEY = 'templeSlipHistory';
+var TEMPLE_HISTORY_MAX = 5;
+
+function saveSlipToHistory(systemId, slip) {
+  var entry = { system:systemId, id:slip.id, level:slip.level, title:slip.title, ts:Date.now() };
+  var history = [];
+  try { history = JSON.parse(localStorage.getItem(TEMPLE_HISTORY_KEY)) || []; } catch(e) {}
+  history.unshift(entry);
+  if (history.length > TEMPLE_HISTORY_MAX) history.length = TEMPLE_HISTORY_MAX;
+  try { localStorage.setItem(TEMPLE_HISTORY_KEY, JSON.stringify(history)); } catch(e) {}
+}
+
+function getSlipHistory() {
+  try { return JSON.parse(localStorage.getItem(TEMPLE_HISTORY_KEY)) || []; } catch(e) { return []; }
+}
+
+function renderHistoryHTML() {
+  var history = getSlipHistory();
+  if (!history.length) return '';
+  var systemIcons = {guanyin:'🪷',guandi:'⚔️',lvzu:'☯️'};
+  var systemNames = {guanyin:_L('观音','Guanyin'),guandi:_L('关帝','Guandi'),lvzu:_L('吕祖','Lüzu')};
+  var h = '<div class="ts-history"><div class="ts-history-title">' + _L('近期求签','Recent Draws') + '</div>';
+  for (var i = 0; i < history.length; i++) {
+    var e = history[i];
+    var ago = Math.floor((Date.now() - e.ts) / 60000);
+    var agoStr = ago < 1 ? _L('刚刚','just now') : ago + _L('分钟前','m ago');
+    if (ago >= 60) { var hrs = Math.floor(ago / 60); agoStr = hrs + _L('小时前','h ago'); }
+    if (ago >= 1440) { var days = Math.floor(ago / 1440); agoStr = days + _L('天前','d ago'); }
+    h += '<div class="ts-history-item" onclick="startTempleDraw(\'' + e.system + '\')">';
+    h += '<span class="ts-hist-icon">' + (systemIcons[e.system] || '') + '</span>';
+    h += '<span class="ts-hist-system">' + (systemNames[e.system] || '') + '</span>';
+    h += '<span class="ts-hist-num">#' + e.id + '</span>';
+    h += '<span class="ts-hist-level">' + e.level + '</span>';
+    h += '<span class="ts-hist-title">' + e.title + '</span>';
+    h += '<span class="ts-hist-ago">' + agoStr + '</span>';
+    h += '</div>';
+  }
+  h += '</div>';
+  return h;
+}
 
 function openTempleFortune() {
   if (typeof TEMPLE_SLIPS_GUANYIN_ZH === 'undefined') {
@@ -446,6 +486,7 @@ function openTempleFortune() {
     html += '</div>';
   }
   html += '</div>';
+  html += renderHistoryHTML();
   showGameModal(html);
   document.getElementById('gameModal').style.background = '#16081c';
 }
@@ -492,6 +533,7 @@ function drawTempleSlip(systemId) {
 
 function revealTempleSlip() {
   var slip = drawTempleSlip(_templeSystemId);
+  saveSlipToHistory(_templeSystemId, slip);
   var systemNames = {guanyin:_L('观音灵签','Guanyin Oracle'),guandi:_L('关帝灵签','Guandi Oracle'),lvzu:_L('吕祖灵签','Lüzu Oracle')};
   var html = '<h3>' + systemNames[_templeSystemId] + '</h3>';
   html += renderTempleSlipResult(slip);
@@ -500,6 +542,7 @@ function revealTempleSlip() {
   html += renderShareButton('temple');
   html += '<button class="share-btn" onclick="event.stopPropagation();downloadTempleCard()" style="background:rgba(200,160,100,0.15);border:1px solid rgba(200,160,100,0.4);">📥 '+_L('下载分享卡片','Download Share Card')+'</button>';
   html += '<button class="share-btn" onclick="event.stopPropagation();revealTempleSlip()" style="background:rgba(180,120,160,0.12);border:1px solid rgba(200,140,180,0.3);">🔮 '+_L('再抽一支','Draw Another')+'</button>';
+  html += '<button class="share-btn" onclick="event.stopPropagation();startTempleDraw(\'' + _templeSystemId + '\')" style="background:rgba(140,160,180,0.10);border:1px solid rgba(160,180,200,0.25);">🪔 '+_L('返回签筒','Back to Tube')+'</button>';
   html += '</div>';
   html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">📕</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日运势推送','Daily Fortune Updates')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('关注小红书 <strong style="color:#d4b870;">LunarVeilAstro</strong> 全平台同名','Follow <strong style="color:#d4b870;">LunarVeilAstro</strong> on Xiaohongshu')+'</div></div><a href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;text-decoration:none;font-weight:bold;white-space:nowrap;">'+_L('去关注 →','Follow →')+'</a></div>';
   document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
@@ -594,6 +637,7 @@ function renderTempleSlipResult(slip) {
 
   // 底部
   r += '<div class="ts-footer">LunarVeilAstro · ' + _L('宇宙回声','Cosmic Echo') + '</div>';
+  r += '<div class="ts-watermark">LunarVeilAstro</div>';
 
   r += '</div></div>';
   return r;

@@ -1651,7 +1651,13 @@ header .subtitle {
     0 10px 0 -2px #1e0a1a,
     0 10px 0 0 rgba(180,140,90,0.35);
 }
+.temple-tube { animation:tubeIdle 4s ease-in-out infinite; }
 .temple-tube.shaking { animation:tubeShake 0.3s ease-in-out 3; }
+@keyframes tubeIdle {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  25% { transform:translateY(-3px) rotate(0.5deg); }
+  75% { transform:translateY(2px) rotate(-0.5deg); }
+}
 .temple-tube::before {
   /* ornate top rim — metallic gold band */
   content:''; position:absolute; top:0; left:-2px; right:-2px; height:9px;
@@ -1717,6 +1723,12 @@ header .subtitle {
 
 .ts-lucky-bar { color:rgba(200,170,130,0.5); font-size:10px; line-height:1.55; }
 .ts-footer { margin-top:8px; text-align:center; color:rgba(180,140,160,0.2); font-size:8.5px; letter-spacing:0.06em; }
+.ts-watermark {
+  position:absolute; bottom:12px; right:14px;
+  color:rgba(200,170,120,0.06); font-size:11px; font-weight:bold;
+  letter-spacing:0.15em; pointer-events:none; z-index:0;
+  transform:rotate(-6deg);
+}
 
 /* ── iOS image preview overlay ── */
 .ios-preview-overlay {
@@ -1740,6 +1752,23 @@ header .subtitle {
   0%,100%{opacity:0.6;} 50%{opacity:1;}
 }
 
+/* ── Slip history ── */
+.ts-history { margin-top:16px; padding-top:12px; border-top:1px solid rgba(200,160,100,0.12); }
+.ts-history-title { color:rgba(200,170,130,0.5); font-size:10px; letter-spacing:0.08em; margin-bottom:8px; }
+.ts-history-item {
+  display:flex; align-items:center; gap:8px; padding:7px 10px;
+  background:rgba(30,13,26,0.5); border:1px solid rgba(200,160,100,0.08);
+  border-radius:8px; margin-bottom:5px; cursor:pointer; transition:all 0.2s;
+}
+.ts-history-item:hover { border-color:rgba(200,160,100,0.25); background:rgba(42,20,50,0.5); }
+.ts-hist-icon { font-size:14px; flex-shrink:0; }
+.ts-hist-system { color:#c0a878; font-size:10px; font-weight:bold; flex-shrink:0; }
+.ts-hist-num { color:rgba(200,170,130,0.5); font-size:9px; flex-shrink:0; }
+.ts-hist-level { font-size:9px; font-weight:bold; flex-shrink:0; }
+.ts-hist-level:has(+ *) {} /* fallback */
+.ts-hist-title { color:#a098b8; font-size:9.5px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ts-hist-ago { color:rgba(180,160,200,0.35); font-size:8px; flex-shrink:0; }
+
 @media(max-width:480px) {
   .ts-interp-grid { grid-template-columns:1fr; }
   .ts-interp-overall { grid-column:1; }
@@ -1747,6 +1776,9 @@ header .subtitle {
   .ts-poem-cols { flex-direction:column; gap:6px; }
   .ts-poem-sep { display:none; }
   .ts-poem-col { text-align:center; }
+  .ts-history-item { gap:5px; padding:6px 8px; }
+  .ts-hist-system { display:none; }
+  .ts-hist-ago { display:none; }
 }
 
 /* ── Card reveal animation ── */
