@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //  CONSTANTS & HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
-function _L(cn, en) { return (window._lang && window._lang() === 'en' && en) ? en : cn; }
+function _L(cn, en) { return (window._lang && window._lang() === 'en' && en != null) ? en : cn; }
 const SIGNS = [
   "白羊座♈","金牛座♉","双子座♊","巨蟹座♋",
   "狮子座♌","处女座♍","天秤座♎","天蝎座♏",
