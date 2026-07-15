@@ -536,7 +536,7 @@ function renderTempleSlipResult(slip) {
     var mainLines = poemLines.slice(0, shiyueIdx).filter(function(l){ return l.trim() !== ''; });
     var verseLines = poemLines.slice(shiyueIdx + 1).filter(function(l){ return l.trim() !== ''; });
     r += '<div class="ts-poem-cols">';
-    r += '<div class="ts-poem-col"><span class="ts-poem-label">签文</span><br>' + mainLines.join('<br>') + '</div>';
+    r += '<div class="ts-poem-col"><span class="ts-poem-label">签文：</span><br>' + mainLines.join('<br>') + '</div>';
     r += '<div class="ts-poem-sep">│</div>';
     r += '<div class="ts-poem-col"><span class="ts-poem-label">' + poemLines[shiyueIdx].trim() + '</span><br>' + verseLines.join('<br>') + '</div>';
     r += '</div>';
