@@ -529,11 +529,17 @@ function renderTempleSlipResult(slip) {
   // 签诗 + 白话
   r += '<div class="ts-poem-block">';
   var poemLines = slip.poem.split('\n');
-  if (poemLines.length === 4) {
+  // 3-6行且无空行 → 左右分栏
+  var hasBlank = false;
+  for (var li=0; li<poemLines.length; li++) { if (poemLines[li].trim() === '') { hasBlank = true; break; } }
+  if (poemLines.length >= 3 && poemLines.length <= 6 && !hasBlank) {
+    var mid = Math.ceil(poemLines.length / 2);
+    var leftLines = poemLines.slice(0, mid).join('<br>');
+    var rightLines = poemLines.slice(mid).join('<br>');
     r += '<div class="ts-poem-cols">';
-    r += '<div class="ts-poem-col">' + poemLines[0] + '<br>' + poemLines[1] + '</div>';
+    r += '<div class="ts-poem-col">' + leftLines + '</div>';
     r += '<div class="ts-poem-sep">│</div>';
-    r += '<div class="ts-poem-col">' + poemLines[2] + '<br>' + poemLines[3] + '</div>';
+    r += '<div class="ts-poem-col">' + rightLines + '</div>';
     r += '</div>';
   } else {
     r += '<div class="ts-poem-text">' + slip.poem.replace(/\n/g,'<br>') + '</div>';
