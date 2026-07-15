@@ -541,7 +541,7 @@ function renderTempleSlipResult(slip) {
   r += '<div class="ts-vernacular">' + slip.vernacular + '</div>';
   r += '</div>';
 
-  // 7项解签
+  // 解签 + 宜忌 同格
   r += '<div class="ts-interp-section"><div class="ts-interp-grid">';
   var cats = [
     {key:'career',label:_L('事业','Career')},{key:'love',label:_L('姻缘','Love')},
@@ -554,17 +554,17 @@ function renderTempleSlipResult(slip) {
     r += '<span class="ts-interp-text">' + (slip.interpretation[cats[i].key] || '') + '</span>';
     r += '</div>';
   }
+  // 宜忌 — 左列
+  r += '<div class="ts-interp-item ts-interp-dosdonts">';
+  r += '<div class="ts-dos">' + slip.dos + '</div>';
+  r += '<div class="ts-donts">' + slip.donts + '</div>';
+  r += '</div>';
+  // 整体 — 右列
   r += '<div class="ts-interp-item ts-interp-overall">';
   r += '<span class="ts-interp-label">' + _L('整体','Overall') + '</span>';
   r += '<span class="ts-interp-text">' + (slip.interpretation['overall'] || '') + '</span>';
   r += '</div>';
   r += '</div></div>';
-
-  // 宜忌
-  r += '<div class="ts-dos-donts">';
-  r += '<div class="ts-dos">' + slip.dos + '</div>';
-  r += '<div class="ts-donts">' + slip.donts + '</div>';
-  r += '</div>';
 
   // 幸运指引
   r += '<div class="ts-lucky-bar">';

@@ -1709,10 +1709,9 @@ header .subtitle {
 .ts-interp-label { color:#c0a878; white-space:nowrap; min-width:24px; flex-shrink:0; }
 .ts-interp-text { color:#a098b8; }
 .ts-interp-overall { grid-column:2; }
-
-.ts-dos-donts { margin-top:8px; font-size:10px; }
-.ts-dos { color:#8ab88a; margin-bottom:1px; }
-.ts-donts { color:#c09090; margin-bottom:4px; }
+.ts-interp-dosdonts { grid-column:1; grid-row:4; }
+.ts-dos { color:#8ab88a; font-size:10px; margin-bottom:2px; }
+.ts-donts { color:#c09090; font-size:10px; }
 
 .ts-lucky-bar { display:flex; gap:10px; flex-wrap:wrap; color:rgba(200,170,130,0.5); font-size:9px; }
 .ts-footer { margin-top:10px; text-align:center; color:rgba(180,140,160,0.2); font-size:8.5px; letter-spacing:0.06em; }
