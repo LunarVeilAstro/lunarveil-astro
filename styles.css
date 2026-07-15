@@ -1704,10 +1704,10 @@ header .subtitle {
 .ts-vernacular { color:#a098b8; font-size:10.5px; line-height:1.65; margin-top:7px; text-align:left; text-indent:2em; }
 
 .ts-interp-section { margin-top:10px; }
-.ts-interp-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 10px; margin-top:3px; }
-.ts-interp-item { display:flex; gap:4px; font-size:10px; line-height:1.5; }
-.ts-interp-label { color:#c0a878; white-space:nowrap; min-width:24px; flex-shrink:0; }
-.ts-interp-text { color:#a098b8; }
+.ts-interp-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; margin-top:3px; }
+.ts-interp-item { font-size:10px; line-height:1.55; }
+.ts-interp-label { color:#c0a878; font-weight:bold; display:block; margin-bottom:1px; }
+.ts-interp-text { color:#a098b8; display:block; }
 .ts-interp-overall { grid-column:2; }
 .ts-interp-dosdonts { grid-column:1; grid-row:4; display:block; }
 .ts-dos { color:#8ab88a; font-size:10px; margin-bottom:2px; }
