@@ -529,20 +529,33 @@ function renderTempleSlipResult(slip) {
   // 签诗 + 白话
   r += '<div class="ts-poem-block">';
   var poemLines = slip.poem.split('\n');
-  // 3-6行且无空行 → 左右分栏
-  var hasBlank = false;
-  for (var li=0; li<poemLines.length; li++) { if (poemLines[li].trim() === '') { hasBlank = true; break; } }
-  if (poemLines.length >= 3 && poemLines.length <= 6 && !hasBlank) {
-    var mid = Math.ceil(poemLines.length / 2);
-    var leftLines = poemLines.slice(0, mid).join('<br>');
-    var rightLines = poemLines.slice(mid).join('<br>');
+  // 含"诗曰" → 签文 | 诗曰 双栏
+  var shiyueIdx = -1;
+  for (var li=0; li<poemLines.length; li++) { if (poemLines[li].indexOf('诗曰') !== -1) { shiyueIdx = li; break; } }
+  if (shiyueIdx >= 0) {
+    var mainLines = poemLines.slice(0, shiyueIdx).filter(function(l){ return l.trim() !== ''; });
+    var verseLines = poemLines.slice(shiyueIdx + 1).filter(function(l){ return l.trim() !== ''; });
     r += '<div class="ts-poem-cols">';
-    r += '<div class="ts-poem-col">' + leftLines + '</div>';
+    r += '<div class="ts-poem-col">' + mainLines.join('<br>') + '</div>';
     r += '<div class="ts-poem-sep">│</div>';
-    r += '<div class="ts-poem-col">' + rightLines + '</div>';
+    r += '<div class="ts-poem-col"><span class="ts-poem-label">' + poemLines[shiyueIdx].trim() + '</span><br>' + verseLines.join('<br>') + '</div>';
     r += '</div>';
   } else {
-    r += '<div class="ts-poem-text">' + slip.poem.replace(/\n/g,'<br>') + '</div>';
+    // 3-6行且无空行 → 左右分栏
+    var hasBlank = false;
+    for (var li2=0; li2<poemLines.length; li2++) { if (poemLines[li2].trim() === '') { hasBlank = true; break; } }
+    if (poemLines.length >= 3 && poemLines.length <= 6 && !hasBlank) {
+      var mid = Math.ceil(poemLines.length / 2);
+      var leftLines = poemLines.slice(0, mid).join('<br>');
+      var rightLines = poemLines.slice(mid).join('<br>');
+      r += '<div class="ts-poem-cols">';
+      r += '<div class="ts-poem-col">' + leftLines + '</div>';
+      r += '<div class="ts-poem-sep">│</div>';
+      r += '<div class="ts-poem-col">' + rightLines + '</div>';
+      r += '</div>';
+    } else {
+      r += '<div class="ts-poem-text">' + slip.poem.replace(/\n/g,'<br>') + '</div>';
+    }
   }
   r += '<div class="ts-vernacular">' + slip.vernacular + '</div>';
   r += '</div>';
