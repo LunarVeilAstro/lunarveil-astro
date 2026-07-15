@@ -447,6 +447,7 @@ function openTempleFortune() {
   }
   html += '</div>';
   showGameModal(html);
+  document.getElementById('gameModal').style.background = '#16081c';
 }
 
 function startTempleDraw(systemId) {
@@ -462,6 +463,7 @@ function startTempleDraw(systemId) {
   html += '<div class="temple-tube" id="templeTube" onclick="shakeTempleTube()"></div>';
   html += '<p style="color:var(--text-dim);font-size:0.78em;">' + _L('点击签筒摇签','Click the cylinder to draw') + '</p>';
   showGameModal(html);
+  document.getElementById('gameModal').style.background = '#16081c';
 }
 
 function shakeTempleTube() {
@@ -500,6 +502,7 @@ function revealTempleSlip() {
   html += '</div>';
   html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">📕</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日运势推送','Daily Fortune Updates')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('关注小红书 <strong style="color:#d4b870;">LunarVeilAstro</strong> 全平台同名','Follow <strong style="color:#d4b870;">LunarVeilAstro</strong> on Xiaohongshu')+'</div></div><a href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;text-decoration:none;font-weight:bold;white-space:nowrap;">'+_L('去关注 →','Follow →')+'</a></div>';
   document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
+  document.getElementById('gameModal').style.background = '#16081c';
   _templeShaking = false;
 }
 
@@ -570,7 +573,7 @@ function downloadTempleCard() {
   if (!node) return;
   if (typeof htmlToImage === 'undefined') { alert(_L('加载中，请稍后再试','Loading, please try again.')); return; }
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  htmlToImage.toPng(node, {pixelRatio:2, backgroundColor:null})
+  htmlToImage.toPng(node, {pixelRatio:2, backgroundColor:'#1e0d1a'})
     .then(function(dataUrl) {
       if (isIOS) {
         showIOSImagePreview(dataUrl);
