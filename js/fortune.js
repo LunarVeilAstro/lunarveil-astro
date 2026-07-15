@@ -537,8 +537,7 @@ function renderTempleSlipResult(slip) {
   var cats = [
     {key:'career',label:_L('事业','Career')},{key:'love',label:_L('姻缘','Love')},
     {key:'wealth',label:_L('财运','Wealth')},{key:'health',label:_L('健康','Health')},
-    {key:'study',label:_L('学业','Study')},{key:'family',label:_L('家宅','Family')},
-    {key:'overall',label:_L('整体','Overall')}
+    {key:'study',label:_L('学业','Study')},{key:'family',label:_L('家宅','Family')}
   ];
   for (var i=0; i<cats.length; i++) {
     r += '<div class="ts-interp-item">';
@@ -546,6 +545,12 @@ function renderTempleSlipResult(slip) {
     r += '<span class="ts-interp-text">' + (slip.interpretation[cats[i].key] || '') + '</span>';
     r += '</div>';
   }
+  // 整体占右列
+  r += '<div class="ts-interp-item"></div>';
+  r += '<div class="ts-interp-item">';
+  r += '<span class="ts-interp-label">' + _L('整体','Overall') + '</span>';
+  r += '<span class="ts-interp-text">' + (slip.interpretation['overall'] || '') + '</span>';
+  r += '</div>';
   r += '</div></div>';
 
   // 宜忌
