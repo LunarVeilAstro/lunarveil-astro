@@ -148,6 +148,7 @@
   add('lodge.badge.drawn', '今日已抽', 'Drawn Today');
   add('lodge.badge.extra', '还可抽', 'More');
   add('lodge.badge.rpAvailable', '今日可查', 'Available');
+  add('lodge.badge.templeAvailable', '今日可求', 'Draw Today');
   add('lodge.chartHint', '✨ 福运方位、每日一签、今日人品会结合你的星盘给出专属结果<br>先算星盘，解读更准', '✨ Fortune Direction, Daily Fortune & Daily RP sync with your birth chart<br>— get your chart calculated first for personalized results');
   add('lodge.chartHintLinked', '✨ 已关联你的星盘<br>以下福运方位、每日一签、今日人品将基于你的本命盘给出专属解读', '✨ Linked to your birth chart<br>— Fortune Direction, Daily Fortune & Daily RP are now personalized to you');
 
