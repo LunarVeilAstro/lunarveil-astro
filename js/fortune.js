@@ -558,6 +558,11 @@ function renderTempleSlipResult(slip) {
   r += '<div class="ts-interp-item ts-interp-dosdonts">';
   r += '<div class="ts-dos">' + slip.dos + '</div>';
   r += '<div class="ts-donts">' + slip.donts + '</div>';
+  r += '<div class="ts-lucky-bar">';
+  r += _L('幸运色','Lucky Color') + '：' + slip.luckyColor + '　';
+  r += _L('幸运数','Lucky Num') + '：' + slip.luckyNum + '　';
+  r += _L('方位','Direction') + '：' + slip.luckyDir;
+  r += '</div>';
   r += '</div>';
   // 整体 — 右列
   r += '<div class="ts-interp-item ts-interp-overall">';
@@ -565,13 +570,6 @@ function renderTempleSlipResult(slip) {
   r += '<span class="ts-interp-text">' + (slip.interpretation['overall'] || '') + '</span>';
   r += '</div>';
   r += '</div></div>';
-
-  // 幸运指引
-  r += '<div class="ts-lucky-bar">';
-  r += _L('幸运色','Lucky Color') + '：' + slip.luckyColor + '　';
-  r += _L('幸运数','Lucky Num') + '：' + slip.luckyNum + '　';
-  r += _L('方位','Direction') + '：' + slip.luckyDir;
-  r += '</div>';
 
   // 底部
   r += '<div class="ts-footer">LunarVeilAstro · ' + _L('宇宙回声','Cosmic Echo') + '</div>';
