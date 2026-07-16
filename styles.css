@@ -1768,6 +1768,14 @@ header .subtitle {
 /* Temple fortune UI helpers */
 .temple-instruction { color: var(--text-dim); font-size: 0.82em; margin-bottom: 14px; }
 .temple-tube-hint { color: var(--text-dim); font-size: 0.78em; }
+.temple-loading { text-align: center; padding: 48px 0; }
+.temple-loading-spinner {
+  width: 36px; height: 36px; margin: 0 auto 16px;
+  border: 3px solid rgba(200,160,120,0.15); border-top-color: #d4b870;
+  border-radius: 50%; animation: templeSpin 0.8s linear infinite;
+}
+@keyframes templeSpin { to { transform: rotate(360deg); } }
+.temple-loading-text { color: #b0a8c0; font-size: 0.88em; }
 .temple-btn-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .temple-btn-download { background: rgba(200,160,100,0.15); border: 1px solid rgba(200,160,100,0.4); }
 .temple-btn-back { background: rgba(140,160,180,0.10); border: 1px solid rgba(160,180,200,0.25); }

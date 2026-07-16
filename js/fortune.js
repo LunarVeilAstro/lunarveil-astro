@@ -458,14 +458,20 @@ function openTempleFortune() {
 }
 
 function startTempleDraw(systemId) {
+  _templeSystemId = systemId;
+  var systemNames = {guanyin:_L('观音灵签','Guanyin Oracle'),guandi:_L('关帝灵签','Guandi Oracle'),lvzu:_L('吕祖灵签','Lüzu Oracle')};
+  var loadingHtml = '<h3>' + systemNames[systemId] + '</h3>';
+  loadingHtml += '<div class="temple-loading"><div class="temple-loading-spinner"></div><p class="temple-loading-text">' + _L('签文加载中…','Loading oracle slips…') + '</p></div>';
+  showGameModal(loadingHtml);
+  document.getElementById('gameModal').style.background = '#16081c';
   loadTempleData(systemId, function() {
+    if (!_gameModalShown()) return;
     _startTempleDraw(systemId);
   });
 }
 
 function _startTempleDraw(systemId) {
   var systemNames = {guanyin:_L('观音灵签','Guanyin Oracle'),guandi:_L('关帝灵签','Guandi Oracle'),lvzu:_L('吕祖灵签','Lüzu Oracle')};
-  _templeSystemId = systemId;
   _templeShaking = false;
   var html = '<h3>' + systemNames[systemId] + '</h3>';
   html += '<p class="temple-instruction">' + _L('心中默念所求之事，点击签筒求签','Hold your question in mind, then click the cylinder to draw.') + '</p>';
