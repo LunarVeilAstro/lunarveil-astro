@@ -1770,12 +1770,6 @@ header .subtitle {
 .ts-hist-ago { color:rgba(180,160,200,0.35); font-size:8px; flex-shrink:0; }
 
 @media(max-width:480px) {
-  .ts-interp-grid { grid-template-columns:1fr; }
-  .ts-interp-overall { grid-column:1; }
-  .ts-interp-dosdonts { grid-column:1; grid-row:auto; }
-  .ts-poem-cols { flex-direction:column; gap:6px; }
-  .ts-poem-sep { display:none; }
-  .ts-poem-col { text-align:center; }
   .ts-history-item { gap:5px; padding:6px 8px; }
   .ts-hist-system { display:none; }
   .ts-hist-ago { display:none; }
