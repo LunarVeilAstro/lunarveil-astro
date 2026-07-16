@@ -1560,31 +1560,6 @@ header .subtitle {
 }
 .game-close:hover { color: var(--accent); }
 
-/* Fortune slip */
-.fortune-tube {
-  width: 60px; height: 180px; margin: 0 auto 20px;
-  background: linear-gradient(180deg, #2a1530, #1a0d20, #2a1530);
-  border: 2px solid var(--gold-dim); border-radius: 10px;
-  position: relative; overflow: hidden;
-  cursor: pointer;
-}
-.fortune-tube.shaking { animation: tubeShake 0.3s ease-in-out 3; }
-.fortune-tube::after {
-  content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-  width: 8px; height: 80px; background: linear-gradient(180deg, #f5e6c8, #c9a96e);
-  border-radius: 4px;
-}
-.fortune-slip {
-  background: linear-gradient(135deg, #faf3e0, #f0e4c8);
-  border: 1px solid #c9a96e; border-radius: 6px;
-  padding: 20px 16px; margin: 16px 0; color: #3a2a10;
-  font-family: 'Cormorant Garamond', 'Ma Shan Zheng', 'STKaiti', serif;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-.fortune-slip .slip-level { font-size: 1.6em; font-weight: bold; letter-spacing: 0.15em; }
-.fortune-slip .slip-poem { font-size: 1em; margin: 12px 0; line-height: 1.8; letter-spacing: 0.06em; }
-.fortune-slip .slip-dos { color: #5a8a5a; font-size: 0.85em; margin-top: 8px; }
-.fortune-slip .slip-donts { color: #a04040; font-size: 0.85em; margin-top: 4px; }
 @keyframes cardBreath { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 @keyframes tubeShake {
   0%, 100% { transform: rotate(0); }
@@ -1781,6 +1756,37 @@ header .subtitle {
   to   { opacity:1; transform:translateY(0); }
 }
 .temple-slip-card { animation:templeCardReveal 0.55s ease-out; }
+
+/* Fortune annotation (shared: temple + daily fortune) */
+.fortune-annotation {
+  margin-top: 12px; padding: 10px 14px;
+  background: rgba(201,169,110,0.08); border-left: 3px solid var(--gold);
+  border-radius: 4px; font-size: 0.82em; color: var(--accent);
+  line-height: 1.6; text-align: left; text-indent: 2em;
+}
+
+/* Temple fortune UI helpers */
+.temple-instruction { color: var(--text-dim); font-size: 0.82em; margin-bottom: 14px; }
+.temple-tube-hint { color: var(--text-dim); font-size: 0.78em; }
+.temple-btn-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.temple-btn-download { background: rgba(200,160,100,0.15); border: 1px solid rgba(200,160,100,0.4); }
+.temple-btn-back { background: rgba(140,160,180,0.10); border: 1px solid rgba(160,180,200,0.25); }
+.temple-promo {
+  margin-top: 18px; padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(200,160,120,0.12), rgba(180,140,90,0.04));
+  border: 1px solid rgba(200,160,100,0.3); border-radius: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.temple-promo-icon { font-size: 2em; }
+.temple-promo-body { flex: 1; }
+.temple-promo-title { color: #d4b870; font-size: 0.85em; font-weight: bold; letter-spacing: 0.05em; }
+.temple-promo-desc { color: #b0a8c0; font-size: 0.75em; margin-top: 2px; }
+.temple-promo-desc strong { color: #d4b870; }
+.temple-promo-btn {
+  background: rgba(200,160,100,0.18); border: 1px solid rgba(200,160,100,0.4);
+  border-radius: 18px; padding: 8px 16px; color: #d4b870;
+  font-size: 0.78em; cursor: pointer; text-decoration: none; font-weight: bold; white-space: nowrap;
+}
 
 /* RP display */
 .rp-score-circle {
@@ -2340,3 +2346,41 @@ header .subtitle {
 #skyPlanetTable td.skyretro { color: #d4906a; font-size: 0.85em; }
 #skyAspectList { font-size: 0.85em; line-height: 2.1; color: #b8aecb; }
 .skyorb { color: var(--text-dim); font-size: 0.85em; }
+
+/* ── Accessibility: focus indicators ── */
+.lodge-item:focus-visible,
+.temple-system-card:focus-visible,
+.ts-history-item:focus-visible {
+  outline: 2px solid rgba(200,160,100,0.6);
+  outline-offset: 2px;
+}
+.temple-tube:focus-visible {
+  outline: 2px solid rgba(200,160,100,0.6);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+/* ── First-visit onboarding toast ── */
+.onboard-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 8000; max-width: 420px; width: calc(100% - 32px);
+  background: linear-gradient(160deg, #1a1028, #140a1c);
+  border: 1px solid rgba(200,160,100,0.3); border-radius: 14px;
+  padding: 18px 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(120,80,160,0.08);
+  animation: onboardIn 0.5s ease-out;
+  font-size: 0.88em; color: #c8bfd8; line-height: 1.55;
+}
+.onboard-toast.hiding { animation: onboardOut 0.35s ease-in forwards; }
+.onboard-title { color: #d4b870; font-size: 1.05em; font-weight: bold; letter-spacing: 0.04em; margin-bottom: 6px; }
+.onboard-desc { color: #a098b8; font-size: 0.88em; margin-bottom: 12px; }
+.onboard-steps { font-size: 0.82em; color: #8880a8; margin-bottom: 14px; line-height: 1.75; }
+.onboard-steps span { color: rgba(200,170,130,0.5); margin-right: 4px; }
+.onboard-close {
+  background: rgba(200,160,100,0.12); border: 1px solid rgba(200,160,100,0.25);
+  border-radius: 20px; padding: 7px 20px; color: #d4b870;
+  font-size: 0.82em; cursor: pointer; letter-spacing: 0.05em;
+  transition: all 0.2s;
+}
+.onboard-close:hover { background: rgba(200,160,100,0.22); border-color: rgba(200,160,100,0.45); }
+@keyframes onboardIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes onboardOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(20px); } }

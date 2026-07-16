@@ -618,7 +618,7 @@ function revealTarotCard(idx) {
   html += '<p style="color:var(--text-dim);font-size:0.75em;margin-top:12px;">' + _t('tarot.cardHint') + '</p>';
   html += '<button class="share-btn" onclick="openSingleTarot()">' + _t('singletarot.drawAgain') + '</button>';
 
-  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
+  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()" aria-label="' + _L('关闭','Close') + '">✕</button>' + html;
 }
 
 // ═══ 合盘塔罗 — Relationship Overlay Data ════════════════════════════════════

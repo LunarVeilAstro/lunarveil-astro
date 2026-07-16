@@ -1,0 +1,30 @@
+{
+  "name": "LunarVeilAstro · 星盘解读 & 灵性驿站",
+  "short_name": "LunarVeilAstro",
+  "description": "免费在线星盘解读 — 本命盘·运势·合盘·塔罗·求签。Free online astrology chart readings & spiritual divination.",
+  "start_url": "/lunarveil-astro/",
+  "scope": "/lunarveil-astro/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d0d24",
+  "theme_color": "#1a0d20",
+  "icons": [
+    {
+      "src": "img/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "img/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "img/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "lang": "zh-CN",
+  "dir": "ltr"
+}

@@ -144,8 +144,8 @@ function generateFortuneAnnotation() {
   const hName = getHouseName(house);
 
   return (isEn
-    ? '<div class="fortune-annotation" style="margin-top:12px;padding:10px 14px;background:rgba(201,169,110,0.08);border-left:3px solid var(--gold);border-radius:4px;font-size:0.82em;color:var(--accent);line-height:1.6;text-align:left;text-indent:2em;">✨ Chart-Specific Insight: Transiting ' + transitName + ' is forming a ' + aspectName + ' with your ' + insight.nt.nameEN + ' — this fortune slip applies especially to your ' + hName + '. ' + sunSign + ', today is for quiet inner reflection — follow the stars\' guidance.</div>'
-    : '<div class="fortune-annotation" style="margin-top:12px;padding:10px 14px;background:rgba(201,169,110,0.08);border-left:3px solid var(--gold);border-radius:4px;font-size:0.82em;color:var(--accent);line-height:1.6;text-align:left;text-indent:2em;">✨ 星盘专属解读：行运' + transitName + '正' + insight.aspectName + '你的' + insight.nt.name + '——这张签文对你的' + hName + '尤其适用。' + sunSign + '今日宜静心内观，跟随星辰指引。</div>');
+    ? '<div class="fortune-annotation">✨ Chart-Specific Insight: Transiting ' + transitName + ' is forming a ' + aspectName + ' with your ' + insight.nt.nameEN + ' — this fortune slip applies especially to your ' + hName + '. ' + sunSign + ', today is for quiet inner reflection — follow the stars\' guidance.</div>'
+    : '<div class="fortune-annotation">✨ 星盘专属解读：行运' + transitName + '正' + insight.aspectName + '你的' + insight.nt.name + '——这张签文对你的' + hName + '尤其适用。' + sunSign + '今日宜静心内观，跟随星辰指引。</div>');
 }
 
 // ── Badge update ──────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ function updateLodgeBadges() {
 
 // ── Game modal helper ─────────────────────────────────────────────────
 function showGameModal(html) {
-  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
+  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()" aria-label="' + _L('关闭','Close') + '">✕</button>' + html;
   document.getElementById('gameOverlay').classList.add('show');
 }
 function closeGameModal() {
@@ -176,77 +176,6 @@ function closeGameModal() {
 function _gameModalShown() {
   var ov = document.getElementById('gameOverlay');
   return !!(ov && ov.classList.contains('show'));
-}
-
-// ── 每日一签 ─────────────────────────────────────────────────────────
-function drawFortuneSlip() {
-  // Always draw from ZH base for consistent index across languages
-  const weights = {上上签:5, 上签:10, 中签:15, 下签:10, 下下签:5};
-  const pool = [];
-  for (let i=0; i<FORTUNE_SLIPS_ZH.length; i++) {
-    for (let j=0; j<(weights[FORTUNE_SLIPS_ZH[i].lv]||1); j++) pool.push(i);
-  }
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
-function openDailyFortune() {
-  // 每次打开都出签筒、摇一摇都是新签（无每日限制）。
-  // 签筒无需 data.js，立即渲染（默认静止）；data.js 后台预载，供点击摇签时用。
-  if (typeof FORTUNE_SLIPS_ZH === 'undefined') loadScript(DATA_JS).catch(function(){});
-  _fortuneShaking = false;
-  let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
-  html += '<div class="fortune-tube" id="fortuneTube" onclick="shakeFortune()"></div>';
-  html += '<p style="color:var(--text-dim);font-size:0.82em;">' + _t('fortune.drawHint') + '</p>';
-  showGameModal(html);
-}
-
-var _fortuneShaking = false;
-// 点击签筒：先摇 3 下（CSS 动画），摇完再抽签出结果
-function shakeFortune() {
-  if (_fortuneShaking) return;
-  // 抽签需要 data.js，没载完先载再来
-  if (typeof FORTUNE_SLIPS_ZH === 'undefined') {
-    loadScript(DATA_JS).then(shakeFortune).catch(function(e){ console.error('data.js load error:', e); alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.')); });
-    return;
-  }
-  _fortuneShaking = true;
-  var tube = document.getElementById('fortuneTube');
-  if (!tube) { revealFortune(); return; }
-  tube.classList.add('shaking');
-  var done = false;
-  var finish = function() { if (done) return; done = true; if (!_gameModalShown()) { _fortuneShaking = false; return; } revealFortune(); };
-  tube.addEventListener('animationend', finish, { once: true });
-  setTimeout(finish, 1100);   // 兜底：animationend 未触发也出签（3 下约 0.9s）
-}
-
-function revealFortune() {
-  // 快速点击时 data.js 可能还没载完——载完再抽（签筒继续显示、动画照旧）
-  if (typeof FORTUNE_SLIPS_ZH === 'undefined') {
-    loadScript(DATA_JS).then(revealFortune).catch(function(e){ console.error('data.js load error:', e); alert(_L('模块加载失败，请刷新页面后重试。','Module loading failed. Please refresh and try again.')); });
-    return;
-  }
-  const slipIdx = drawFortuneSlip();
-
-  let html = '<h3>' + _t('lodge.dailyFortune') + '</h3>';
-  html += renderFortuneResult(slipIdx);
-  if (chartData1) {
-    html += generateFortuneAnnotation();
-  }
-  html += renderShareButton('fortune');
-  html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">📕</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日运势推送','Daily Fortune Updates')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('关注小红书 <strong style="color:#d4b870;">LunarVeilAstro</strong> 全平台同名','Follow <strong style="color:#d4b870;">LunarVeilAstro</strong> on Xiaohongshu')+'</div></div><a href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;text-decoration:none;font-weight:bold;white-space:nowrap;">'+_L('去关注 →','Follow →')+'</a></div>';
-  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
-}
-
-function renderFortuneResult(slipIdx) {
-  const slips = FORTUNE_SLIPS();
-  const slip = slips[slipIdx % slips.length];
-  let r = '<div class="fortune-slip">';
-  r += '<div class="slip-level">' + slip.lv + '</div>';
-  r += '<div class="slip-poem" style="white-space:pre-line;">' + slip.poem + '</div>';
-  r += '<div class="slip-dos">' + slip.dos + '</div>';
-  r += '<div class="slip-donts">' + slip.donts + '</div>';
-  r += '</div>';
-  return r;
 }
 
 // ── 今日人品 ─────────────────────────────────────────────────────────
@@ -426,6 +355,41 @@ var _templeSystemId = 'guanyin';
 var _templeShaking = false;
 var TEMPLE_HISTORY_KEY = 'templeSlipHistory';
 var TEMPLE_HISTORY_MAX = 5;
+var TEMPLE_DATA_FILES = {
+  guanyin: 'js/data-guanyin.js?v=20260712',
+  guandi: 'js/data-guandi.js?v=20260712',
+  lvzu: 'js/data-lvzu.js?v=20260712'
+};
+var _templeDataLoaded = {};
+var _templeDataQueue = {};
+
+function _hasTempleData(systemId) {
+  if (systemId === 'guanyin') return typeof TEMPLE_SLIPS_GUANYIN_ZH !== 'undefined';
+  if (systemId === 'guandi') return typeof TEMPLE_SLIPS_GUANDI_ZH !== 'undefined';
+  if (systemId === 'lvzu') return typeof TEMPLE_SLIPS_LVZU_ZH !== 'undefined';
+  return false;
+}
+
+function loadTempleData(systemId, callback) {
+  if (_hasTempleData(systemId)) { callback(); return; }
+  if (_templeDataLoaded[systemId] === 'loading') {
+    if (!_templeDataQueue[systemId]) _templeDataQueue[systemId] = [];
+    _templeDataQueue[systemId].push(callback);
+    return;
+  }
+  _templeDataLoaded[systemId] = 'loading';
+  loadScript(TEMPLE_DATA_FILES[systemId]).then(function() {
+    _templeDataLoaded[systemId] = 'loaded';
+    callback();
+    var q = _templeDataQueue[systemId];
+    if (q) { _templeDataQueue[systemId] = null; for (var i = 0; i < q.length; i++) q[i](); }
+  }).catch(function(e) {
+    _templeDataLoaded[systemId] = '';
+    _templeDataQueue[systemId] = null;
+    console.error('Failed to load temple data:', systemId, e);
+    alert(_L('签文数据加载失败，请刷新页面后重试','Oracle data failed to load. Please refresh and try again.'));
+  });
+}
 
 function saveSlipToHistory(systemId, slip) {
   var entry = { system:systemId, id:slip.id, level:slip.level, title:slip.title, ts:Date.now() };
@@ -452,7 +416,7 @@ function renderHistoryHTML() {
     var agoStr = ago < 1 ? _L('刚刚','just now') : ago + _L('分钟前','m ago');
     if (ago >= 60) { var hrs = Math.floor(ago / 60); agoStr = hrs + _L('小时前','h ago'); }
     if (ago >= 1440) { var days = Math.floor(ago / 1440); agoStr = days + _L('天前','d ago'); }
-    h += '<div class="ts-history-item" onclick="startTempleDraw(\'' + e.system + '\')">';
+    h += '<div class="ts-history-item" role="button" tabindex="0" onclick="startTempleDraw(\'' + e.system + '\')">';
     h += '<span class="ts-hist-icon">' + (systemIcons[e.system] || '') + '</span>';
     h += '<span class="ts-hist-system">' + (systemNames[e.system] || '') + '</span>';
     h += '<span class="ts-hist-num">#' + e.id + '</span>';
@@ -466,11 +430,13 @@ function renderHistoryHTML() {
 }
 
 function openTempleFortune() {
-  if (typeof TEMPLE_SLIPS_GUANYIN_ZH === 'undefined') {
+  // Ensure core data.js is loaded (accessor functions) + preload Guanyin
+  if (typeof TEMPLE_SLIPS_GUANYIN === 'undefined') {
     loadScript(DATA_JS).catch(function(){});
   }
+  loadTempleData('guanyin', function(){});
   var html = '<h3>' + _t('lodge.templeFortune') + '</h3>';
-  html += '<p style="color:var(--text-dim);font-size:0.82em;margin-bottom:14px;">' + _L('选择一套灵签系统，心中默念所求之事，然后摇签','Choose an oracle, hold your question in mind, then draw.') + '</p>';
+  html += '<p class="temple-instruction">' + _L('选择一套灵签系统，心中默念所求之事，然后摇签','Choose an oracle, hold your question in mind, then draw.') + '</p>';
   html += '<div class="temple-system-grid">';
   var systems = [
     {id:'guanyin',icon:'🪷',name:_L('观音灵签','Guanyin Oracle'),desc:_L('慈悲指引 · 姻缘 家庭 健康 求心安','Compassionate — love, family, health, peace of mind')},
@@ -479,7 +445,7 @@ function openTempleFortune() {
   ];
   for (var i=0; i<systems.length; i++) {
     var s = systems[i];
-    html += '<div class="temple-system-card" onclick="startTempleDraw(\'' + s.id + '\')">';
+    html += '<div class="temple-system-card" role="button" tabindex="0" onclick="startTempleDraw(\'' + s.id + '\')">';
     html += '<div class="temple-system-icon">' + s.icon + '</div>';
     html += '<div><div class="temple-system-name">' + s.name + '</div>';
     html += '<div class="temple-system-desc">' + s.desc + '</div></div>';
@@ -492,27 +458,31 @@ function openTempleFortune() {
 }
 
 function startTempleDraw(systemId) {
-  if (typeof TEMPLE_SLIPS_GUANYIN_ZH === 'undefined') {
-    loadScript(DATA_JS).then(function(){ startTempleDraw(systemId); }).catch(function(e){ console.error(e); });
-    return;
-  }
+  loadTempleData(systemId, function() {
+    _startTempleDraw(systemId);
+  });
+}
+
+function _startTempleDraw(systemId) {
   var systemNames = {guanyin:_L('观音灵签','Guanyin Oracle'),guandi:_L('关帝灵签','Guandi Oracle'),lvzu:_L('吕祖灵签','Lüzu Oracle')};
   _templeSystemId = systemId;
   _templeShaking = false;
   var html = '<h3>' + systemNames[systemId] + '</h3>';
-  html += '<p style="color:var(--text-dim);font-size:0.82em;margin-bottom:14px;">' + _L('心中默念所求之事，点击签筒求签','Hold your question in mind, then click the cylinder to draw.') + '</p>';
-  html += '<div class="temple-tube" id="templeTube" onclick="shakeTempleTube()"></div>';
-  html += '<p style="color:var(--text-dim);font-size:0.78em;">' + _L('点击签筒摇签','Click the cylinder to draw') + '</p>';
+  html += '<p class="temple-instruction">' + _L('心中默念所求之事，点击签筒求签','Hold your question in mind, then click the cylinder to draw.') + '</p>';
+  html += '<div class="temple-tube" id="templeTube" role="button" tabindex="0" aria-label="' + _L('点击摇签','Click to draw a slip') + '" onclick="shakeTempleTube()"></div>';
+  html += '<p class="temple-tube-hint">' + _L('点击签筒摇签','Click the cylinder to draw') + '</p>';
   showGameModal(html);
   document.getElementById('gameModal').style.background = '#16081c';
 }
 
 function shakeTempleTube() {
   if (_templeShaking) return;
-  if (typeof TEMPLE_SLIPS_GUANYIN_ZH === 'undefined') {
-    loadScript(DATA_JS).then(shakeTempleTube).catch(function(e){ console.error(e); });
-    return;
-  }
+  loadTempleData(_templeSystemId, function() {
+    _shakeTempleTube();
+  });
+}
+
+function _shakeTempleTube() {
   _templeShaking = true;
   var tube = document.getElementById('templeTube');
   if (!tube) { revealTempleSlip(); return; }
@@ -528,23 +498,29 @@ function drawTempleSlip(systemId) {
   if (systemId === 'guanyin') pool = TEMPLE_SLIPS_GUANYIN();
   else if (systemId === 'guandi') pool = TEMPLE_SLIPS_GUANDI();
   else pool = TEMPLE_SLIPS_LVZU();
+  if (!pool || !pool.length) return null;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function revealTempleSlip() {
   var slip = drawTempleSlip(_templeSystemId);
+  if (!slip) {
+    _templeShaking = false;
+    alert(_L('签文加载中，请稍后再试','Oracle is loading, please try again.'));
+    return;
+  }
   saveSlipToHistory(_templeSystemId, slip);
   var systemNames = {guanyin:_L('观音灵签','Guanyin Oracle'),guandi:_L('关帝灵签','Guandi Oracle'),lvzu:_L('吕祖灵签','Lüzu Oracle')};
   var html = '<h3>' + systemNames[_templeSystemId] + '</h3>';
   html += renderTempleSlipResult(slip);
   if (chartData1) { html += generateFortuneAnnotation(); }
-  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">';
+  html += '<div class="temple-btn-row">';
   html += renderShareButton('temple');
-  html += '<button class="share-btn" onclick="event.stopPropagation();downloadTempleCard()" style="background:rgba(200,160,100,0.15);border:1px solid rgba(200,160,100,0.4);">📥 '+_L('下载分享卡片','Download Share Card')+'</button>';
-  html += '<button class="share-btn" onclick="event.stopPropagation();startTempleDraw(\'' + _templeSystemId + '\')" style="background:rgba(140,160,180,0.10);border:1px solid rgba(160,180,200,0.25);">🪔 '+_L('返回签筒','Back to Tube')+'</button>';
+  html += '<button class="share-btn temple-btn-download" onclick="event.stopPropagation();downloadTempleCard()">📥 '+_L('下载分享卡片','Download Share Card')+'</button>';
+  html += '<button class="share-btn temple-btn-back" onclick="event.stopPropagation();startTempleDraw(\'' + _templeSystemId + '\')">🪔 '+_L('返回签筒','Back to Tube')+'</button>';
   html += '</div>';
-  html += '<div style="margin-top:18px;padding:14px 18px;background:linear-gradient(135deg,rgba(200,160,120,0.12),rgba(180,140,90,0.04));border:1px solid rgba(200,160,100,0.3);border-radius:12px;display:flex;align-items:center;gap:12px;"><span style="font-size:2em;">📕</span><div style="flex:1;"><div style="color:#d4b870;font-size:0.85em;font-weight:bold;letter-spacing:0.05em;">'+_L('每日运势推送','Daily Fortune Updates')+'</div><div style="color:#b0a8c0;font-size:0.75em;margin-top:2px;">'+_L('关注小红书 <strong style="color:#d4b870;">LunarVeilAstro</strong> 全平台同名','Follow <strong style="color:#d4b870;">LunarVeilAstro</strong> on Xiaohongshu')+'</div></div><a href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" style="background:rgba(200,160,100,0.18);border:1px solid rgba(200,160,100,0.4);border-radius:18px;padding:8px 16px;color:#d4b870;font-size:0.78em;cursor:pointer;text-decoration:none;font-weight:bold;white-space:nowrap;">'+_L('去关注 →','Follow →')+'</a></div>';
-  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()">✕</button>' + html;
+  html += '<div class="temple-promo"><span class="temple-promo-icon">📕</span><div class="temple-promo-body"><div class="temple-promo-title">'+_L('每日运势推送','Daily Fortune Updates')+'</div><div class="temple-promo-desc">'+_L('关注小红书 <strong>LunarVeilAstro</strong> 全平台同名','Follow <strong>LunarVeilAstro</strong> on Xiaohongshu')+'</div></div><a href="https://www.xiaohongshu.com/user/LunarVeilAstro" target="_blank" rel="noopener" class="temple-promo-btn">'+_L('去关注 →','Follow →')+'</a></div>';
+  document.getElementById('gameModal').innerHTML = '<button class="game-close" onclick="closeGameModal()" aria-label="' + _L('关闭','Close') + '">✕</button>' + html;
   document.getElementById('gameModal').style.background = '#16081c';
   _templeShaking = false;
 }

@@ -4,12 +4,10 @@
 <meta charset="UTF-8">
 <script>var s=localStorage.getItem('lang');if(s&&s.startsWith('en'))document.documentElement.lang='en';</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
 <title>LunarVeilAstro · 星盘解读 | Natal Chart · Transit · Synastry</title>
 <meta name="description" content="LunarVeilAstro 免费在线星盘解读 — 本命星盘分析、五年运势预测、合盘缘分解读、塔罗占卜、职业天赋诊断。输入出生信息即可获取专属报告。Free online astrology chart readings.">
 <meta name="keywords" content="LunarVeilAstro,星盘解读,本命星盘,运势预测,合盘分析,塔罗占卜,星座,星盘,占星,命运之轮,在线星盘,astrology,birth chart,natal chart,horoscope,tarot,synastry">
@@ -112,7 +110,7 @@
     <p class="lodge-scroll-hint" style="text-align:center;" data-i18n="hint.scrollLodge">如模块显示不全，上下滑动页面即可完整加载</p>
 
     <!-- 福运方位 · 主打横幅 -->
-    <div class="lodge-banner" onclick="openFortuneDirection()" id="fortuneDirBanner">
+    <div class="lodge-banner" role="button" tabindex="0" onclick="openFortuneDirection()" id="fortuneDirBanner">
       <div class="lodge-banner-icon">🧭</div>
       <div class="lodge-banner-text">
         <div class="lodge-banner-title" data-i18n="lodge.bannerTitle">福运方位 · 罗盘指路</div>
@@ -123,34 +121,34 @@
 
     <div class="lodge-grid">
       <!-- Row 1: 答案之书, 魔法八球, 单张塔罗, 星座速配 -->
-      <div class="lodge-item" onclick="openAnswerBook()">
+      <div class="lodge-item" role="button" tabindex="0" onclick="openAnswerBook()">
         <div class="lodge-icon">📖</div>
         <div class="lodge-name" data-i18n="lodge.answerBook">答案之书</div>
         <div class="lodge-desc" data-i18n="lodge.answerBookDesc">默念问题，翻开一页寻找答案</div>
       </div>
-      <div class="lodge-item" onclick="openMagicBall()">
+      <div class="lodge-item" role="button" tabindex="0" onclick="openMagicBall()">
         <div class="lodge-icon">🔮</div>
         <div class="lodge-name" data-i18n="lodge.magic8">魔法八球</div>
         <div class="lodge-desc" data-i18n="lodge.magic8Desc">问一个是/否问题，让命运回答</div>
       </div>
-      <div class="lodge-item" onclick="openSingleTarot()">
+      <div class="lodge-item" role="button" tabindex="0" onclick="openSingleTarot()">
         <div class="lodge-icon">🃏</div>
         <div class="lodge-name" data-i18n="lodge.tarot">单张塔罗</div>
         <div class="lodge-desc" data-i18n="lodge.tarotDesc">抽一张牌，获得今日指引</div>
       </div>
-      <div class="lodge-item" onclick="openZodiacMatch()">
+      <div class="lodge-item" role="button" tabindex="0" onclick="openZodiacMatch()">
         <div class="lodge-icon">💫</div>
         <div class="lodge-name" data-i18n="lodge.zodiacMatch">星座速配</div>
         <div class="lodge-desc" data-i18n="lodge.zodiacMatchDesc">测测你和TA的星座缘分</div>
       </div>
       <!-- Row 2: 每日一签 + 今日人品 (centered) -->
-      <div class="lodge-item lodge-daily" onclick="openTempleFortune()">
+      <div class="lodge-item lodge-daily" role="button" tabindex="0" onclick="openTempleFortune()">
         <div class="lodge-icon">🏮</div>
         <div class="lodge-name" data-i18n="lodge.dailyFortune">每日一签</div>
         <div class="lodge-desc" data-i18n="lodge.dailyFortuneDesc">摇一支签，已算星盘者得专属解读</div>
         <div class="lodge-badge" id="templeFortuneBadge" data-i18n="lodge.badge.templeAvailable">今日可求</div>
       </div>
-      <div class="lodge-item lodge-daily" onclick="openDailyRP()">
+      <div class="lodge-item lodge-daily" role="button" tabindex="0" onclick="openDailyRP()">
         <div class="lodge-icon">🎲</div>
         <div class="lodge-name" data-i18n="lodge.dailyRP">今日人品</div>
         <div class="lodge-desc" data-i18n="lodge.dailyRPDesc">已算星盘者基于本命盘专属计算</div>
@@ -385,7 +383,7 @@
 <script defer src="js/astronomy.js?v=20260712"></script>
 <!-- Heavy modules (data, reports, tarot) loaded lazily on first 解读星盘 click -->
 <script defer src="js/compass.js?v=20260712"></script>
-<script defer src="js/fortune.js?v=20260715"></script>
+<script defer src="js/fortune.js?v=20260716"></script>
 <script defer src="js/html-to-image.js?v=20260718"></script>
 <script defer src="js/dailycard.js?v=20260712"></script>
 <script defer src="js/lodge.js?v=20260712"></script>
@@ -517,5 +515,12 @@ try {
 })();
 </script>
 
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/lunarveil-astro/sw.js').catch(function() {});
+  });
+}
+</script>
 </body>
 </html>

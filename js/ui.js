@@ -8,12 +8,12 @@ var DATA_JS = 'js/data.js?v=20260712';
 
 // ── Wrapper: lodge games (answer book / magic ball) need data.js (lazy) ──
 // lodge.js already ran (defer order), so real fns are defined. Override immediately.
-// 注意：每日一签(openDailyFortune)、今日人品(openDailyRP) 不在此列——签筒/轮盘无需 data.js，自己即时渲染+后台预载。
+// 注意：今日人品(openDailyRP) 不在此列——轮盘无需 data.js，自己即时渲染+后台预载。
 (function() {
   var _openAB = openAnswerBook;
   var _openMB = openMagicBall;
   var _ensureData = function(fn) {
-    if (typeof BOOK_ANSWERS === 'function' && typeof BALL_ANSWERS === 'function' && typeof FORTUNE_SLIPS_ZH !== 'undefined') {
+    if (typeof BOOK_ANSWERS === 'function' && typeof BALL_ANSWERS === 'function') {
       fn(); return;
     }
     loadScript(DATA_JS).then(function() { fn(); })
@@ -61,6 +61,17 @@ window.onerror = function(msg, url, line, col, err) {
 };
 window.addEventListener('unhandledrejection', function(e) {
   console.error('Promise Error: ' + String(e.reason));
+
+// ── Keyboard accessibility: Enter/Space on role=button elements ──────────
+document.addEventListener('keydown', function(e) {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute('role') === 'button') {
+    // Don't fire for actual <button> or <a> — they handle it natively
+    var tag = e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+    e.preventDefault();
+    e.target.click();
+  }
+});
 });
 
 
@@ -1655,3 +1666,32 @@ function mailContact() {
   window.location.href = 'mailto:' + addr + '?subject=' + subject;
 }
 
+// ── First-visit onboarding ──────────────────────────────────────────────
+(function() {
+  if (localStorage.getItem('lva_visited')) return;
+  var ONBOARD_DELAY = 800;
+  setTimeout(function() {
+    var toast = document.createElement('div');
+    toast.className = 'onboard-toast';
+    toast.innerHTML =
+      '<div class="onboard-title">✨ ' + _L('欢迎来到 LunarVeilAstro','Welcome to LunarVeilAstro') + '</div>' +
+      '<div class="onboard-desc">' + _L('你的线上星盘与玄学灵性空间','Your online sanctuary for astrology & spiritual divination') + '</div>' +
+      '<div class="onboard-steps">' +
+      '<span>1.</span>' + _L('输入出生信息 → 解锁专属星盘解读','Enter birth info → Unlock your natal chart') + '<br>' +
+      '<span>2.</span>' + _L('浏览本命盘、行运、合盘报告','Explore natal, transit & synastry reports') + '<br>' +
+      '<span>3.</span>' + _L('前往灵性驿站 → 每日求签、塔罗占卜','Visit the Spiritual Lodge → Daily oracle & tarot') +
+      '</div>' +
+      '<button class="onboard-close" onclick="var t=document.querySelector(\'.onboard-toast\');if(t){t.classList.add(\'hiding\');setTimeout(function(){t.remove();},350);}localStorage.setItem(\'lva_visited\',\'1\');">' +
+      _L('开始探索','Start Exploring') +
+      '</button>';
+    document.body.appendChild(toast);
+    // Auto-dismiss after 15s
+    setTimeout(function() {
+      if (toast.parentNode) {
+        toast.classList.add('hiding');
+        setTimeout(function() { if (toast.parentNode) toast.remove(); }, 350);
+        localStorage.setItem('lva_visited', '1');
+      }
+    }, 15000);
+  }, ONBOARD_DELAY);
+})();
